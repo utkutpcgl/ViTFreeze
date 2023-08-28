@@ -158,7 +158,7 @@ class DenseNet(nn.Module):
                         if group['layer_index']==m.layer_index: # freezout specific
                             self.optim.param_groups[i]['lr'] = (0.05/m.lr_ratio)*(1+np.cos(np.pi*self.j/m.max_j))\
                                                               if self.scale_lr else 0.05 * (1+np.cos(np.pi*self.j/m.max_j)) # freezout specific, 0.1 initial learning rate cosine annealing.
-        self.j += 1   
+        self.j += 1   # freezout specific, counting iterations, updated every iteration.
     def forward(self, x):
         out = self.conv1(x)
         out = self.block1(out)
