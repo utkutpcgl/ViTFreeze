@@ -14,7 +14,7 @@ import json
 
 def param_groups_lrd(model, weight_decay=0.05, no_weight_decay_list=[], layer_decay=.75):
     """
-    Parameter groups for layer-wise lr decay
+    Parameter groups for layer-wise lr decay  NOTE for fine tuning phase.
     Following BEiT: https://github.com/microsoft/unilm/blob/master/beit/optim_factory.py#L58
     """
     param_group_names = {}

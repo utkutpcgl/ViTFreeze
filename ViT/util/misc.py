@@ -235,6 +235,7 @@ def init_distributed_mode(args):
 
 
 class NativeScalerWithGradNormCount:
+    """Normalize gradients (clip_grad_norm_) and amp scalar (scale, unscale_)"""
     state_dict_key = "amp_scaler"
 
     def __init__(self):

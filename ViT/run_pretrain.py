@@ -135,8 +135,8 @@ def main(args):
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=True)
         model_without_ddp = model.module
     
-    # following timm
-    param_groups = optim_factory.add_weight_decay(model_without_ddp, args.weight_decay)
+    # following timm, separates biases and normalization parameters (only applies wd to necessary parameters)
+    param_groups = optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay) 
     optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95))
     loss_scaler = NativeScaler()
     print(optimizer)

@@ -16,6 +16,7 @@ import torch
 import torch.nn as nn
 from timm.models.vision_transformer import PatchEmbed, Block
 from util.pos_embed import get_2d_sincos_pos_embed
+import numpy as np
 
 
 class LayerNorm(nn.Module):
@@ -185,6 +186,8 @@ class MaskedAutoencoderViT(nn.Module):
         for hog_enc in self.hog_enc:
             for param in hog_enc.parameters():
                 param.requires_grad = False
+        # Iteration Counter            
+        self.j = 0
 
     def initialize_weights(self):
         # initialization
@@ -264,8 +267,8 @@ class MaskedAutoencoderViT(nn.Module):
 
         # apply Transformer blocks
         latent = []
-        for i in range(len(self.blocks)):
-            x = self.blocks[i](x)
+        for i,block in enumerate(self.blocks):
+            x = block(x) if block.active else block(x).detach()
             if i in self.ID:
                 latent.append(self.norm[self.ID.index(i)](x))
 
@@ -282,6 +285,26 @@ class MaskedAutoencoderViT(nn.Module):
             mask = mask.reshape(B, H//s, s, H//s, s).transpose(2, 3).mean((-2, -1)).reshape(B, -1)
 
         return mask
+
+    def update_lr(self, optim, initial_lr):
+        # Loop over all modules, requires -> self.j and module. active, max_j, layer_index, lr_ratio,
+        for m in self.modules():
+            # If a module is active:
+            if hasattr(m,'active') and m.active:
+                # If we've passed this layer's freezing point, deactivate it.
+                if self.j > m.max_j: 
+                    m.active = False
+                    # Also make sure we remove all this layer from the optimizer
+                    for i,group in enumerate(optim.param_groups):
+                        if group['layer_index']==m.layer_index:
+                            optim.param_groups.remove(group)
+                # If not, update the LR
+                else:
+                    for i,group in enumerate(optim.param_groups):
+                        if group['layer_index']==m.layer_index:
+                            optim.param_groups[i]['lr'] = ((initial_lr/2)/m.lr_ratio)*(1+np.cos(np.pi*self.j/m.max_j))\
+                                                              if self.scale_lr else (initial_lr/2) * (1+np.cos(np.pi*self.j/m.max_j))
+        self.j += 1  
 
     def forward_loss(self, imgs, pred, mask):
         """

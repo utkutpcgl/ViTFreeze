@@ -29,7 +29,7 @@ def train_one_epoch(model, data_loader, optimizer, device, epoch, loss_scaler, l
     header = 'Epoch: [{}]'.format(epoch)
     print_freq = 50
 
-    accum_iter = args.accum_iter
+    accum_iter = args.accum_iter # NOTE Accumulate gradient iterations (for increasing the effective batch size under memory constraints, normally is 1.
 
     optimizer.zero_grad()
 
