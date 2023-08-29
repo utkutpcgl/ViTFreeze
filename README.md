@@ -2,7 +2,7 @@
 
 ## Steps
 
-- Simple guide: <https://chat.openai.com/share/30777d71-4944-41ad-80a3-17dfca5bac7a>
+- Simple guide: [https://chat.openai.com/share/30777d71-4944-41ad-80a3-17dfca5bac7a](https://chat.openai.com/share/30777d71-4944-41ad-80a3-17dfca5bac7a)
 
 ### Step 1: Add FreezeOut Specific Variables
 
@@ -92,6 +92,16 @@ This is a simplified example and you'll need to adapt it to fit into your existi
   ```
   self.optim.param_groups[i]['lr'] = (0.05/m.lr_ratio)*(1+np.cos(np.pi*self.j/m.max_j)) if self.scale_lr else 0.05 * (1+np.cos(np.pi*self.j/m.max_j)
   ```
+
+## Important details about LocalMIM
+
+- TODO:
+- TODO: choose lr, blr and min_lr wisely.
+- TODO: The optimizer is defined on pre-training code, which maybe should be combined with the model itself for it to be similar to freezeout.
+- NOTE: Weight decay is applied selectively to non-bias or normalization layers with: `optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay)`.
+- NOTE: A different decay is applied during fine tuning: `param_groups_lrd`
+- NOTE: Gradient clipping is only applied during fine tuning, not pretraining. Only amp scaling is applied during pretraining.
+- NOTE: For pretraining, accum_iter: Accumulate gradient iterations (for increasing the effective batch size under memory constraints)
 
 ## Important questions
 

@@ -304,7 +304,7 @@ class MaskedAutoencoderViT(nn.Module):
                         if group['layer_index']==m.layer_index:
                             optim.param_groups[i]['lr'] = ((initial_lr/2)/m.lr_ratio)*(1+np.cos(np.pi*self.j/m.max_j))\
                                                               if self.scale_lr else (initial_lr/2) * (1+np.cos(np.pi*self.j/m.max_j))
-        self.j += 1  
+        self.j += 1  # TODO left here.
 
     def forward_loss(self, imgs, pred, mask):
         """
