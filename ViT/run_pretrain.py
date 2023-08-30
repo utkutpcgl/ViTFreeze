@@ -33,6 +33,11 @@ from engine_pretrain import train_one_epoch
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
+# NOTE scale function
+scale_fn = {'linear':lambda x: x,
+            'squared': lambda x: x**2,
+            'cubic': lambda x: x**3}
+
 
 def get_args():
     parser = argparse.ArgumentParser('MAE pre-training', add_help=False)
@@ -121,6 +126,16 @@ def main(args):
     model = models_mim.__dict__[args.model](hog_nbins=args.hog_nbins, hog_bias=args.hog_bias)
     model.to(device)
     model_without_ddp = model
+    # NOTE initialize for freezeout:
+    # TODO replace 1e-1 with initial lr and make sure adamw does not reset the lrs.
+    for module in model.modules():
+        if hasattr(module,'active'): # freezout specific
+            module.lr_ratio = scale_fn[model.how_scale](model.t_0 + (1 - model.t_0) * float(module.layer_index) / model.layer_index) # freezout specific, the ratio to be multiplied with the initial learning rate.
+            module.max_j = args.epochs * 1000 * module.lr_ratio # freezout specific, the maximum count a layer will be trained for (after max_j it will be frozen), hardcoded 1000 iterations per epoch.
+            # Optionally scale the learning rates to have the same total
+            # distance traveled (modulo the  gradients).
+            module.lr = 1e-1 / module.lr_ratio if model.scale_lr else 1e-1 # freezout specific, by lr will be scaled. (either cubic or linear)
+                
     # print("Model = %s" % str(model_without_ddp))
 
     eff_batch_size = args.batch_size*args.accum_iter*misc.get_world_size()
