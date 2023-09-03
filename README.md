@@ -96,8 +96,8 @@ This is a simplified example and you'll need to adapt it to fit into your existi
 ## Important details about LocalMIM
 
 - TODO:
-- TODO: choose lr, blr and min_lr wisely.
-- TODO: The optimizer is defined on pre-training code, which maybe should be combined with the model itself for it to be similar to freezeout.
+- TODO: choose blr and min_lr (should be 0?) wisely.
+- TODO: The optimizer is defined on pre-training code, apply freezeout logic.
 - NOTE: Weight decay is applied selectively to non-bias or normalization layers with: `optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay)`.
 - NOTE: A different decay is applied during fine tuning: `param_groups_lrd`
 - NOTE: Gradient clipping is only applied during fine tuning, not pretraining. Only amp scaling is applied during pretraining.

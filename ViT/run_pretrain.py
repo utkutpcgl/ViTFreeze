@@ -28,6 +28,7 @@ import timm.optim.optim_factory as optim_factory
 
 import util.misc as misc
 from util.misc import NativeScalerWithGradNormCount as NativeScaler
+from util.freezeout_utils import update_lr
 import models_mim
 from engine_pretrain import train_one_epoch
 import warnings
@@ -122,22 +123,7 @@ def main(args):
     else:
         log_writer = None
 
-    # define the model
-    model = models_mim.__dict__[args.model](hog_nbins=args.hog_nbins, hog_bias=args.hog_bias)
-    model.to(device)
-    model_without_ddp = model
-    # NOTE initialize for freezeout:
-    # TODO replace 1e-1 with initial lr and make sure adamw does not reset the lrs.
-    for module in model.modules():
-        if hasattr(module,'active'): # freezout specific
-            module.lr_ratio = scale_fn[model.how_scale](model.t_0 + (1 - model.t_0) * float(module.layer_index) / model.layer_index) # freezout specific, the ratio to be multiplied with the initial learning rate.
-            module.max_j = args.epochs * 1000 * module.lr_ratio # freezout specific, the maximum count a layer will be trained for (after max_j it will be frozen), hardcoded 1000 iterations per epoch.
-            # Optionally scale the learning rates to have the same total
-            # distance traveled (modulo the  gradients).
-            module.lr = 1e-1 / module.lr_ratio if model.scale_lr else 1e-1 # freezout specific, by lr will be scaled. (either cubic or linear)
-                
-    # print("Model = %s" % str(model_without_ddp))
-
+    # NOTE Def effective batch size and lr (represents initial learning rate).
     eff_batch_size = args.batch_size*args.accum_iter*misc.get_world_size()
     if args.lr is None:  # only base_lr is specified
         args.lr = args.blr*eff_batch_size/256
@@ -146,13 +132,36 @@ def main(args):
     print("accumulate grad iterations: %d" % args.accum_iter)
     print("effective batch size: %d" % eff_batch_size)
 
+    # define the model
+    model = models_mim.__dict__[args.model](hog_nbins=args.hog_nbins, hog_bias=args.hog_bias)
+    model.to(device)
+    lr_scale_fn = scale_fn[model.how_scale]
+    t_0 = model.t_0
+    num_of_layers = model.layer_index
+    scale_lr = model.scale_lr # Works in theory with SGD, will work with adamw?
+    for module in model.modules():
+        if hasattr(module,'active'): # freezout specific
+            # the ratio to be multiplied with the initial learning rate.
+            module.lr_ratio = lr_scale_fn(t_0 + (1 - t_0) * float(module.layer_index) / num_of_layers) # freezout specific
+            module.max_j = args.epochs * 1000 * module.lr_ratio # freezout specific, the maximum count a layer will be trained for (after max_j it will be frozen), hardcoded 1000 iterations per epoch.
+            # Optionally scale the learning rates to have the same total
+            # distance traveled (modulo the  gradients).
+            # lr will be scaled. (either cubic or linear)
+            module.lr = args.lr / module.lr_ratio if scale_lr else args.lr # freezout specific, 
+    model_without_ddp = model
+    # print("Model = %s" % str(model_without_ddp))
+
     if args.distributed:
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=True)
         model_without_ddp = model.module
     
+    # TODO make sure adamw does not reset the lrs.
+    # TODO left here, I have to combine param_groups weight decay with freezeout layer specific param_groups logic.
     # following timm, separates biases and normalization parameters (only applies wd to necessary parameters)
     param_groups = optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay) 
-    optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95))
+    # Default optimizer: optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95)) 
+    layer_specific_param_groups = [{'params':m.parameters(), 'lr':m.lr, 'layer_index':m.layer_index} for m in self.modules() if hasattr(m,'active')]
+    optimizer = torch.optim.AdamW(layer_specific_param_groups, betas=(0.9, 0.95)) # freezout specific optimizer
     loss_scaler = NativeScaler()
     print(optimizer)
 

@@ -118,7 +118,7 @@ class DenseNet(nn.Module):
                 # distance traveled (modulo the  gradients).
                 m.lr = 1e-1 / m.lr_ratio if self.scale_lr else 1e-1 # freezout specific, by lr will be scaled. (either cubic or linear)
                 
-        # Optimizer
+        # Optimizer # freezout specific
         self.optim = optim.SGD([{'params':m.parameters(), 'lr':m.lr, 'layer_index':m.layer_index} for m in self.modules() if hasattr(m,'active')],  
                          nesterov=True,momentum=0.9, weight_decay=1e-4) # freezout specific, learning rate is layer dependent
         # Iteration Counter            
