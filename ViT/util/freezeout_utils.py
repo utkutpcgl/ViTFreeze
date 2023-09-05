@@ -3,6 +3,7 @@ from timm.models.vision_transformer import Block # NOTE has internal skip connec
 
 
 # https://chat.openai.com/share/30777d71-4944-41ad-80a3-17dfca5bac7a
+# TODO left here
 class CustomBlock(Block):
     def __init__(self, *args, layer_index=0, **kwargs):
         super().__init__(*args, **kwargs)
