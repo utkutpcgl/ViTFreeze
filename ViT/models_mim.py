@@ -14,7 +14,7 @@ from functools import partial
 import math
 import torch
 import torch.nn as nn
-from timm.models.vision_transformer import PatchEmbed, Block
+from timm.models.vision_transformer import PatchEmbed, Block # NOTE has internal skip connections.
 from util.pos_embed import get_2d_sincos_pos_embed
 import numpy as np
 
@@ -169,6 +169,7 @@ class MaskedAutoencoderViT(nn.Module):
         num_patches = self.patch_embed.num_patches
         self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim))
         self.pos_embed = nn.Parameter(torch.zeros(1, 1+num_patches, embed_dim), requires_grad=False)  # fixed sin-cos embedding
+        # TODO UTKU left here, to add active and layer_index class variables to Block, it should be imported.
         self.blocks = nn.ModuleList([
             Block(embed_dim, num_heads, mlp_ratio, qkv_bias=True, norm_layer=norm_layer) for _ in range(depth)])
         self.ID = [1, 3, depth-3, depth-1]
@@ -186,7 +187,7 @@ class MaskedAutoencoderViT(nn.Module):
         for hog_enc in self.hog_enc:
             for param in hog_enc.parameters():
                 param.requires_grad = False
-        # Iteration Counter            
+        # Freezeout specific Iteration Counter            
         self.j = 0
 
     def initialize_weights(self):

@@ -160,7 +160,7 @@ def main(args):
     # following timm, separates biases and normalization parameters (only applies wd to necessary parameters)
     param_groups = optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay) 
     # Default optimizer: optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95)) 
-    layer_specific_param_groups = [{'params':m.parameters(), 'lr':m.lr, 'layer_index':m.layer_index} for m in self.modules() if hasattr(m,'active')]
+    layer_specific_param_groups = [{'params':m.parameters(), 'lr':m.lr, 'layer_index':m.layer_index} for m in model_without_ddp.modules() if hasattr(m,'active')]
     optimizer = torch.optim.AdamW(layer_specific_param_groups, betas=(0.9, 0.95)) # freezout specific optimizer
     loss_scaler = NativeScaler()
     print(optimizer)
