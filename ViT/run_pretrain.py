@@ -155,6 +155,7 @@ def main(args):
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=True)
         model_without_ddp = model.module
     
+    # TODO solution offered by gpt4: https://chat.openai.com/share/dd81318c-3985-4f32-ae45-0044336d963c
     # TODO make sure adamw does not reset the lrs.
     # TODO left here, I have to combine param_groups weight decay with freezeout layer specific param_groups logic.
     # TODO understand in which configuration to add parameters to the param_groups (only encoder should have layer specific params while all should have unique weight decay.)
