@@ -28,7 +28,7 @@ import timm.optim.optim_factory as optim_factory
 
 import util.misc as misc
 from util.misc import NativeScalerWithGradNormCount as NativeScaler
-from util.freezeout_utils import update_lr
+from util.freezeout_utils import update_lr, create_param_groups #TODO add update_lr
 import models_mim
 from engine_pretrain import train_one_epoch
 import warnings
@@ -160,11 +160,11 @@ def main(args):
     # TODO left here, I have to combine param_groups weight decay with freezeout layer specific param_groups logic.
     # TODO understand in which configuration to add parameters to the param_groups (only encoder should have layer specific params while all should have unique weight decay.)
     # following timm, separates biases and normalization parameters (only applies wd to necessary parameters)
-    param_groups = optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay) 
+    # TODO The model has encoder decoder and hog layer. I want only parameters of the encoder layer to have these freezeout specific layer param_groups.
+    # Default: param_groups = optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay) 
     # Default optimizer: optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95))
-    # The model has encoder decoder and hog layer. I want only parameters of the encoder layer to have these freezeout specific layer param_groups.
-    layer_specific_param_groups = [{'params':m.parameters(), 'lr':m.lr, 'layer_index':m.layer_index} for m in model_without_ddp.modules() if hasattr(m,'active')]
-    optimizer = torch.optim.AdamW(layer_specific_param_groups, betas=(0.9, 0.95)) # freezout specific optimizer
+    optimizer_param_groups = create_param_groups(model_without_ddp)
+    optimizer = torch.optim.AdamW(optimizer_param_groups, betas=(0.9, 0.95)) # freezout specific optimizer
     loss_scaler = NativeScaler()
     print(optimizer)
 
