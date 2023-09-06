@@ -187,8 +187,12 @@ class MaskedAutoencoderViT(nn.Module):
         for hog_enc in self.hog_enc:
             for param in hog_enc.parameters():
                 param.requires_grad = False
-        # Freezeout specific Iteration Counter            
-        self.j = 0
+        # Freezeout specific           
+        self.j = 0 #  Iteration Counter 
+        self.how_scale = "cubic" # scaling method  
+        self.t_0 = 0.5 # Assume the first layer is going to be trained for half of the epochs? TODO modifiy
+        self.layer_index = 1 # Init 0 for now  TODO modifiy
+        self.scale_lr = True # Scale the learning rate for the gradients to integrate to the same values (w.r.t. lr without freezeout)
 
     def initialize_weights(self):
         # initialization
