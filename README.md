@@ -95,13 +95,16 @@ This is a simplified example and you'll need to adapt it to fit into your existi
 
 ## Important details about LocalMIM
 
-- TODO:
-- TODO: choose blr and min_lr (should be 0?) wisely.
-- TODO: The optimizer is defined on pre-training code, apply freezeout logic.
+- TODO: Add block specific freezeout parameters and make sure they are utilized correctly.
+- TODO: Debugging: Try to run some log key statistics, learning rate per layer.
 - NOTE: Weight decay is applied selectively to non-bias or normalization layers with: `optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay)`.
 - NOTE: A different decay is applied during fine tuning: `param_groups_lrd`
 - NOTE: Gradient clipping is only applied during fine tuning, not pretraining. Only amp scaling is applied during pretraining.
 - NOTE: For pretraining, accum_iter: Accumulate gradient iterations (for increasing the effective batch size under memory constraints)
+- NOTE: Gradient Updates: Make sure that setting custom parameter groups doesn't interfere with how gradients are updated. You've mentioned that gradients will be accumulated; ensure that's compatible with your custom parameter groups.
+- NOTE min_lr is 0 based on freeze_out(j/max_j becomes 1 and layer is frozen after that)
+- NOTE: blr is set already, you have to set batch_size to the same number as localmim paper.
+
 
 ## Important questions
 

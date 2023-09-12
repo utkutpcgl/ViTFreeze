@@ -44,7 +44,7 @@ def update_lr(mae_vit_model, optim, initial_lr):
         mae_vit_model.j += 1  # TODO left here.
 
 
-# TODO check again.
+# NOTE checked oK.
 def create_param_groups(model: nn.Module, default_weight_decay=1e-5, default_lr=1e-3):
     """Create param_groups different for freezeout layers (with attribute active), and non-freezeout layers.
     Weight decay is added to non-bias and non normalization(?) layers only.
@@ -67,10 +67,11 @@ def create_param_groups(model: nn.Module, default_weight_decay=1e-5, default_lr=
                 if not param.requires_grad:
                     continue
 
-                # Add the lr and layer_index attributes if they exist in the module
-                param_group = {'params': param, 'lr': getattr(module, 'lr', default_lr), 'layer_index': getattr(module, 'layer_index', None)}
+                # Add the lr and layer_index attributes, they must exist in the module
+                param_group = {'params': param, 'lr': module.lr, 'layer_index': module.layer_index}
 
-                if param.ndim <= 1 or name.endswith(".bias"):
+                # scaling factor (gamma) and the shift (beta), which are both learnable parameters 1-D
+                if param.ndim <= 1 or name.endswith(".bias"): # normalization or bias
                     param_group['weight_decay'] = 0.
                 else:
                     param_group['weight_decay'] = default_weight_decay
@@ -87,7 +88,7 @@ def create_param_groups(model: nn.Module, default_weight_decay=1e-5, default_lr=
                 else:
                     decay.append(param)
 
-    # Create regular decay and no_decay groups
+    # Create regular decay and no_decay groups, you need to specify lr here because it is not given by the optimizer.
     standard_param_groups = [
         {'params': no_decay, 'weight_decay': 0., 'lr': default_lr},
         {'params': decay, 'weight_decay': default_weight_decay, 'lr': default_lr}
