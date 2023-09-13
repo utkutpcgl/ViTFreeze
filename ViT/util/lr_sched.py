@@ -8,6 +8,7 @@ import math
 
 
 def adjust_learning_rate(optimizer, epoch, args):
+    # TODO left here
     # TODO this adjust learning rate has to be adjusted to modify each layers learning rate based on max_j,j,layer_index,lr_ratio and lr.
     """Decay the learning rate with half-cycle cosine after warmup"""
     if epoch < args.warmup_epochs:
