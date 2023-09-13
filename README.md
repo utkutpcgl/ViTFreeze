@@ -102,8 +102,10 @@ This is a simplified example and you'll need to adapt it to fit into your existi
 - NOTE: Gradient clipping is only applied during fine tuning, not pretraining. Only amp scaling is applied during pretraining.
 - NOTE: For pretraining, accum_iter: Accumulate gradient iterations (for increasing the effective batch size under memory constraints)
 - NOTE: Gradient Updates: Make sure that setting custom parameter groups doesn't interfere with how gradients are updated. You've mentioned that gradients will be accumulated; ensure that's compatible with your custom parameter groups.
-- NOTE min_lr is 0 based on freeze_out(j/max_j becomes 1 and layer is frozen after that)
+- NOTE: min_lr is 0 based on freeze_out(j/max_j becomes 1 and layer is frozen after that)
 - NOTE: blr is set already, you have to set batch_size to the same number as localmim paper.
+- NOTE: the cls token serves as global image context summarizer, but here (MIM) it does not have a clear purpose (can be frozen)
+
 
 
 ## Important questions

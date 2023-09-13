@@ -66,7 +66,7 @@ def create_param_groups(model: nn.Module, default_weight_decay=1e-5, default_lr=
             for param in module.parameters():
                 if not param.requires_grad:
                     continue
-
+                # NOTE this part creates a new parameter group with or without weight decay.
                 # Add the lr and layer_index attributes, they must exist in the module
                 param_group = {'params': param, 'lr': module.lr, 'layer_index': module.layer_index}
 

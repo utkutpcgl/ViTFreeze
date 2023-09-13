@@ -164,17 +164,49 @@ class MaskedAutoencoderViT(nn.Module):
     def __init__(self, img_size=224, patch_size=16, in_chans=3, embed_dim=1024, depth=24, num_heads=16, decoder_embed_dim=512,
                  decoder_depth=1, decoder_num_heads=16, mlp_ratio=4., norm_layer=nn.LayerNorm, hog_nbins=9, hog_bias=False, **kwargs):
         super().__init__()
+        # Freezeout specific           
+        self.j = 0 #  Iteration Counter 
+        self.how_scale = "cubic" # scaling method  
+        self.t_0 = 0.5 # Assume the first layer is going to be trained for half of the epochs? TODO modifiy
+        self.scale_lr = True # Scale the learning rate for the gradients to integrate to the same values (w.r.t. lr without freezeout)
+        initial_layer_index = 2 # NOTE there are 2 layers before blocks start
+        self.cum_layer_index = initial_layer_index # NOTE serves as a layer count
+
+        # NOTE dynamically add attributes to instances of Python classes at runtime
         # MIM encoder specifics
         self.patch_embed = PatchEmbed(img_size, patch_size, in_chans, embed_dim)
+        self.patch_embed.layer_index = 0 # Freezeout specific
+        self.patch_embed.active = True # Freezeout specific
         num_patches = self.patch_embed.num_patches
+        # NOTE UTKU Normally the cls token serves as global image context summarizer, but here (MIM) it does not have a clear purpose (can be frozen)
         self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim))
+        self.cls_token.layer_index = 1 # Freezeout specific
+        self.cls_token.active = True # Freezeout specific
         self.pos_embed = nn.Parameter(torch.zeros(1, 1+num_patches, embed_dim), requires_grad=False)  # fixed sin-cos embedding
-        # TODO UTKU left here, to add active and layer_index class variables to Block, it should be imported.
-        self.blocks = nn.ModuleList([
-            Block(embed_dim, num_heads, mlp_ratio, qkv_bias=True, norm_layer=norm_layer) for _ in range(depth)])
-        self.ID = [1, 3, depth-3, depth-1]
-        self.scale = [4.0, 2.0, 1.0, 0.5]
-        self.norm = nn.ModuleList([norm_layer(embed_dim) for _ in range(len(self.ID))])
+        blocks = [] # Freezeout specific
+        for _ in range(depth): # Freezeout specific
+            block = Block(embed_dim, num_heads, mlp_ratio, qkv_bias=True, norm_layer=norm_layer)
+            block.layer_index = self.cum_layer_index # Freezeout specific
+            block.active = True # Freezeout specific
+            blocks.append(block) # Freezeout specific
+            self.cum_layer_index += 1 # Freezeout specific
+        self.blocks = nn.ModuleList(blocks) # Freezeout specific
+
+        # Original blocks
+        # self.blocks = nn.ModuleList([
+        #     Block(embed_dim, num_heads, mlp_ratio, qkv_bias=True, norm_layer=norm_layer) for _ in range(depth)])
+        self.ID = [1, 3, depth-3, depth-1] # NOTE layers that are the inputs to decoder (fed features)
+        self.scale = [4.0, 2.0, 1.0, 0.5] # NOTE scaling factors of the decoder outputs
+
+        norms = []# Freezeout specific
+        for ID_layer_index in self.ID:# Freezeout specific
+            norm = norm_layer(embed_dim)
+            block_layer_index = blocks[ID_layer_index].layer_index
+            norm.layer_index = block_layer_index # Freezeout specific
+            norm.active =True# Freezeout specific
+            norms.append(norm)# Freezeout specific
+        self.norm = nn.ModuleList(norms)# Freezeout specific
+        # Original normalization layers: self.norm = nn.ModuleList([norm_layer(embed_dim) for _ in range(len(self.ID))])
         self.initialize_weights()
 
         # MIM decoder specifics
@@ -187,13 +219,7 @@ class MaskedAutoencoderViT(nn.Module):
         for hog_enc in self.hog_enc:
             for param in hog_enc.parameters():
                 param.requires_grad = False
-        # Freezeout specific           
-        self.j = 0 #  Iteration Counter 
-        self.how_scale = "cubic" # scaling method  
-        self.t_0 = 0.5 # Assume the first layer is going to be trained for half of the epochs? TODO modifiy
-        self.layer_index = 1 # Init 0 for now  TODO modifiy
-        self.scale_lr = True # Scale the learning rate for the gradients to integrate to the same values (w.r.t. lr without freezeout)
-
+        
     def initialize_weights(self):
         # initialization
         pos_embed = get_2d_sincos_pos_embed(self.pos_embed.shape[-1], int(self.patch_embed.num_patches**.5), cls_token=True)
@@ -265,7 +291,7 @@ class MaskedAutoencoderViT(nn.Module):
         # masking: length -> length * mask_ratio
         x, mask, ids_restore = self.random_masking(x, mask_ratio)
 
-        # append cls token
+        # append cls token # NOTE the class token is just appended to the input data (with pos embedding)
         cls_token = self.cls_token + self.pos_embed[:, :1]
         cls_tokens = cls_token.expand(x.shape[0], -1, -1)
         x = torch.cat((cls_tokens, x), dim=1)
@@ -275,7 +301,9 @@ class MaskedAutoencoderViT(nn.Module):
         for i,block in enumerate(self.blocks):
             x = block(x) if block.active else block(x).detach()
             if i in self.ID:
-                latent.append(self.norm[self.ID.index(i)](x))
+                norm = self.norm[self.ID.index(i)]
+                assert norm.layer_index == block.layer_index, "norm and block layer indices are mismatched"
+                latent.append(norm(x))
 
         return latent, mask, ids_restore
 

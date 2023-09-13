@@ -103,19 +103,19 @@ def main(args):
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
-    dataset_train = datasets.ImageFolder(os.path.join(args.data_path, 'train'), transform=transform_train)
+    # dataset_train = datasets.ImageFolder(os.path.join(args.data_path, 'train'), transform=transform_train)
     # print(dataset_train)
     num_tasks = misc.get_world_size()
     global_rank = misc.get_rank()
-    sampler_train = torch.utils.data.DistributedSampler(dataset_train, num_replicas=num_tasks, rank=global_rank, shuffle=True)
-    print("Sampler_train = %s" % str(sampler_train))
-    data_loader_train = torch.utils.data.DataLoader(
-        dataset_train,
-        sampler=sampler_train,
-        batch_size=args.batch_size,
-        num_workers=args.num_workers,
-        pin_memory=args.pin_mem,
-        drop_last=True)
+    # sampler_train = torch.utils.data.DistributedSampler(dataset_train, num_replicas=num_tasks, rank=global_rank, shuffle=True)
+    # print("Sampler_train = %s" % str(sampler_train))
+    # data_loader_train = torch.utils.data.DataLoader(
+    #     dataset_train,
+    #     sampler=sampler_train,
+    #     batch_size=args.batch_size,
+    #     num_workers=args.num_workers,
+    #     pin_memory=args.pin_mem,
+    #     drop_last=True)
 
     if global_rank == 0 and args.log_dir is not None:
         os.makedirs(args.log_dir, exist_ok=True)
@@ -155,15 +155,16 @@ def main(args):
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=True)
         model_without_ddp = model.module
     
-    # TODO solution offered by gpt4: https://chat.openai.com/share/dd81318c-3985-4f32-ae45-0044336d963c
-    # TODO make sure adamw does not reset the lrs.
-    # TODO left here, I have to combine param_groups weight decay with freezeout layer specific param_groups logic.
-    # TODO understand in which configuration to add parameters to the param_groups (only encoder should have layer specific params while all should have unique weight decay.)
-    # following timm, separates biases and normalization parameters (only applies wd to necessary parameters)
-    # TODO The model has encoder decoder and hog layer. I want only parameters of the encoder layer to have these freezeout specific layer param_groups.
+    # TODO understand in which configuration to add parameters to the param_groups (only encoder
+    # should have layer specific params while all should have unique weight decay.)
+    # following timm, separates biases and normalization parameters 
+    # (only applies wd to necessary parameters)
+    # TODO The model has encoder decoder and hog layer. I want only parameters of the encoder layer
+    # to have these freezeout specific layer param_groups.
     # Default: param_groups = optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay) 
     # Default optimizer: optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95))
     optimizer_param_groups = create_param_groups(model_without_ddp)
+    # NOTE parameters groups set with explicit learning_rate (or other params) will ignore the learning rate of AdamW arguments.
     optimizer = torch.optim.AdamW(optimizer_param_groups, betas=(0.9, 0.95)) # freezout specific optimizer
     loss_scaler = NativeScaler()
     print(optimizer)

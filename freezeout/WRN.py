@@ -84,6 +84,7 @@ class DenseNet(nn.Module):
         self.layer_index = 1 # freezout specific
         
         # 1st block
+        # NOTE _make_layer modifies layer_index
         self.block1 = self._make_layer(n, nChannels[0], nChannels[1], block, 1, dropRate)
         # 2nd block
         self.block2 = self._make_layer(n, nChannels[1], nChannels[2], block, 2, dropRate)
