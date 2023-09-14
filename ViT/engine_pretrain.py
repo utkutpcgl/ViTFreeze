@@ -20,6 +20,7 @@ import datetime
 
 import util.misc as misc
 import util.lr_sched as lr_sched
+import util.freezeout_utils as fo_sched
 
 
 def train_one_epoch(model, data_loader, optimizer, device, epoch, loss_scaler, log_writer=None, args=None):
@@ -42,7 +43,10 @@ def train_one_epoch(model, data_loader, optimizer, device, epoch, loss_scaler, l
         start = time.time()
         # we use a per iteration (instead of per epoch) lr scheduler
         if data_iter_step % accum_iter == 0:
-            lr_sched.adjust_learning_rate(optimizer, data_iter_step/len(data_loader)+epoch, args)
+            # Default was: lr_sched.adjust_learning_rate(optimizer, data_iter_step/len(data_loader)+epoch, args)
+            # NOTE lr and attributes have to be set for all models (all ranks.)
+            # TODO CHECK update based on iterations.
+            fo_sched.adjust_learning_rate_fo(model, optimizer, epoch, data_iter_step, iter_per_epoch=len(data_loader), args=args)
 
         samples = samples.to(device, non_blocking=True)
         with torch.cuda.amp.autocast():
