@@ -165,7 +165,6 @@ class MaskedAutoencoderViT(nn.Module):
                  decoder_depth=1, decoder_num_heads=16, mlp_ratio=4., norm_layer=nn.LayerNorm, hog_nbins=9, hog_bias=False, **kwargs):
         super().__init__()
         # Freezeout specific           
-        self.j = 0 #  Iteration Counter 
         self.how_scale = "cubic" # scaling method  
         self.t_0 = 0.5 # Assume the first layer is going to be trained for half of the epochs? TODO modifiy
         self.scale_lr = True # Scale the learning rate for the gradients to integrate to the same values (w.r.t. lr without freezeout)
@@ -203,7 +202,7 @@ class MaskedAutoencoderViT(nn.Module):
             norm = norm_layer(embed_dim)
             block_layer_index = blocks[ID_layer_index].layer_index
             norm.layer_index = block_layer_index # Freezeout specific
-            norm.active =True# Freezeout specific
+            norm.active = True# Freezeout specific
             norms.append(norm)# Freezeout specific
         self.norm = nn.ModuleList(norms)# Freezeout specific
         # Original normalization layers: self.norm = nn.ModuleList([norm_layer(embed_dim) for _ in range(len(self.ID))])
@@ -214,7 +213,7 @@ class MaskedAutoencoderViT(nn.Module):
             MAE_Decoder(embed_dim, decoder_embed_dim, in_chans*hog_nbins, s, num_patches, decoder_depth, decoder_num_heads, mlp_ratio, True, norm_layer)
             for s in self.scale])
 
-        # target
+        # target, NOTE not learnable hog layer
         self.hog_enc = nn.ModuleList([HOGLayer(nbins=hog_nbins, pool=k, bias=hog_bias) for k in [4, 8, 16, 32]])
         for hog_enc in self.hog_enc:
             for param in hog_enc.parameters():
@@ -297,9 +296,12 @@ class MaskedAutoencoderViT(nn.Module):
         x = torch.cat((cls_tokens, x), dim=1)
 
         # apply Transformer blocks
+        # NOTE as the transformer has skip connection, the first input will flow till the end untouched.
         latent = []
         for i,block in enumerate(self.blocks):
-            x = block(x) if block.active else block(x).detach()
+            # NOTE x already detached if necessary with requires_grad
+            # Freezeout originally: x = block(x) if block.active else block(x).detach()
+            x = block(x)
             if i in self.ID:
                 norm = self.norm[self.ID.index(i)]
                 assert norm.layer_index == block.layer_index, "norm and block layer indices are mismatched"
