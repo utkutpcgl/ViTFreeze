@@ -95,8 +95,7 @@ This is a simplified example and you'll need to adapt it to fit into your existi
 
 ## Important details about LocalMIM
 
-- TODO: Add block specific freezeout parameters and make sure they are utilized correctly. (TODO left here)
-- TODO: Debugging: Try to run some log key statistics, learning rate per layer.
+- TODO: Test, check evaluate all changes (TODO left here) / Debugging: Try to run some log key statistics, learning rate per layer.
 - NOTE: Weight decay is applied selectively to non-bias or normalization layers with: `optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay)`.
 - NOTE: A different decay is applied during fine tuning: `param_groups_lrd`
 - NOTE: Gradient clipping is only applied during fine tuning, not pretraining. Only amp scaling is applied during pretraining.
