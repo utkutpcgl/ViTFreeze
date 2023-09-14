@@ -14,7 +14,7 @@ Modify the optimizer to take into account the `lr_ratio` for each layer, similar
 
 ### Step 3: Update Learning Rate
 
-Implement a function to update the learning rate and freeze layers based on the `max_j` and `j` (iteration count), similar to the `update_lr` function in the Wide ResNet model.
+Implement a function to update the learning rate and freeze layers based on the `max_j` and `j` (iteration count), similar to the `update_lr` function in the Wide ResNet model. Both freezeout and localmim uses iteration count as steps for cosine annealing.
 
 ### Step 4: Modify the Forward Pass
 
@@ -105,6 +105,9 @@ This is a simplified example and you'll need to adapt it to fit into your existi
 - NOTE: min_lr is 0 based on freeze_out(j/max_j becomes 1 and layer is frozen after that)
 - NOTE: blr is set already, you have to set batch_size to the same number as localmim paper.
 - NOTE: the cls token serves as global image context summarizer, but here (MIM) it does not have a clear purpose (can be frozen)
+- NOTE as the transformer has skip connection, the first input will flow till the end untouched.
+- NOTE localmim and freezeout both use epoch count for cosine annealing.
+
 
 
 
