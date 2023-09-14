@@ -28,7 +28,7 @@ import timm.optim.optim_factory as optim_factory
 
 import util.misc as misc
 from util.misc import NativeScalerWithGradNormCount as NativeScaler
-from util.freezeout_utils import update_lr, create_param_groups #TODO add update_lr
+from util.freezeout_utils import create_param_groups
 import models_mim
 from engine_pretrain import train_one_epoch
 import warnings
@@ -135,19 +135,16 @@ def main(args):
     # define the model
     model = models_mim.__dict__[args.model](hog_nbins=args.hog_nbins, hog_bias=args.hog_bias)
     model.to(device)
-    lr_scale_fn = scale_fn[model.how_scale]
-    t_0 = model.t_0
-    num_of_layers = model.layer_index
-    scale_lr = model.scale_lr # Works in theory with SGD, will work with adamw?
+    lr_scale_fn = scale_fn[model.how_scale] # freezeout spec
+    t_0 = model.t_0 # freezeout spec
+    num_of_layers = model.layer_index # freezeout spec
+    iterations_per_epoch = len(data_loader_train) # NOTE (len(dataset)/batch_size).
     for module in model.modules():
         if hasattr(module,'active'): # freezout specific
             # the ratio to be multiplied with the initial learning rate.
             module.lr_ratio = lr_scale_fn(t_0 + (1 - t_0) * float(module.layer_index) / num_of_layers) # freezout specific
-            module.max_j = args.epochs * 1000 * module.lr_ratio # freezout specific, the maximum count a layer will be trained for (after max_j it will be frozen), hardcoded 1000 iterations per epoch.
-            # Optionally scale the learning rates to have the same total
-            # distance traveled (modulo the  gradients).
-            # lr will be scaled. (either cubic or linear)
-            module.lr = args.lr / module.lr_ratio if scale_lr else args.lr # freezout specific, 
+            # NOTE iterations set auto instead of 1000 (so in freezeout), warmup is not included.
+            module.max_iteration = (args.epochs-args.warmup_epochs) * iterations_per_epoch * module.lr_ratio # freezout specific, the maximum count a layer will be trained for (after max_iteration it will be frozen), hardcoded 1000 iterations per epoch.
     model_without_ddp = model
     # print("Model = %s" % str(model_without_ddp))
 
@@ -155,12 +152,7 @@ def main(args):
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=True)
         model_without_ddp = model.module
     
-    # TODO understand in which configuration to add parameters to the param_groups (only encoder
-    # should have layer specific params while all should have unique weight decay.)
-    # following timm, separates biases and normalization parameters 
-    # (only applies wd to necessary parameters)
-    # TODO The model has encoder decoder and hog layer. I want only parameters of the encoder layer
-    # to have these freezeout specific layer param_groups.
+    # NOTE I want only parameters of the encoder layer to have these freezeout specific param_groups.
     # Default: param_groups = optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay) 
     # Default optimizer: optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95))
     optimizer_param_groups = create_param_groups(model_without_ddp)
