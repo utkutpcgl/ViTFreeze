@@ -2,8 +2,46 @@ import numpy as np
 from timm.models.vision_transformer import Block # NOTE has internal skip connections.
 from torch import nn
 import math
+import pandas as pd
+import matplotlib.pyplot as plt
+
+LR_LOG_FO = {'iteration': []}
+LOG_ITERATION_FREQ = 5 # log per iteration frequency
+PLOT_LR_FREQ = 5
+
+# LR VIS AND LOGGING
+def log_and_plot_lrs(cur_global_iteration):
+    if cur_global_iteration % LOG_ITERATION_FREQ == 0:
+        save_xl_fo(cur_global_iteration) # log to excel
+    if cur_global_iteration % PLOT_LR_FREQ == 0:
+        plot_learning_rates()
+
+def log_lr_fo(layer_index, lr):
+    layer_key = f'freezeout_layer_{layer_index}_lr'
+    if layer_key not in LR_LOG_FO:
+        LR_LOG_FO[layer_key] = []
+    LR_LOG_FO[layer_key].append(lr)
+
+def save_xl_fo(cur_global_iteration):
+    # Log the current iteration
+    LR_LOG_FO['iteration'].append(cur_global_iteration)
+    # Save learning rates to Excel
+    pd.DataFrame(LR_LOG_FO).to_excel('learning_rates.xlsx', index=False)
+
+def plot_learning_rates():
+    df = pd.read_excel('learning_rates.xlsx')
+    for column in df.columns:
+        if column != 'iteration':
+            plt.plot(df['iteration'], df[column], label=column)
+    plt.legend()
+    plt.xlabel('Iteration')
+    plt.ylabel('Learning Rate')
+    plt.title('Learning Rates per Layer per Iteration')
+    plt.savefig('learning_rates.png')
+    
 
 
+# LR UPDATING
 # NOTE checked oK.
 def create_param_groups(model: nn.Module, default_weight_decay=1e-5, default_lr=1e-3):
     """Create param_groups different for freezeout layers (with attribute active), and non-freezeout layers.
@@ -99,7 +137,9 @@ def adjust_learning_rate_fo(model, optimizer, epoch, cur_local_iteration, param_
         non_freezeout_param_groups = param_groups["non_freezeout"]
         update_non_freezeout_layers_lr(non_freezeout_param_groups, lmim_cosine_lr)
         update_freezeout_layers_lr(model, cur_global_iteration, optimizer, freezeout_param_groups, initial_lr=args.lr)
-        validate_same_objects(optimizer, freezeout_param_groups) #
+        validate_same_objects(optimizer, freezeout_param_groups)
+        log_and_plot_lrs(cur_global_iteration)
+
 
 def update_freezeout_layers_lr(model, cur_global_iteration, optim, freezeout_param_groups, initial_lr):
         """initial_lr: The default learning rate of the overall model before scaling (after warmup)
@@ -114,6 +154,7 @@ def update_freezeout_layers_lr(model, cur_global_iteration, optim, freezeout_par
                 target_freezeout_param_group = freezeout_param_groups[m.layer_index]
                 # If we've passed this layer's freezing point, deactivate it.
                 if cur_global_iteration > m.max_iteration: 
+                    lr = 0
                     m.active = False
                     m.requires_grad = False # NOTE detach is no longer necessary in the forward passes.
                     # Also make sure we remove all this layer from the optimizer
@@ -124,11 +165,15 @@ def update_freezeout_layers_lr(model, cur_global_iteration, optim, freezeout_par
                     layer_wise_initial_lr = m.initial_lr # NOTE lr_ratio scaled lrs per layer
                     lr = (layer_wise_initial_lr/2)*(1+np.cos(np.pi*cur_global_iteration/m.max_iteration))
                     target_freezeout_param_group['lr'] = lr
+                # Add the learning rate of this layer to the log
+                log_lr_fo(layer_index=m.layer_index, lr=lr)
         assert active_attr_count > 15, "active_attr_count should be at least around 20 (layers)"
+
 
 def update_non_freezeout_layers_lr(non_freezeout_param_groups, lmim_cosine_lr):
     for non_freezeout_param_group in non_freezeout_param_groups:
         non_freezeout_param_group['lr'] = lmim_cosine_lr
+
 
 def get_param_groups(optimizer):
     """To access the param_groups with specific layer_indexes of the freezeout layers faster.
