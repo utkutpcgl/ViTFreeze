@@ -28,7 +28,7 @@ import timm.optim.optim_factory as optim_factory
 
 import util.misc as misc
 from util.misc import NativeScalerWithGradNormCount as NativeScaler
-from util.freezeout_utils import create_param_groups
+from util.freezeout_utils import create_param_groups, get_param_groups, validate_same_objects
 import models_mim
 from engine_pretrain import train_one_epoch
 import warnings
@@ -143,6 +143,7 @@ def main(args):
         if hasattr(module,'active'): # freezout specific
             # the ratio to be multiplied with the initial learning rate.
             module.lr_ratio = lr_scale_fn(t_0 + (1 - t_0) * float(module.layer_index) / num_of_layers) # freezout specific
+            module.initial_lr = args.lr/module.lr_ratio if model.scale_lr else args.lr # freezout specific
             # NOTE iterations set auto instead of 1000 (so in freezeout), warmup is not included.
             module.max_iteration = (args.epochs-args.warmup_epochs) * iterations_per_epoch * module.lr_ratio # freezout specific, the maximum count a layer will be trained for (after max_iteration it will be frozen), hardcoded 1000 iterations per epoch.
     model_without_ddp = model
@@ -158,6 +159,8 @@ def main(args):
     optimizer_param_groups = create_param_groups(model_without_ddp)
     # NOTE parameters groups set with explicit learning_rate (or other params) will ignore the learning rate of AdamW arguments.
     optimizer = torch.optim.AdamW(optimizer_param_groups, betas=(0.9, 0.95)) # freezout specific optimizer
+    param_groups = get_param_groups(optimizer) # freezout specific
+    validate_same_objects(optimizer, param_groups["freezeout"]) # freezout specific assertion
     loss_scaler = NativeScaler()
     print(optimizer)
 
@@ -168,7 +171,7 @@ def main(args):
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
             data_loader_train.sampler.set_epoch(epoch)
-        train_stats = train_one_epoch(model, data_loader_train, optimizer, device, epoch, loss_scaler, log_writer=log_writer, args=args)
+        train_stats = train_one_epoch(model, data_loader_train, optimizer, device, epoch, loss_scaler, param_groups, log_writer=log_writer, args=args)
         if args.output_dir and (epoch%50 == 0 or epoch+1 == args.epochs):
             misc.save_model(args=args, model=model, model_without_ddp=model_without_ddp, optimizer=optimizer, loss_scaler=loss_scaler, epoch=epoch)
 
