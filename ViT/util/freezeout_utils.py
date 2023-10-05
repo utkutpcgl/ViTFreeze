@@ -6,15 +6,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 LR_LOG_FO = {'iteration': []}
-LOG_ITERATION_FREQ = 5 # log per iteration frequency
-PLOT_LR_FREQ = 5
+LR_LOG_NFO = {'iteration': [], "non_freezeout_layers_lr": []}
+# LOG_ITERATION_FREQ = 5 # log per iteration frequency
+# PLOT_LR_FREQ = 5
 
 # LR VIS AND LOGGING
 def log_and_plot_lrs(cur_global_iteration):
-    if cur_global_iteration % LOG_ITERATION_FREQ == 0:
-        save_xl_fo(cur_global_iteration) # log to excel
-    if cur_global_iteration % PLOT_LR_FREQ == 0:
-        plot_learning_rates()
+    # if cur_global_iteration % LOG_ITERATION_FREQ == 0:
+    save_xl(cur_global_iteration) # log to excel
+    # if cur_global_iteration % PLOT_LR_FREQ == 0:
+    plot_learning_rates()
 
 def log_lr_fo(layer_index, lr):
     layer_key = f'freezeout_layer_{layer_index}_lr'
@@ -22,22 +23,38 @@ def log_lr_fo(layer_index, lr):
         LR_LOG_FO[layer_key] = []
     LR_LOG_FO[layer_key].append(lr)
 
-def save_xl_fo(cur_global_iteration):
+def log_lr_nfo(lr):
+    LR_LOG_NFO['non_freezeout_layers_lr'].append(lr)
+
+def save_xl(cur_global_iteration):
+    # TODO save_xl is not called simulatenously with lr logging, this can cause iteration lr mismatch fix it.
     # Log the current iteration
     LR_LOG_FO['iteration'].append(cur_global_iteration)
+    LR_LOG_NFO['iteration'].append(cur_global_iteration)
     # Save learning rates to Excel
-    pd.DataFrame(LR_LOG_FO).to_excel('learning_rates.xlsx', index=False)
+    pd.DataFrame(LR_LOG_FO).to_excel('learning_rates_fo.xlsx', index=False)
+    pd.DataFrame(LR_LOG_NFO).to_excel('learning_rates_nfo.xlsx', index=False)
 
 def plot_learning_rates():
-    df = pd.read_excel('learning_rates.xlsx')
-    for column in df.columns:
+    df_fo = pd.read_excel('learning_rates_fo.xlsx')
+    for column in df_fo.columns:
         if column != 'iteration':
-            plt.plot(df['iteration'], df[column], label=column)
+            plt.plot(df_fo['iteration'], df_fo[column], label=column)
     plt.legend()
     plt.xlabel('Iteration')
     plt.ylabel('Learning Rate')
-    plt.title('Learning Rates per Layer per Iteration')
-    plt.savefig('learning_rates.png')
+    plt.title('Learning Rates per Layer per Iteration FO')
+    plt.savefig('learning_rates_fo.png')
+
+    df_nfo = pd.read_excel('learning_rates_nfo.xlsx')
+    for column in df_nfo.columns:
+        if column != 'iteration':
+            plt.plot(df_nfo['iteration'], df_nfo[column], label=column)
+    plt.legend()
+    plt.xlabel('Iteration')
+    plt.ylabel('Learning Rate')
+    plt.title('Learning Rates per Layer per Iteration NFO')
+    plt.savefig('learning_rates_nfo.png')
     
 
 
@@ -149,8 +166,8 @@ def update_freezeout_layers_lr(model, cur_global_iteration, optim, freezeout_par
         active_attr_count = 0
         for m in model.modules():
             # If a module is active:
-            active_attr_count = active_attr_count + 1 if hasattr(m,'active') else active_attr_count
             if hasattr(m,'active') and m.active:
+                active_attr_count += 1
                 target_freezeout_param_group = freezeout_param_groups[m.layer_index]
                 # If we've passed this layer's freezing point, deactivate it.
                 if cur_global_iteration > m.max_iteration: 
@@ -158,8 +175,9 @@ def update_freezeout_layers_lr(model, cur_global_iteration, optim, freezeout_par
                     m.active = False
                     m.requires_grad = False # NOTE detach is no longer necessary in the forward passes.
                     # Also make sure we remove all this layer from the optimizer
-                    del freezeout_param_groups[m.layer_index] # NOTE UTKU is this line necessary?
                     optim.param_groups.remove(target_freezeout_param_group)
+                    if freezeout_param_groups[m.layer_index] is not None: # delete if exists
+                        del freezeout_param_groups[m.layer_index] # NOTE UTKU is this line necessary?
                 else:
                     # update the LR
                     layer_wise_initial_lr = m.initial_lr # NOTE lr_ratio scaled lrs per layer
@@ -167,19 +185,23 @@ def update_freezeout_layers_lr(model, cur_global_iteration, optim, freezeout_par
                     target_freezeout_param_group['lr'] = lr
                 # Add the learning rate of this layer to the log
                 log_lr_fo(layer_index=m.layer_index, lr=lr)
-        assert active_attr_count > 15, "active_attr_count should be at least around 20 (layers)"
+        if cur_global_iteration < 50: # assert only for initial iterations
+            assert active_attr_count > 15, "active_attr_count should be at least around 20 (layers)"
 
 
 def update_non_freezeout_layers_lr(non_freezeout_param_groups, lmim_cosine_lr):
+    """This method updates non-freezeout layers lr.
+    Cosine annealng applied previously to lr is lmim_cosine_lr."""
     for non_freezeout_param_group in non_freezeout_param_groups:
         non_freezeout_param_group['lr'] = lmim_cosine_lr
+    log_lr_nfo(lr=lmim_cosine_lr)
 
 
 def get_param_groups(optimizer):
     """To access the param_groups with specific layer_indexes of the freezeout layers faster.
     NOTE that changes of the optimizer param_groups will reflect to the param_groups in freezeout_param_groups
     as they point to the same objects."""
-    non_freezeout_param_groups = {}
+    non_freezeout_param_groups = []
     freezeout_param_groups = {}
     for param_group in optimizer.param_groups:
         if hasattr(param_group, "layer_index"):
