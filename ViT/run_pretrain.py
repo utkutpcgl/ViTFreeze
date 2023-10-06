@@ -64,7 +64,7 @@ def get_args():
     # Dataset parameters
     parser.add_argument('--data_path', default='./dataset/ImageNet/train/', type=str, help='dataset path')
     parser.add_argument('--output_dir', default='./output/MAE_ViT_B', help='path where to save, empty for no saving')
-    parser.add_argument('--log_dir', default=None, help='path where to tensorboard log')
+    parser.add_argument('--log_dir', default="runs/pretrain/exp", help='path where to tensorboard log')
     parser.add_argument('--device', default='cuda', help='device to use for training/testing')
     parser.add_argument('--seed', default=0, type=int)
     parser.add_argument('--resume', default='', help='resume from checkpoint')
@@ -156,10 +156,10 @@ def main(args):
     # NOTE I want only parameters of the encoder layer to have these freezeout specific param_groups.
     # Default: param_groups = optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay) 
     # Default optimizer: optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95))
-    optimizer_param_groups = create_param_groups(model_without_ddp)
+    optimizer_param_groups = create_param_groups(model_without_ddp,log_writer=log_writer)
     # NOTE parameters groups set with explicit learning_rate (or other params) will ignore the learning rate of AdamW arguments.
     optimizer = torch.optim.AdamW(optimizer_param_groups, betas=(0.9, 0.95)) # freezout specific optimizer
-    param_groups = get_param_groups(optimizer) # freezout specific
+    param_groups = get_param_groups(optimizer, test=False, log_writer=log_writer) # freezout specific
     validate_same_objects(optimizer, param_groups["freezeout"]) # freezout specific assertion
     loss_scaler = NativeScaler()
     print(optimizer)
