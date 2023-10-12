@@ -45,7 +45,6 @@ def train_one_epoch(model, data_loader, optimizer, device, epoch, loss_scaler, p
         if data_iter_step % accum_iter == 0:
             # Default was: lr_sched.adjust_learning_rate(optimizer, data_iter_step/len(data_loader)+epoch, args)
             # NOTE lr and attributes have to be set for all models (all ranks.)
-            # TODO CHECK update based on iterations.
             fo_sched.adjust_learning_rate_freezeout(model, optimizer, epoch, data_iter_step, param_groups, iter_per_epoch=len(data_loader), writer=log_writer, args=args)
 
         samples = samples.to(device, non_blocking=True)
