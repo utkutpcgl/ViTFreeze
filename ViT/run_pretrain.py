@@ -47,6 +47,7 @@ def get_args():
     parser.add_argument('--accum_iter', default=1, type=int, help='Accumulate gradient iterations (for increasing the effective batch size under memory constraints)')
 
     # Model parameters
+    #TODO check the params.
     parser.add_argument('--model', default='MIM_vit_large_patch16', type=str, help='Name of model to train') # NOTE was mae_vit_large_patch16
     parser.add_argument('--input_size', default=224, type=int, help='images input size')
     parser.add_argument('--mask_ratio', default=0.75, type=float, help='Masking ratio (percentage of removed patches).')
@@ -62,7 +63,8 @@ def get_args():
     parser.add_argument('--warmup_epochs', type=int, default=40, help='epochs to warmup LR')
 
     # Dataset parameters
-    parser.add_argument('--data_path', default='./dataset/ImageNet/train/', type=str, help='dataset path')
+    parser.add_argument('--data_path', default='/raid/utku/datasets/imagenet/classification/train/demo_dataset/', type=str, help='dataset path orig: /raid/utku/datasets/imagenet/classification/train/image_folders \
+                        demo: /raid/utku/datasets/imagenet/classification/train/demo_dataset/' )
     parser.add_argument('--output_dir', default='./output/MAE_ViT_B', help='path where to save, empty for no saving')
     parser.add_argument('--log_dir', default="runs/pretrain/exp", help='path where to tensorboard log')
     parser.add_argument('--device', default='cuda', help='device to use for training/testing')
@@ -71,14 +73,14 @@ def get_args():
     parser.add_argument('--auto_resume', action='store_true')
     parser.set_defaults(auto_resume=True)
     parser.add_argument('--start_epoch', default=0, type=int, help='start epoch')
-    parser.add_argument('--num_workers', default=12, type=int)
+    parser.add_argument('--num_workers', default=12, type=int) # TODO is this per gpu?
     parser.add_argument('--pin_mem', action='store_true', help='Pin CPU memory in DataLoader for more efficient transfer to GPU.')
     parser.add_argument('--no_pin_mem', action='store_false', dest='pin_mem')
     parser.set_defaults(pin_mem=True)
 
     # distributed training parameters
-    parser.add_argument('--world_size', default=1, type=int, help='number of distributed processes')
-    parser.add_argument('--local_rank', default=-1, type=int)
+    parser.add_argument('--world_size', default=4, type=int, help='number of distributed processes')
+    parser.add_argument('--local_rank', default=0, type=int)
     parser.add_argument('--dist_on_itp', action='store_true')
     parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
 
