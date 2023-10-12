@@ -3,7 +3,6 @@ from timm.models.vision_transformer import Block # NOTE has internal skip connec
 from torch import nn
 import math
 import pandas as pd
-import matplotlib.pyplot as plt
 
 
 # LR_LOG_FO = {'iteration': []}
@@ -89,7 +88,7 @@ def create_param_groups(model: nn.Module, default_weight_decay=1e-5, default_lr=
                         continue
                     # NOTE this part creates a new parameter group with or without weight decay.
                     # Add the lr and layer_index attributes, they must exist in the module
-                    param_group = {'params': param, 'lr': module.lr, 'layer_index': module.layer_index}
+                    param_group = {'params': param, 'lr': module.initial_lr, 'layer_index': module.layer_index}
 
                     # scaling factor (gamma) and the shift (beta), which are both learnable parameters 1-D
                     if param.ndim <= 1 or name.endswith(".bias"): # normalization or bias
@@ -149,6 +148,7 @@ def adjust_learning_rate_freezeout(model, optimizer, epoch, cur_local_iteration,
     """Freezeout decay the learning rate with half-cycle cosine after linnear warmup, step=iteration"""
     total_warmup_iterations = iter_per_epoch*args.warmup_epochs
     cur_global_iteration = cur_local_iteration + epoch*iter_per_epoch
+    fractional_epoch = epoch + cur_local_iteration/iter_per_epoch # cur_global_iteration / iter_per_epoch
     if cur_global_iteration < total_warmup_iterations:
         # Update all param groups equally in warm-up iterations
         lr = args.lr*cur_global_iteration/total_warmup_iterations
@@ -156,7 +156,7 @@ def adjust_learning_rate_freezeout(model, optimizer, epoch, cur_local_iteration,
             assert "lr_scale" not in param_group, "lr_scale should be only in fine tuning"
             param_group["lr"] = lr
     else:
-        lmim_cosine_lr = args.min_lr+(args.lr-args.min_lr)*0.5*(1.+math.cos(math.pi*(epoch-args.warmup_epochs)/(args.epochs-args.warmup_epochs)))
+        lmim_cosine_lr = args.min_lr+(args.lr-args.min_lr)*0.5*(1.+math.cos(math.pi*(fractional_epoch-args.warmup_epochs)/(args.epochs-args.warmup_epochs)))
         freezeout_param_groups = param_groups["freezeout"]
         non_freezeout_param_groups = param_groups["non_freezeout"]
         update_non_freezeout_layers_lr(non_freezeout_param_groups, lmim_cosine_lr, cur_global_iteration, writer=writer)
