@@ -202,6 +202,7 @@ def save_on_master(*args, **kwargs):
 
 
 def init_distributed_mode(args):
+    # TODO what is this dist initialization.
     if args.dist_on_itp:
         args.rank = int(os.environ['OMPI_COMM_WORLD_RANK'])
         args.world_size = int(os.environ['OMPI_COMM_WORLD_SIZE'])
