@@ -6,22 +6,20 @@ import pandas as pd
 from functools import reduce
 
 
-# ---------------------------------- LAYER AWARE ATTRIBUTES
+# ---------------------------------- ATTRIBUTE AWARE LEAVES
 class AttributeAwareModule(nn.Module):
     def named_parameters(self, prefix='', recurse=True):
         gen = super().named_parameters(prefix=prefix, recurse=recurse)
-        for elem in gen:
+        for elem in gen: # TODO there is a mistake, this sets all parents with active attr.
             name, param = elem
             parent_names = name.split(".")[:-1]
             parent_module = reduce(getattr, [self] + parent_names)
-
             if hasattr(parent_module, 'active'):
                 param.active = parent_module.active
             if hasattr(parent_module, 'layer_index'):
                 param.layer_index = parent_module.layer_index
             if hasattr(parent_module, "initial_lr"):
                 param.initial_lr = parent_module.initial_lr
-            # TODO you have to add all attributes to "param"
             yield elem
 
 
@@ -58,16 +56,15 @@ def create_param_groups(model: nn.Module, default_weight_decay=1e-5, default_lr=
     """
     layer_specific_param_groups = [] # for freezeout layers
     standard_param_groups = [] # for regular layers
-    leaf_param_count = len(model.parameters())
+    leaf_param_count = len(list(model.parameters()))
 
     # NOTE named modules is not what I want to iterate over, it is recursive.
-    for name, param in model.named_parameters(): # TODO modify named_modules with named_parameters() and groups parameters accordingly if it is a solution.
-        # TODO answered here https://chat.openai.com/share/5d8c4fac-62ce-4ce9-970d-ecb05898b425, fix this.
-        # TODO currently the param_groups added does not correspond to layer param_groups directly. But they should.
+    for name, param in model.named_parameters():
+        # NOTE Leaf parameters are separated to 4 groups (fo-nfo, wd-nwd)
         if not param.requires_grad:
             continue
         if hasattr(param, 'active'):
-            param_group = {'params': [param], 'lr': param.initial_lr, 'layer_index': param.layer_index}
+            param_group = {'params': [param], 'lr': param.initial_lr, 'layer_index': param.layer_index} # NOTE no need for activeness information
             # scaling factor (gamma) and the shift (beta), which are both learnable parameters 1-D, also normalization or bias will have 0 wd
             param_group['weight_decay'] = 0. if (param.ndim <= 1 or name.endswith(".bias")) else default_weight_decay 
             layer_specific_param_groups.append(param_group)
@@ -136,7 +133,7 @@ def get_param_groups(optimizer, test=False, log_writer=None):
         log_text_fo = "Freezeout layer count is: {}".format(len(freezeout_param_groups))
         print(log_text_fo)
         log_writer.add_text('Info', log_text_fo)
-        log_text_nfo = "Non_freezeout layer count is: {}".format(len(non_freezeout_param_groups))
+        log_text_nfo = "Non_freezeout param count is: {}".format(len(non_freezeout_param_groups))
         print(log_text_nfo)
         log_writer.add_text('Info', log_text_nfo)
     param_groups = {"freezeout": freezeout_param_groups,"non_freezeout": non_freezeout_param_groups}
@@ -167,10 +164,10 @@ def adjust_learning_rate_freezeout(model, optimizer, epoch, cur_local_iteration,
             assert "lr_scale" not in param_group, "lr_scale should be only in fine tuning"
             param_group["lr"] = lr
     else:
-        lmim_cosine_lr = args.min_lr+(args.lr-args.min_lr)*0.5*(1.+math.cos(math.pi*(fractional_epoch-args.warmup_epochs)/(args.epochs-args.warmup_epochs)))
+        regular_cosine_lr = args.min_lr+(args.lr-args.min_lr)*0.5*(1.+math.cos(math.pi*(fractional_epoch-args.warmup_epochs)/(args.epochs-args.warmup_epochs)))
         freezeout_param_groups = param_groups["freezeout"]
         non_freezeout_param_groups = param_groups["non_freezeout"]
-        update_non_freezeout_layers_lr(non_freezeout_param_groups, lmim_cosine_lr, cur_global_iteration, writer=writer)
+        update_non_freezeout_layers_lr(non_freezeout_param_groups, regular_cosine_lr, cur_global_iteration, writer=writer)
         update_freezeout_layers_lr(model, cur_global_iteration, optimizer, freezeout_param_groups, writer=writer, test=test)
         validate_same_objects(optimizer, freezeout_param_groups)
 
@@ -180,7 +177,7 @@ def update_freezeout_layers_lr(model, cur_global_iteration, optim, freezeout_par
         # NOTE cur_global_iteration incremented by train loop
         # Loop over all modules, requires -> cur_global_iteration and module. active, max_iteration, layer_index,
         freezeout_active_layer_count = 0
-        for m in model.modules(): # TODO this will work if all active layers are captured by this if statement.
+        for m in model.modules():
             # If a module is active and at the freezeout layer level of model.modules() hierarchy.:
             if hasattr(m,'freezeout_module_level_specifier') and m.active: # NOTE does not enter if no more active. TODO check if fixed problem.
                 freezeout_active_layer_count += 1
@@ -197,6 +194,7 @@ def update_freezeout_layers_lr(model, cur_global_iteration, optim, freezeout_par
                         if target_freezeout_param is not None:
                             del target_freezeout_param # NOTE assumes that this parameter will not be activated (trainable) again
                     del freezeout_param_groups[m.layer_index] # NOTE delete the obsolete param groups.
+                    freezeout_active_layer_count-=1
                 else:
                     # update the LR
                     layer_wise_initial_lr = m.initial_lr # NOTE lr_ratio already scaled lrs per layer
@@ -211,9 +209,9 @@ def update_freezeout_layers_lr(model, cur_global_iteration, optim, freezeout_par
                 assert freezeout_active_layer_count > 15, "freezeout_active_layer_count should be at least around 20 (layers)"
 
 
-def update_non_freezeout_layers_lr(non_freezeout_param_groups, lmim_cosine_lr, cur_global_iteration, writer):
+def update_non_freezeout_layers_lr(non_freezeout_param_groups, regular_cosine_lr, cur_global_iteration, writer):
     """This method updates non-freezeout layers lr.
-    Cosine annealng applied previously to lr is lmim_cosine_lr."""
+    Cosine annealng applied previously to lr is regular_cosine_lr."""
     for non_freezeout_param_group in non_freezeout_param_groups:
-        non_freezeout_param_group['lr'] = lmim_cosine_lr
-    log_lr_non_freezeout(lr=lmim_cosine_lr, iteration=cur_global_iteration, writer=writer)
+        non_freezeout_param_group['lr'] = regular_cosine_lr
+    log_lr_non_freezeout(lr=regular_cosine_lr, iteration=cur_global_iteration, writer=writer)
