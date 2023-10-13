@@ -45,7 +45,7 @@ def train_one_epoch(model, data_loader, optimizer, device, epoch, loss_scaler, p
         if data_iter_step % accum_iter == 0:
             # Default was: lr_sched.adjust_learning_rate(optimizer, data_iter_step/len(data_loader)+epoch, args)
             # NOTE lr and attributes have to be set for all models (all ranks.)
-            fo_sched.adjust_learning_rate_freezeout(model, optimizer, epoch, data_iter_step, param_groups, iter_per_epoch=len(data_loader), writer=log_writer, args=args)
+            fo_sched.adjust_learning_rate_freezeout(model, optimizer,  epoch, data_iter_step, param_groups, iter_per_epoch=len(data_loader), writer=log_writer, args=args) # Freezeout specific
 
         samples = samples.to(device, non_blocking=True)
         with torch.cuda.amp.autocast():
@@ -64,7 +64,8 @@ def train_one_epoch(model, data_loader, optimizer, device, epoch, loss_scaler, p
         torch.cuda.synchronize()
 
         metric_logger.update(loss=loss_value)
-        lr = optimizer.param_groups[0]["lr"] # TODO fix this
+        # lr = optimizer.param_groups[0]["lr"] # Default was this
+        lr = param_groups["non_freezeout"][0]["lr"] # Freezeout specific
         metric_logger.update(lr=lr)
 
         loss_value_reduce = misc.all_reduce_mean(loss_value)
