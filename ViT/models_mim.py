@@ -17,6 +17,7 @@ import torch.nn as nn
 from timm.models.vision_transformer import PatchEmbed, Block # NOTE has internal skip connections.
 from util.pos_embed import get_2d_sincos_pos_embed
 import numpy as np
+from util.freezeout_utils import AttributeAwareModule
 
 
 class LayerNorm(nn.Module):
@@ -157,7 +158,7 @@ class HOGLayer(nn.Module):
         return hog
 
 
-class MaskedAutoencoderViT(nn.Module):
+class MaskedAutoencoderViT(AttributeAwareModule):
     """
         Masked Autoencoder with VisionTransformer backbone
     """
@@ -166,10 +167,8 @@ class MaskedAutoencoderViT(nn.Module):
         super().__init__()
         # Freezeout specific           
         self.how_scale = "cubic" # scaling method  
-        self.t_0 = 0.5 # Assume the first layer is going to be trained for half of the epochs? TODO modifiy
+        self.t_0 = 0.8 # NOTE 0.8 for cubic scaling and 0.5 for linear scaling method.
         self.scale_lr = True # Scale the learning rate for the gradients to integrate to the same values (w.r.t. lr without freezeout)
-        initial_layer_index = 2 # NOTE there are 2 layers before blocks start
-        self.cum_layer_index = initial_layer_index # NOTE serves as a layer count
 
         # NOTE dynamically add attributes to instances of Python classes at runtime
         # MIM encoder specifics
@@ -182,6 +181,9 @@ class MaskedAutoencoderViT(nn.Module):
         self.cls_token.layer_index = 1 # Freezeout specific
         self.cls_token.active = True # Freezeout specific
         self.pos_embed = nn.Parameter(torch.zeros(1, 1+num_patches, embed_dim), requires_grad=False)  # fixed sin-cos embedding
+
+        initial_layer_index = 2 # NOTE there are 2 layers before blocks start
+        self.cum_layer_index = initial_layer_index # NOTE serves as a layer count
         blocks = [] # Freezeout specific
         for _ in range(depth): # Freezeout specific
             block = Block(embed_dim, num_heads, mlp_ratio, qkv_bias=True, norm_layer=norm_layer)
@@ -356,7 +358,7 @@ def MIM_vit_small_patch16(**kwargs):
     return model
 
 
-def MIM_vit_base_patch16(**kwargs):
+def MIM_vit_base_patch16(**kwargs): # NOTE this is used for ViT-B
     model = MaskedAutoencoderViT(
         patch_size=16,
         embed_dim=768,
@@ -370,7 +372,7 @@ def MIM_vit_base_patch16(**kwargs):
     return model
 
 
-def MIM_vit_large_patch16(**kwargs):
+def MIM_vit_large_patch16(**kwargs): # NOTE this is used for ViT-L
     model = MaskedAutoencoderViT(
         patch_size=16,
         embed_dim=1024,

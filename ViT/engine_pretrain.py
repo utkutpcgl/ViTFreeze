@@ -64,7 +64,7 @@ def train_one_epoch(model, data_loader, optimizer, device, epoch, loss_scaler, p
         torch.cuda.synchronize()
 
         metric_logger.update(loss=loss_value)
-        lr = optimizer.param_groups[0]["lr"]
+        lr = optimizer.param_groups[0]["lr"] # TODO fix this
         metric_logger.update(lr=lr)
 
         loss_value_reduce = misc.all_reduce_mean(loss_value)

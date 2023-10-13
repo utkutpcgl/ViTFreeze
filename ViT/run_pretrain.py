@@ -42,27 +42,27 @@ scale_fn = {'linear':lambda x: x,
 
 def get_args():
     parser = argparse.ArgumentParser('MAE pre-training', add_help=False)
-    parser.add_argument('--batch_size', default=128, type=int, help='Batch size per GPU (effective batch size is batch_size*accum_iter*ngpus')
-    parser.add_argument('--epochs', default=400, type=int)
+    parser.add_argument('--batch_size', default=128, type=int, help='Batch size per GPU (effective batch size is batch_size*accum_iter*ngpus') # 8*256 = 2048 for base model
+    parser.add_argument('--epochs', default=400, type=int) # 100 for initial training
     parser.add_argument('--accum_iter', default=1, type=int, help='Accumulate gradient iterations (for increasing the effective batch size under memory constraints)')
 
     # Model parameters
-    #TODO check the params.
-    parser.add_argument('--model', default='MIM_vit_large_patch16', type=str, help='Name of model to train') # NOTE was mae_vit_large_patch16
-    parser.add_argument('--input_size', default=224, type=int, help='images input size')
-    parser.add_argument('--mask_ratio', default=0.75, type=float, help='Masking ratio (percentage of removed patches).')
-    parser.add_argument('--hog_nbins', default=9, type=int, help='nbins for HOG feature')
+    parser.add_argument('--model', default='MIM_vit_base_patch16', type=str, help='Name of model to train') # NOTE was mae_vit_large_patch16 TODO why mae? CHECKED
+    parser.add_argument('--input_size', default=224, type=int, help='images input size') # 224 always
+    parser.add_argument('--mask_ratio', default=0.75, type=float, help='Masking ratio (percentage of removed patches).') # 0.75 always
+    parser.add_argument('--hog_nbins', default=9, type=int, help='nbins for HOG feature') # NOTE paper says 18 but here and in the repo it says 9??
     parser.add_argument('--hog_bias', action='store_true', help='hog bias')
     parser.set_defaults(hog_bias=False)
 
     # Optimizer parameters
     parser.add_argument('--weight_decay', type=float, default=0.05, help='weight decay (default: 0.05)')
     parser.add_argument('--lr', type=float, default=None, help='learning rate (absolute lr)')
-    parser.add_argument('--blr', type=float, default=1e-3, help='absolute_lr = base_lr*total_batch_size/256')
-    parser.add_argument('--min_lr', type=float, default=1e-6, help='lower lr bound for cyclic schedulers that hit 0')
+    parser.add_argument('--blr', type=float, default=1e-3, help='absolute_lr = base_lr*total_batch_size/256') # 2*10^-4 for base model
+    parser.add_argument('--min_lr', type=float, default=1e-6, help='lower lr bound for cyclic schedulers that hit 0') # NOTE the paper provides no information, the repo does not modify it.
     parser.add_argument('--warmup_epochs', type=int, default=40, help='epochs to warmup LR')
 
     # Dataset parameters
+    #TODO update when necessray data_path.
     parser.add_argument('--data_path', default='/raid/utku/datasets/imagenet/classification/train/demo_dataset/', type=str, help='dataset path orig: /raid/utku/datasets/imagenet/classification/train/image_folders \
                         demo: /raid/utku/datasets/imagenet/classification/train/demo_dataset/' )
     parser.add_argument('--output_dir', default='./output/MAE_ViT_B', help='path where to save, empty for no saving')
@@ -73,13 +73,13 @@ def get_args():
     parser.add_argument('--auto_resume', action='store_true')
     parser.set_defaults(auto_resume=True)
     parser.add_argument('--start_epoch', default=0, type=int, help='start epoch')
-    parser.add_argument('--num_workers', default=12, type=int) # TODO is this per gpu?
+    parser.add_argument('--num_workers', default=12, type=int) # NOTE this is per gpu.
     parser.add_argument('--pin_mem', action='store_true', help='Pin CPU memory in DataLoader for more efficient transfer to GPU.')
     parser.add_argument('--no_pin_mem', action='store_false', dest='pin_mem')
     parser.set_defaults(pin_mem=True)
 
     # distributed training parameters
-    parser.add_argument('--world_size', default=4, type=int, help='number of distributed processes')
+    parser.add_argument('--world_size', default=1, type=int, help='number of distributed processes')
     parser.add_argument('--local_rank', default=0, type=int)
     parser.add_argument('--dist_on_itp', action='store_true')
     parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
@@ -105,19 +105,18 @@ def main(args):
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
-    # dataset_train = datasets.ImageFolder(os.path.join(args.data_path, 'train'), transform=transform_train)
-    # print(dataset_train)
+    dataset_train = datasets.ImageFolder(args.data_path, transform=transform_train)
     num_tasks = misc.get_world_size()
     global_rank = misc.get_rank()
-    # sampler_train = torch.utils.data.DistributedSampler(dataset_train, num_replicas=num_tasks, rank=global_rank, shuffle=True)
-    # print("Sampler_train = %s" % str(sampler_train))
-    # data_loader_train = torch.utils.data.DataLoader(
-    #     dataset_train,
-    #     sampler=sampler_train,
-    #     batch_size=args.batch_size,
-    #     num_workers=args.num_workers,
-    #     pin_memory=args.pin_mem,
-    #     drop_last=True)
+    sampler_train = torch.utils.data.DistributedSampler(dataset_train, num_replicas=num_tasks, rank=global_rank, shuffle=True)
+    print("Sampler_train = %s" % str(sampler_train))
+    data_loader_train = torch.utils.data.DataLoader(
+        dataset_train,
+        sampler=sampler_train,
+        batch_size=args.batch_size,
+        num_workers=args.num_workers,
+        pin_memory=args.pin_mem,
+        drop_last=True)
 
     if global_rank == 0 and args.log_dir is not None:
         os.makedirs(args.log_dir, exist_ok=True)
@@ -139,7 +138,7 @@ def main(args):
     model.to(device)
     lr_scale_fn = scale_fn[model.how_scale] # freezeout spec
     t_0 = model.t_0 # freezeout spec
-    num_of_layers = model.layer_index # freezeout spec
+    num_of_layers = model.cum_layer_index # freezeout spec
     iterations_per_epoch = len(data_loader_train) # NOTE (len(dataset)/batch_size).
     for module in model.modules():
         if hasattr(module,'active'): # freezout specific
@@ -148,6 +147,7 @@ def main(args):
             module.initial_lr = args.lr/module.lr_ratio if model.scale_lr else args.lr # freezout specific
             # NOTE iterations set auto instead of 1000 (so in freezeout), warmup is not included.
             module.max_iteration = (args.epochs-args.warmup_epochs) * iterations_per_epoch * module.lr_ratio # freezout specific, the maximum count a layer will be trained for (after max_iteration it will be frozen), hardcoded 1000 iterations per epoch.
+            module.freezeout_module_level_specifier = None # Just a module level specifier to distinguish module freezeout layer levels.
     model_without_ddp = model
     # print("Model = %s" % str(model_without_ddp))
 
@@ -159,6 +159,7 @@ def main(args):
     # Default: param_groups = optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay) 
     # Default optimizer: optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95))
     optimizer_param_groups = create_param_groups(model_without_ddp,log_writer=log_writer)
+    print(optimizer_param_groups)
     # NOTE parameters groups set with explicit learning_rate (or other params) will ignore the learning rate of AdamW arguments.
     optimizer = torch.optim.AdamW(optimizer_param_groups, betas=(0.9, 0.95)) # freezout specific optimizer
     param_groups = get_param_groups(optimizer, test=False, log_writer=log_writer) # freezout specific

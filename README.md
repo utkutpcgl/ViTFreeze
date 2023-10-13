@@ -1,5 +1,26 @@
 # freezeout_localmim_rho
 
+## Running Experiments
+
+### Pre-training:
+
+  Explained in the repos README.md as this, to pre-train ViT-B:
+  ```bash
+  OMP_NUM_THREADS=1 python -m torch.distributed.launch --nproc_per_node=8 run_pretrain.py --batch_size 256 --model MIM_vit_base_patch16 --hog_nbins 9 --mask_ratio 0.75 --epochs 1600 --warmup_epochs 40 --blr 2e-4 --weight_decay 0.05 --data_path /path/to/imagenet/ --output_dir /output_dir/
+  ```
+
+#### Noticed:
+- accum_iter set to 2 for 4 gpus (normally 8).
+- warm-up epoch is set to 10 for 100 epochs and 40 for all other epoch settings.
+- Note that min_lr is not set in the repo's command and is not explained in the paper.
+- Code uses as many gpus as there are available, hence, set CUDA_VISIBLE_DEVICES.
+
+```bash
+CUDA_VISIBLE_DEVICES=0,1,2,3 OMP_NUM_THREADS=1 python3 -m torch.distributed.launch --nproc_per_node=4 run_pretrain.py --epochs 100 --batch_size 256 --warmup_epochs 10 --world_size 4 --accum_iter 2 
+```
+
+
+
 ## Steps
 
 - Simple guide: [https://chat.openai.com/share/30777d71-4944-41ad-80a3-17dfca5bac7a](https://chat.openai.com/share/30777d71-4944-41ad-80a3-17dfca5bac7a)
@@ -95,7 +116,6 @@ This is a simplified example and you'll need to adapt it to fit into your existi
 
 ## Important details about LocalMIM
 
-- TODO: Test, check evaluate all changes (TODO left here) / Debugging: Try to run some log key statistics, learning rate per layer, visualization.
 - NOTE: Weight decay is applied selectively to non-bias or normalization layers with: `optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay)`.
 - NOTE: A different decay is applied during fine tuning: `param_groups_lrd`
 - NOTE: Gradient clipping is only applied during fine tuning, not pretraining. Only amp scaling is applied during pretraining.
