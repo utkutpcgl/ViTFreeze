@@ -140,15 +140,19 @@ def main(args):
     t_0 = model.t_0 # freezeout spec
     num_of_layers = model.cum_layer_index # freezeout spec
     iterations_per_epoch = len(data_loader_train) # NOTE (len(dataset)/batch_size).
+    cls_def = False
     for module in model.modules():
         if hasattr(module,'active'): # freezout specific
             # the ratio to be multiplied with the initial learning rate.
+            if module.layer_index == 0:
+                cls_def = True
             module.lr_ratio = lr_scale_fn(t_0 + (1 - t_0) * float(module.layer_index) / num_of_layers) # freezout specific
             module.initial_lr = args.lr/module.lr_ratio if model.scale_lr else args.lr # freezout specific
             # NOTE iterations set auto instead of 1000 (so in freezeout), warmup is not included.
             module.max_iteration = (args.epochs-args.warmup_epochs) * iterations_per_epoch * module.lr_ratio # freezout specific, the maximum count a layer will be trained for (after max_iteration it will be frozen), hardcoded 1000 iterations per epoch.
             module.freezeout_module_level_specifier = None # Just a module level specifier to distinguish module freezeout layer levels.
     model_without_ddp = model
+    assert cls_def
     # print("Model = %s" % str(model_without_ddp))
 
     if args.distributed:

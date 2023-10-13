@@ -16,9 +16,9 @@ class AttributeAwareModule(nn.Module):
             parent_module = reduce(getattr, [self] + parent_names)
             if hasattr(parent_module, 'active'):
                 param.active = parent_module.active
-            if hasattr(parent_module, 'layer_index'):
+            # if hasattr(parent_module, 'layer_index'):
                 param.layer_index = parent_module.layer_index
-            if hasattr(parent_module, "initial_lr"):
+            # if hasattr(parent_module, "initial_lr"):
                 param.initial_lr = parent_module.initial_lr
             yield elem
 
@@ -64,6 +64,7 @@ def create_param_groups(model: nn.Module, default_weight_decay=1e-5, default_lr=
         if not param.requires_grad:
             continue
         if hasattr(param, 'active'):
+             # TODO patch embed and cls_token DOES NOT HAVE INITIAL LR AND LAYER INDEX OR MAX ITERATIONS, WHY IS IT OVERRİDDEN??
             param_group = {'params': [param], 'lr': param.initial_lr, 'layer_index': param.layer_index} # NOTE no need for activeness information
             # scaling factor (gamma) and the shift (beta), which are both learnable parameters 1-D, also normalization or bias will have 0 wd
             param_group['weight_decay'] = 0. if (param.ndim <= 1 or name.endswith(".bias")) else default_weight_decay 

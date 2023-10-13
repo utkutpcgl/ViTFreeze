@@ -172,7 +172,7 @@ class MaskedAutoencoderViT(AttributeAwareModule):
 
         # NOTE dynamically add attributes to instances of Python classes at runtime
         # MIM encoder specifics
-        self.patch_embed = PatchEmbed(img_size, patch_size, in_chans, embed_dim)
+        self.patch_embed = PatchEmbed(img_size, patch_size, in_chans, embed_dim) # TODO patch embed and cls_token is not being considered as active??
         self.patch_embed.layer_index = 0 # Freezeout specific
         self.patch_embed.active = True # Freezeout specific
         num_patches = self.patch_embed.num_patches
