@@ -1,5 +1,5 @@
 from torch import nn
-from freezeout_utils import create_param_groups, get_param_groups, adjust_learning_rate_freezeout
+from freezeout_utils import create_param_groups, get_param_groups, adjust_learning_rate_freezeout, AttributeAwareModule
 from torch.utils.tensorboard import SummaryWriter
 
 test_writer = SummaryWriter("runs/lr_logging_experiment")
@@ -9,7 +9,7 @@ scale_fn = {'linear':lambda x: x,
             'cubic': lambda x: x**3}
 
 # DUMMY MODEL TO VALIDATE LR UPDATE FUNCTIONALITY
-class DummyModel(nn.Module):
+class DummyModel(AttributeAwareModule):
     # Dummy model with `active` attributes and layer indices
     def __init__(self):
         super(DummyModel, self).__init__()
@@ -21,7 +21,8 @@ class DummyModel(nn.Module):
             layer = getattr(self, f'layer{i}')
             layer.active = True
             layer.layer_index = i - 1  # 0-based index
-
+        for i in range(31, 61):  
+            setattr(self, f'layer{i}', nn.Linear(10, 10))
         self.how_scale = "cubic"
         self.t_0 = 0.5
         self.cum_layer_index = 30  # Updated total number of layers
@@ -55,6 +56,7 @@ def simulate_lr_logging(log_writer):
             module.initial_lr = args.lr/module.lr_ratio if model.scale_lr else args.lr # freezout specific
             # NOTE iterations set auto instead of 1000 (so in freezeout), warmup is not included.
             module.max_iteration = (args.epochs-args.warmup_epochs) * iter_per_epoch * module.lr_ratio
+            module.freezeout_module_level_specifier = None # Just a module level specifier to distinguish module freezeout layer levels.
             log_writer.add_scalar('LR Ratios', module.lr_ratio, module.layer_index)
             log_writer.add_scalar('Max Iterations', module.max_iteration, module.layer_index)
 
