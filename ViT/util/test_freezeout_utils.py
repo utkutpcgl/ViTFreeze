@@ -24,7 +24,7 @@ class DummyModel(nn.Module):
 
         self.how_scale = "cubic"
         self.t_0 = 0.5
-        self.layer_index = 30  # Updated total number of layers
+        self.cum_layer_index = 30  # Updated total number of layers
         self.scale_lr = True
 
 
@@ -47,7 +47,7 @@ def simulate_lr_logging(log_writer):
     # Freezeout lr setting logic
     lr_scale_fn = scale_fn[model.how_scale] # freezeout spec
     t_0 = model.t_0 # freezeout spec
-    num_of_layers = model.layer_index # freezeout spec
+    num_of_layers = model.cum_layer_index # freezeout spec
     for module in model.modules():
         if hasattr(module,'active'): # freezout specific
             # the ratio to be multiplied with the initial learning rate.
@@ -55,7 +55,6 @@ def simulate_lr_logging(log_writer):
             module.initial_lr = args.lr/module.lr_ratio if model.scale_lr else args.lr # freezout specific
             # NOTE iterations set auto instead of 1000 (so in freezeout), warmup is not included.
             module.max_iteration = (args.epochs-args.warmup_epochs) * iter_per_epoch * module.lr_ratio
-            # TODO Log lr_ratio and max iteration per layer to log_writer.
             log_writer.add_scalar('LR Ratios', module.lr_ratio, module.layer_index)
             log_writer.add_scalar('Max Iterations', module.max_iteration, module.layer_index)
 
