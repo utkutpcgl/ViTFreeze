@@ -28,7 +28,7 @@ import timm.optim.optim_factory as optim_factory
 
 import util.misc as misc
 from util.misc import NativeScalerWithGradNormCount as NativeScaler
-from util.freezeout_utils import create_param_groups, get_param_groups, validate_same_objects
+from util.freezeout_utils import create_param_groups, get_param_groups, validate_same_objects, FREEZEOUT_LAYER_COUNT_VIT_B
 import models_mim
 from engine_pretrain import train_one_epoch
 import warnings
@@ -43,7 +43,7 @@ scale_fn = {'linear':lambda x: x,
 def get_args():
     parser = argparse.ArgumentParser('MAE pre-training', add_help=False)
     parser.add_argument('--batch_size', default=128, type=int, help='Batch size per GPU (effective batch size is batch_size*accum_iter*ngpus') # 8*256 = 2048 for base model
-    parser.add_argument('--epochs', default=400, type=int) # 100 for initial training
+    parser.add_argument('--epochs', default=10, type=int) # 100 for initial training
     parser.add_argument('--accum_iter', default=1, type=int, help='Accumulate gradient iterations (for increasing the effective batch size under memory constraints)')
 
     # Model parameters
@@ -59,7 +59,7 @@ def get_args():
     parser.add_argument('--lr', type=float, default=None, help='learning rate (absolute lr)')
     parser.add_argument('--blr', type=float, default=1e-3, help='absolute_lr = base_lr*total_batch_size/256') # 2*10^-4 for base model
     parser.add_argument('--min_lr', type=float, default=1e-6, help='lower lr bound for cyclic schedulers that hit 0') # NOTE the paper provides no information, the repo does not modify it.
-    parser.add_argument('--warmup_epochs', type=int, default=40, help='epochs to warmup LR')
+    parser.add_argument('--warmup_epochs', type=int, default=0, help='epochs to warmup LR')
 
     # Dataset parameters
     #TODO update when necessray data_path.
@@ -140,21 +140,22 @@ def main(args):
     t_0 = model.t_0 # freezeout spec
     num_of_layers = model.cum_layer_index # freezeout spec
     iterations_per_epoch = len(data_loader_train) # NOTE (len(dataset)/batch_size).
-    cls_def = False
+    assert hasattr(model.patch_embed, "layer_index")
+    freezeout_module_level_specifier_count = 0
     for module in model.modules():
         if hasattr(module,'active'): # freezout specific
+            print("Set module with layer_index:", module.layer_index)
             # the ratio to be multiplied with the initial learning rate.
-            if module.layer_index == 0:
-                cls_def = True
             module.lr_ratio = lr_scale_fn(t_0 + (1 - t_0) * float(module.layer_index) / num_of_layers) # freezout specific
             module.initial_lr = args.lr/module.lr_ratio if model.scale_lr else args.lr # freezout specific
             # NOTE iterations set auto instead of 1000 (so in freezeout), warmup is not included.
             module.max_iteration = (args.epochs-args.warmup_epochs) * iterations_per_epoch * module.lr_ratio # freezout specific, the maximum count a layer will be trained for (after max_iteration it will be frozen), hardcoded 1000 iterations per epoch.
             module.freezeout_module_level_specifier = None # Just a module level specifier to distinguish module freezeout layer levels.
+            freezeout_module_level_specifier_count+=1
+    print("freezeout_module_level_specifier_count: ", freezeout_module_level_specifier_count)
+    assert freezeout_module_level_specifier_count == FREEZEOUT_LAYER_COUNT_VIT_B
     model_without_ddp = model
-    assert cls_def
-    # print("Model = %s" % str(model_without_ddp))
-
+    
     if args.distributed:
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=True)
         model_without_ddp = model.module
@@ -163,15 +164,15 @@ def main(args):
     # Default: param_groups = optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay) 
     # Default optimizer: optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95))
     optimizer_param_groups = create_param_groups(model_without_ddp,log_writer=log_writer)
-    print(optimizer_param_groups)
     # NOTE parameters groups set with explicit learning_rate (or other params) will ignore the learning rate of AdamW arguments.
     optimizer = torch.optim.AdamW(optimizer_param_groups, betas=(0.9, 0.95)) # freezout specific optimizer
-    param_groups = get_param_groups(optimizer, test=False, log_writer=log_writer) # freezout specific
-    validate_same_objects(optimizer, param_groups["freezeout"]) # freezout specific assertion
     loss_scaler = NativeScaler()
-    print(optimizer)
 
     misc.auto_load_model(args=args, model_without_ddp=model_without_ddp, optimizer=optimizer, loss_scaler=loss_scaler)
+
+    # NOTE initialize the param_groups after auto loading the model and optimizer in case starting from checkpoint
+    param_groups = get_param_groups(optimizer, test=False, log_writer=log_writer) # freezout specific
+    validate_same_objects(optimizer, param_groups["freezeout"]) # freezout specific assertion
 
     print(f"Start training for {args.epochs} epochs")
     start_time = time.time()
@@ -179,7 +180,7 @@ def main(args):
         if args.distributed:
             data_loader_train.sampler.set_epoch(epoch)
         train_stats = train_one_epoch(model, data_loader_train, optimizer, device, epoch, loss_scaler, param_groups, log_writer=log_writer, args=args)
-        if args.output_dir and (epoch%50 == 0 or epoch+1 == args.epochs):
+        if args.output_dir and (epoch%10 == 0 or epoch+1 == args.epochs):
             misc.save_model(args=args, model=model, model_without_ddp=model_without_ddp, optimizer=optimizer, loss_scaler=loss_scaler, epoch=epoch)
 
         log_stats = {**{f'train_{k}': v for k, v in train_stats.items()}, 'epoch': epoch}
