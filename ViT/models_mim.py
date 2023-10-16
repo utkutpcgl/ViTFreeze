@@ -160,7 +160,7 @@ class HOGLayer(nn.Module):
 
 class MaskedAutoencoderViT(AttributeAwareModule):
     """
-        Masked Autoencoder with VisionTransformer backbone
+        Masked Autoencoder with VisionTransformer backbone, NOTE depth 24 changes w.r.t. the model size.
     """
     def __init__(self, img_size=224, patch_size=16, in_chans=3, embed_dim=1024, depth=24, num_heads=16, decoder_embed_dim=512,
                  decoder_depth=1, decoder_num_heads=16, mlp_ratio=4., norm_layer=nn.LayerNorm, hog_nbins=9, hog_bias=False, **kwargs):
@@ -172,17 +172,15 @@ class MaskedAutoencoderViT(AttributeAwareModule):
 
         # NOTE dynamically add attributes to instances of Python classes at runtime
         # MIM encoder specifics
-        self.patch_embed = PatchEmbed(img_size, patch_size, in_chans, embed_dim) # TODO patch embed and cls_token is not being considered as active??
+        self.patch_embed = PatchEmbed(img_size, patch_size, in_chans, embed_dim)
         self.patch_embed.layer_index = 0 # Freezeout specific
         self.patch_embed.active = True # Freezeout specific
         num_patches = self.patch_embed.num_patches
-        # NOTE UTKU Normally the cls token serves as global image context summarizer, but here (MIM) it does not have a clear purpose (can be frozen)
-        self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim))
-        self.cls_token.layer_index = 1 # Freezeout specific
-        self.cls_token.active = True # Freezeout specific
+        # TODO UTKU Normally the cls token serves as global image context summarizer, but here (MIM) it does not have a clear purpose, can it carry info to later layers?
+        self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim)) # NOTE nn.Parameter is not considered part of the model, hence, cls_token can not be accessed in model.modules()
         self.pos_embed = nn.Parameter(torch.zeros(1, 1+num_patches, embed_dim), requires_grad=False)  # fixed sin-cos embedding
 
-        initial_layer_index = 2 # NOTE there are 2 layers before blocks start
+        initial_layer_index = 1 # NOTE there are 2 layers before blocks start
         self.cum_layer_index = initial_layer_index # NOTE serves as a layer count
         blocks = [] # Freezeout specific
         for _ in range(depth): # Freezeout specific
@@ -231,7 +229,6 @@ class MaskedAutoencoderViT(AttributeAwareModule):
         torch.nn.init.xavier_uniform_(w.view([w.shape[0], -1]))
 
         torch.nn.init.normal_(self.cls_token, std=.02)
-
         # initialize nn.Linear and nn.LayerNorm
         self.apply(self._init_weights)
 
