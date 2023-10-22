@@ -4,23 +4,31 @@ from torch import nn
 import math
 import pandas as pd
 from functools import reduce
+import torch
+from multiprocessing import Pool, cpu_count
+from numba import jit
+
+DECODER_EXTRA_NB_LAYER_COUNT = 4 # NOTE normalization layers fed to decoder adds 4 more neihbouring layers (len(model.ID))
+FREEZEOUT_LAYER_COUNT_VIT_B = 13 + DECODER_EXTRA_NB_LAYER_COUNT 
 
 
 # ---------------------------------- ATTRIBUTE AWARE LEAVES
 class AttributeAwareModule(nn.Module):
     def named_parameters(self, prefix='', recurse=True):
         gen = super().named_parameters(prefix=prefix, recurse=recurse)
-        for elem in gen: # TODO there is a mistake, this sets all parents with active attr.
-            name, param = elem
-            parent_names = name.split(".")[:-1]
-            parent_module = reduce(getattr, [self] + parent_names)
-            if hasattr(parent_module, 'active'):
-                param.active = parent_module.active
-            # if hasattr(parent_module, 'layer_index'):
-                param.layer_index = parent_module.layer_index
-            # if hasattr(parent_module, "initial_lr"):
-                param.initial_lr = parent_module.initial_lr
-            yield elem
+        for name, param in gen: # TODO there is a mistake, this sets all parents with active attr. SOLVED?
+            parent_names = name.split('.')[:-1]
+            for i in range(len(parent_names), 0, -1):
+                sub_parent_names = parent_names[:i]
+                parent_module = reduce(getattr, [self] + sub_parent_names)
+                # Add attributes from parent modules
+                if hasattr(parent_module, 'active'):
+                    setattr(param, 'active', getattr(parent_module, 'active'))
+                if hasattr(parent_module, 'layer_index'):
+                    setattr(param, 'layer_index', getattr(parent_module, 'layer_index'))
+                if hasattr(parent_module, 'initial_lr'):
+                    setattr(param, 'initial_lr', getattr(parent_module, 'initial_lr'))
+            yield name, param
 
 
 
@@ -64,7 +72,6 @@ def create_param_groups(model: nn.Module, default_weight_decay=1e-5, default_lr=
         if not param.requires_grad:
             continue
         if hasattr(param, 'active'):
-             # TODO patch embed and cls_token DOES NOT HAVE INITIAL LR AND LAYER INDEX OR MAX ITERATIONS, WHY IS IT OVERRİDDEN??
             param_group = {'params': [param], 'lr': param.initial_lr, 'layer_index': param.layer_index} # NOTE no need for activeness information
             # scaling factor (gamma) and the shift (beta), which are both learnable parameters 1-D, also normalization or bias will have 0 wd
             param_group['weight_decay'] = 0. if (param.ndim <= 1 or name.endswith(".bias")) else default_weight_decay 
@@ -123,13 +130,10 @@ def get_param_groups(optimizer, test=False, log_writer=None):
         else:
             non_freezeout_param_groups.append(param_group)
     if not test: # not necessary for testing.
-        print(len(list(optimizer.param_groups)))
-        print(len(non_freezeout_param_groups))
-        for fo_param_group in freezeout_param_groups.values():
-            for param in fo_param_group:
-                print(param.keys())
-        assert len(freezeout_param_groups) > 15, f"freezeout_param_group_count should be at least around 15 (params), but is: {len(freezeout_param_groups)}"
-        assert len(non_freezeout_param_groups) > 15, f"freezeout_param_group_count should be at least around 15 (params), but is: {len(non_freezeout_param_groups)}"
+        if len(freezeout_param_groups) >= 13:
+            print(f"number of freezeout layers should be at least around 13, but is: {len(freezeout_param_groups)}")
+        if len(non_freezeout_param_groups) >= 85:
+            print(f"freezeout_param_group_count should be at least around 15 (params), but is: {len(non_freezeout_param_groups)}")
     if log_writer:
         log_text_fo = "Freezeout layer count is: {}".format(len(freezeout_param_groups))
         print(log_text_fo)
@@ -140,20 +144,47 @@ def get_param_groups(optimizer, test=False, log_writer=None):
     param_groups = {"freezeout": freezeout_param_groups,"non_freezeout": non_freezeout_param_groups}
     return param_groups
 
+
+
+
+
+# PARAM GROUP COMPARISON
+def are_tensors_equal(tensor1, tensor2):
+    if tensor1.shape != tensor2.shape:
+        return False
+    return torch.all(torch.eq(tensor1, tensor2)).item()
+
+def are_dicts_equal(dict1, dict2):
+    """Default dictionary comparison fails due to tensor equality comparison."""
+    if dict1.keys() != dict2.keys():
+        return False
+    
+    for k, v in dict1.items():
+        if isinstance(v, list): # The element inside the list is a tensor
+            if isinstance(v[0], torch.Tensor):
+                if not are_tensors_equal(v[0], dict2[k][0]):
+                    return False
+        elif dict1[k] != dict2[k]:
+            return False
+    return True
+
 def validate_same_objects(optimizer, freezeout_param_groups):
     """Assert that changes of the optimizer param_groups will reflect to the freezeout_param_groups."""
     for param_group in optimizer.param_groups:
-        if hasattr(param_group, "layer_index"):
+        if 'layer_index' in param_group:
             layer_index = param_group['layer_index']
-            assert param_group in freezeout_param_groups[layer_index], "Optimizer param_group objects are not available in freezeout_param_groups"
-
-
+            # TODO this returned false.
+            assert any(are_dicts_equal(param_group, other_group) for other_group in freezeout_param_groups[layer_index]), "Optimizer param_group objects are not available in freezeout_param_groups"
+    #TODO there is mistake in param_group element comparision.
+    for param_group_list in freezeout_param_groups.values():
+        for param_group in param_group_list:
+            assert any(are_dicts_equal(param_group, other_group) for other_group in optimizer.param_groups), "freezeout_param_groups param_group objects are not available in optimizer param_groups"
 
 
 
 
 # ---------------------------------- ADJUST LEARNING RATES
-def adjust_learning_rate_freezeout(model, optimizer, epoch, cur_local_iteration, param_groups, iter_per_epoch, args, writer, test=False):
+def adjust_learning_rate_freezeout(model, optimizer, epoch, cur_local_iteration, param_groups, active_freezeout_modules, iter_per_epoch, args, writer, test=False):
     """Freezeout decay the learning rate with half-cycle cosine after linnear warmup, step=iteration"""
     total_warmup_iterations = iter_per_epoch*args.warmup_epochs
     cur_global_iteration = cur_local_iteration + epoch*iter_per_epoch
@@ -169,45 +200,141 @@ def adjust_learning_rate_freezeout(model, optimizer, epoch, cur_local_iteration,
         freezeout_param_groups = param_groups["freezeout"]
         non_freezeout_param_groups = param_groups["non_freezeout"]
         update_non_freezeout_layers_lr(non_freezeout_param_groups, regular_cosine_lr, cur_global_iteration, writer=writer)
-        update_freezeout_layers_lr(model, cur_global_iteration, optimizer, freezeout_param_groups, writer=writer, test=test)
-        validate_same_objects(optimizer, freezeout_param_groups)
+        update_freezeout_layers_lr(cur_global_iteration, optimizer, freezeout_param_groups, active_freezeout_modules, writer=writer)
 
-def update_freezeout_layers_lr(model, cur_global_iteration, optim, freezeout_param_groups, writer, test=False):
+def update_freezeout_layers_lr(cur_global_iteration, optim, freezeout_param_groups, active_freezeout_modules, writer):
         """initial_lr: The default learning rate of the overall model before scaling (after warmup)
         Here we assume the min_lr=0 in cosine annealing (orginally -> min_lr + (lr-min_lr)*...)"""
         # NOTE cur_global_iteration incremented by train loop
         # Loop over all modules, requires -> cur_global_iteration and module. active, max_iteration, layer_index,
-        freezeout_active_layer_count = 0
-        for m in model.modules():
+        freezeout_active_layer_set = set()
+        for m in active_freezeout_modules.modules():
             # If a module is active and at the freezeout layer level of model.modules() hierarchy.:
-            if hasattr(m,'freezeout_module_level_specifier') and m.active: # NOTE does not enter if no more active. TODO check if fixed problem.
-                freezeout_active_layer_count += 1
+            if not hasattr(m,'freezeout_module_level_specifier') or not m.active:
+                continue # NOTE does not enter if no more active.
+            # If we've passed this layer's freezing point, deactivate it.
+            target_freezeout_param_group = freezeout_param_groups.get(m.layer_index)
+            if cur_global_iteration > m.max_iteration: 
+                lr = 0
+                m.active = False
+                m.requires_grad = False # NOTE detach is no longer necessary in the forward passes.
+                # Also make sure we remove all this layer from the optimizer
+                # optim.param_groups.remove(target_freezeout_param_group) -> default one.
+                if target_freezeout_param_group is None:
+                    continue
                 target_freezeout_param_group = freezeout_param_groups[m.layer_index]
-                # If we've passed this layer's freezing point, deactivate it.
-                if cur_global_iteration > m.max_iteration: 
-                    lr = 0
-                    m.active = False
-                    m.requires_grad = False # NOTE detach is no longer necessary in the forward passes.
-                    # Also make sure we remove all this layer from the optimizer
-                    # optim.param_groups.remove(target_freezeout_param_group) -> default one.
-                    for target_freezeout_param in target_freezeout_param_group:
-                        optim.param_groups.remove(target_freezeout_param)
-                        if target_freezeout_param is not None:
-                            del target_freezeout_param # NOTE assumes that this parameter will not be activated (trainable) again
-                    del freezeout_param_groups[m.layer_index] # NOTE delete the obsolete param groups.
-                    freezeout_active_layer_count-=1
-                else:
-                    # update the LR
-                    layer_wise_initial_lr = m.initial_lr # NOTE lr_ratio already scaled lrs per layer
-                    lr = (layer_wise_initial_lr/2)*(1+np.cos(np.pi*cur_global_iteration/m.max_iteration))
-                    for target_freezeout_param in target_freezeout_param_group:
-                        target_freezeout_param['lr'] = lr
-                # Add the learning rate of this layer to the log
-                log_lr_freezeout(layer_index=m.layer_index, lr=lr, iteration=cur_global_iteration, writer=writer)
-        assert freezeout_active_layer_count == len(freezeout_param_groups), "optimizer's freezeout_param_groups should all be updated"
-        if cur_global_iteration < 50: # assert only for initial iterations
-            if not test: # Do not assert for testing.
-                assert freezeout_active_layer_count > 15, "freezeout_active_layer_count should be at least around 20 (layers)"
+                for pg_index, pg in reversed(list(enumerate(optim.param_groups))):
+                    if pg.get('layer_index') == m.layer_index:  # Assuming you have 'layer_index' in param_groups
+                        remove_param_from_optimizer(optim,pg,pg_index)
+                del freezeout_param_groups[m.layer_index]
+            else:
+                freezeout_active_layer_set.add(m.layer_index) # NOTE will see same layer_index twice for decoder input layers
+                # update the LR
+                layer_wise_initial_lr = m.initial_lr # NOTE lr_ratio already scaled lrs per layer
+                lr = compute_lr(layer_wise_initial_lr, cur_global_iteration, max_iteration=m.max_iteration)
+                for target_freezeout_param in target_freezeout_param_group:
+                    target_freezeout_param['lr'] = lr
+            # Add the learning rate of this layer to the log
+            log_lr_freezeout(layer_index=m.layer_index, lr=lr, iteration=cur_global_iteration, writer=writer)
+        assert len(freezeout_active_layer_set) == len(freezeout_param_groups), "optimizer's freezeout_param_groups should all be updated"
+
+@jit(nopython=True)
+def compute_lr(layer_wise_initial_lr, cur_global_iteration, max_iteration):
+    return (layer_wise_initial_lr/2) * (1+np.cos(np.pi*cur_global_iteration/max_iteration))
+
+def get_freezeout_modules(model):
+    return [m for m in model.modules() if hasattr(m, 'freezeout_module_level_specifier') and m.active]
+
+
+
+def update_freezeout_layers_lr(cur_global_iteration, optim, freezeout_param_groups, active_freezeout_modules, writer):
+        """initial_lr: The default learning rate of the overall model before scaling (after warmup)
+        Here we assume the min_lr=0 in cosine annealing (orginally -> min_lr + (lr-min_lr)*...)"""
+        # NOTE cur_global_iteration incremented by train loop
+        # Loop over all modules, requires -> cur_global_iteration and module. active, max_iteration, layer_index,
+        freezeout_active_layer_set = set()
+        # TODO you have to make this method incredibly fast.
+        for m in active_freezeout_modules:
+            # If a module is active and at the freezeout layer level of model.modules() hierarchy.:
+            if not hasattr(m,'freezeout_module_level_specifier') or not m.active:
+                continue # NOTE does not enter if no more active.
+            # If we've passed this layer's freezing point, deactivate it.
+            target_freezeout_param_group = freezeout_param_groups.get(m.layer_index)
+            if cur_global_iteration > m.max_iteration: 
+                lr = 0
+                m.active = False
+                m.requires_grad = False # NOTE detach is no longer necessary in the forward passes.
+                # Also make sure we remove all this layer from the optimizer
+                # optim.param_groups.remove(target_freezeout_param_group) -> default one.
+                if target_freezeout_param_group is None:
+                    continue
+                target_freezeout_param_group = freezeout_param_groups[m.layer_index]
+                for target_freezeout_param in target_freezeout_param_group:
+                    for pg_index, pg in reversed(list(enumerate(optim.param_groups))):
+                        if are_dicts_equal(pg, target_freezeout_param):
+                            remove_param_from_optimizer(optim, pg_index)
+                del freezeout_param_groups[m.layer_index]
+            else:
+                freezeout_active_layer_set.add(m.layer_index) # NOTE will see same layer_index twice for decoder input layers
+                # update the LR
+                layer_wise_initial_lr = m.initial_lr # NOTE lr_ratio already scaled lrs per layer
+                lr = (layer_wise_initial_lr/2)*(1+np.cos(np.pi*cur_global_iteration/m.max_iteration))
+                for target_freezeout_param in target_freezeout_param_group:
+                    target_freezeout_param['lr'] = lr
+            # Add the learning rate of this layer to the log
+            log_lr_freezeout(layer_index=m.layer_index, lr=lr, iteration=cur_global_iteration, writer=writer)
+        assert len(freezeout_active_layer_set) == len(freezeout_param_groups), "optimizer's freezeout_param_groups should all be updated"
+
+
+# def update_freezeout_layers_lr(cur_global_iteration, optim, freezeout_param_groups, active_freezeout_modules, writer):
+#     # Filter the model.modules() based on the attribute
+#     with Pool(cpu_count()) as pool: # TODO this wont work as epxected, objects are not modifiable in multiprocessing.
+#         freezeout_active_layer_sets = pool.map(process_module, [(m, cur_global_iteration, freezeout_param_groups, optim, writer) for m in active_freezeout_modules])
+#     # TODO update the active_freezeout_modules to remove inactive layers from the list. BAsed on this logic: modules = [m for m in model.modules() if hasattr(m, 'freezeout_module_level_specifier') and m.active]
+#     freezeout_active_layer_set = set().union(*freezeout_active_layer_sets)
+#     assert len(freezeout_active_layer_set) == len(freezeout_param_groups), "optimizer's freezeout_param_groups should all be updated"
+
+# def process_module(args):
+#     m, cur_global_iteration, freezeout_param_groups, optim, writer = args
+#     freezeout_active_layer_set = set()
+    
+#     target_freezeout_param_group = freezeout_param_groups.get(m.layer_index)
+#     if cur_global_iteration > m.max_iteration:
+#         lr = 0
+#         m.active = False
+#         m.requires_grad = False
+#         if target_freezeout_param_group is not None:
+#             for pg_index, pg in reversed(list(enumerate(optim.param_groups))):
+#                 if pg.get('layer_index') == m.layer_index:
+#                     remove_param_from_optimizer(optim, pg, pg_index)
+#             del freezeout_param_groups[m.layer_index]
+#     else:
+#         freezeout_active_layer_set.add(m.layer_index)
+#         layer_wise_initial_lr = m.initial_lr
+#         lr = (layer_wise_initial_lr/2) * (1+np.cos(np.pi*cur_global_iteration/m.max_iteration))
+#         for target_freezeout_param in target_freezeout_param_group:
+#             target_freezeout_param['lr'] = lr
+#     log_lr_freezeout(layer_index=m.layer_index, lr=lr, iteration=cur_global_iteration, writer=writer) #  TODO fasten this log.
+#     return freezeout_active_layer_set
+
+def remove_param_from_optimizer(optim, pg_index):
+    # Remove corresponding state
+    for param in optim.param_groups[pg_index]['params']:
+        if param in optim.state:
+            del optim.state[param]
+    del optim.param_groups[pg_index]
+
+# ALIGN OBJECTS TO STATE_DICTS
+def align_optimizer_to_checkpoint(optimizer, checkpoint_state_dict, model):
+    checkpoint_layer_indexes = {pg.get('layer_index', None) for pg in checkpoint_state_dict['param_groups']}
+    for m in model.modules():
+        if not hasattr(m, 'freezeout_module_level_specifier') or not m.active:
+            continue
+        layer_index = m.layer_index
+        if layer_index not in checkpoint_layer_indexes:
+            for pg_index, pg in reversed(list(enumerate(optimizer.param_groups))):
+                if pg.get('layer_index') == layer_index:  # Assuming you have 'layer_index' in param_groups
+                    remove_param_from_optimizer(optimizer, pg_index)
 
 
 def update_non_freezeout_layers_lr(non_freezeout_param_groups, regular_cosine_lr, cur_global_iteration, writer):
@@ -215,4 +342,12 @@ def update_non_freezeout_layers_lr(non_freezeout_param_groups, regular_cosine_lr
     Cosine annealng applied previously to lr is regular_cosine_lr."""
     for non_freezeout_param_group in non_freezeout_param_groups:
         non_freezeout_param_group['lr'] = regular_cosine_lr
+    # TODO you have to make the logging incredibly fast.
     log_lr_non_freezeout(lr=regular_cosine_lr, iteration=cur_global_iteration, writer=writer)
+
+
+
+
+
+
+
