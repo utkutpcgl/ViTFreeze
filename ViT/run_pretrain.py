@@ -28,7 +28,7 @@ import timm.optim.optim_factory as optim_factory
 
 import util.misc as misc
 from util.misc import NativeScalerWithGradNormCount as NativeScaler
-from util.freezeout_utils import create_param_groups, get_param_groups, validate_same_objects, FREEZEOUT_LAYER_COUNT_VIT_B
+from util.freezeout_utils import create_param_groups, get_param_groups, validate_same_objects, get_freezeout_modules, FREEZEOUT_LAYER_COUNT_VIT_B
 import models_mim
 from engine_pretrain import train_one_epoch
 import warnings
@@ -43,11 +43,11 @@ scale_fn = {'linear':lambda x: x,
 def get_args():
     parser = argparse.ArgumentParser('MAE pre-training', add_help=False)
     parser.add_argument('--batch_size', default=128, type=int, help='Batch size per GPU (effective batch size is batch_size*accum_iter*ngpus') # 8*256 = 2048 for base model
-    parser.add_argument('--epochs', default=10, type=int) # 100 for initial training
+    parser.add_argument('--epochs', default=5, type=int) # 100 for initial training
     parser.add_argument('--accum_iter', default=1, type=int, help='Accumulate gradient iterations (for increasing the effective batch size under memory constraints)')
 
     # Model parameters
-    parser.add_argument('--model', default='MIM_vit_base_patch16', type=str, help='Name of model to train') # NOTE was mae_vit_large_patch16 TODO why mae? CHECKED
+    parser.add_argument('--model', default='MIM_vit_base_patch16', type=str, help='Name of model to train') # NOTE was mae_vit_large_patch16
     parser.add_argument('--input_size', default=224, type=int, help='images input size') # 224 always
     parser.add_argument('--mask_ratio', default=0.75, type=float, help='Masking ratio (percentage of removed patches).') # 0.75 always
     parser.add_argument('--hog_nbins', default=9, type=int, help='nbins for HOG feature') # NOTE paper says 18 but here and in the repo it says 9??
@@ -71,7 +71,7 @@ def get_args():
     parser.add_argument('--seed', default=0, type=int)
     parser.add_argument('--resume', default='', help='resume from checkpoint')
     parser.add_argument('--auto_resume', action='store_true')
-    parser.set_defaults(auto_resume=True)
+    parser.set_defaults(auto_resume=False) # TODO make this work for the long
     parser.add_argument('--start_epoch', default=0, type=int, help='start epoch')
     parser.add_argument('--num_workers', default=12, type=int) # NOTE this is per gpu.
     parser.add_argument('--pin_mem', action='store_true', help='Pin CPU memory in DataLoader for more efficient transfer to GPU.')
@@ -157,7 +157,7 @@ def main(args):
     model_without_ddp = model
     
     if args.distributed:
-        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=True)
+        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=False)
         model_without_ddp = model.module
     
     # NOTE I want only parameters of the encoder layer to have these freezeout specific param_groups.
@@ -172,6 +172,7 @@ def main(args):
 
     # NOTE initialize the param_groups after auto loading the model and optimizer in case starting from checkpoint
     param_groups = get_param_groups(optimizer, test=False, log_writer=log_writer) # freezout specific
+    active_freezeout_modules = get_freezeout_modules(model_without_ddp)
     validate_same_objects(optimizer, param_groups["freezeout"]) # freezout specific assertion
 
     print(f"Start training for {args.epochs} epochs")
@@ -179,8 +180,8 @@ def main(args):
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
             data_loader_train.sampler.set_epoch(epoch)
-        train_stats = train_one_epoch(model, data_loader_train, optimizer, device, epoch, loss_scaler, param_groups, log_writer=log_writer, args=args)
-        if args.output_dir and (epoch%10 == 0 or epoch+1 == args.epochs):
+        train_stats = train_one_epoch(model, data_loader_train, optimizer, device, epoch, loss_scaler, param_groups, active_freezeout_modules=active_freezeout_modules, log_writer=log_writer, args=args)
+        if args.output_dir and (epoch%50 == 0 or epoch+1 == args.epochs):
             misc.save_model(args=args, model=model, model_without_ddp=model_without_ddp, optimizer=optimizer, loss_scaler=loss_scaler, epoch=epoch)
 
         log_stats = {**{f'train_{k}': v for k, v in train_stats.items()}, 'epoch': epoch}
