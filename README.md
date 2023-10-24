@@ -4,20 +4,74 @@
 
 ### Pre-training:
 
-  Explained in the repos README.md as this, to pre-train ViT-B:
-  ```bash
-  OMP_NUM_THREADS=1 python -m torch.distributed.launch --nproc_per_node=8 run_pretrain.py --batch_size 256 --model MIM_vit_base_patch16 --hog_nbins 9 --mask_ratio 0.75 --epochs 1600 --warmup_epochs 40 --blr 2e-4 --weight_decay 0.05 --data_path /path/to/imagenet/ --output_dir /output_dir/
-  ```
+Explained in the repos README.md as this, to pre-train ViT-B:
+```bash
+OMP_NUM_THREADS=1 python -m torch.distributed.launch --nproc_per_node=8 run_pretrain.py --batch_size 256 --model MIM_vit_base_patch16 --hog_nbins 9 --mask_ratio 0.75 --epochs 1600 --warmup_epochs 40 --blr 2e-4 --weight_decay 0.05 --data_path /path/to/imagenet/ --output_dir /output_dir/
+```
 
-#### Noticed:
+#### Train Configurations:
+- The learning rate is set to 2e-4 (based on repo README)
 - accum_iter set to 2 for 4 gpus (normally 8).
 - warm-up epoch is set to 10 for 100 epochs and 40 for all other epoch settings.
 - Note that min_lr is not set in the repo's command and is not explained in the paper.
-- Code uses as many gpus as there are available, hence, set CUDA_VISIBLE_DEVICES.
+- Code uses as many gpus as there are available, hence, set CUDA_VISIBLE_DEVICES. (optional CUDA_VISIBLE_DEVICES=4,5,6,7 )
+
+*Freezeout Pretrain for 100 epochs:*
+```bash
+bash record.sh CUDA_VISIBLE_DEVICES=0,1,2,3 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29501 run_pretrain.py \
+--epochs 100 --batch_size 256 --warmup_epochs 10 \
+--blr 2e-4 --world_size 4 --accum_iter 2 --model MIM_vit_base_patch16 \
+--data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
+--output_dir full_pretrain_out_freezeout --log_dir full_pretrain_out_freezeout
+```
+
+*Regular Pretrain for 100 epochs:*
 
 ```bash
-CUDA_VISIBLE_DEVICES=0,1,2,3 OMP_NUM_THREADS=1 python3 -m torch.distributed.launch --nproc_per_node=4 run_pretrain.py --epochs 100 --batch_size 256 --warmup_epochs 10 --world_size 4 --accum_iter 2 
+bash record.sh  CUDA_VISIBLE_DEVICES=4,5,6,7 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29502 run_pretrain.py \
+--epochs 100 --batch_size 256 --warmup_epochs 10 \
+--blr 2e-4 --world_size 4 --accum_iter 2 --weight_decay 0.05 \
+--model MIM_vit_base_patch16 --hog_nbins 9 --mask_ratio 0.75 \
+--data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
+--output_dir full_pretrain_out --log_dir full_pretrain_out
 ```
+
+### Fine Tuning:
+
+Explained in the repos README.md as this, to finetune ViT-B:
+```bash
+OMP_NUM_THREADS=1 python -m torch.distributed.launch --nproc_per_node=8 run_finetune.py --batch_size 128 --model vit_base_patch16 --finetune /path/to/checkpoint.pth --epochs 100 --warmup_epochs 20 --lr 2e-3 --min_lr 1e-5 --layer_decay 0.65 --weight_decay 0.05 --drop_path 0.1 --reprob 0.25 --mixup 0.8 --cutmix 1.0 --dist_eval --data_path /path/to/imagenet/ --output_dir /output_dir/
+```
+
+#### Training configurations
+- For 100-epoch pre-trained model, we set lr=4e-3, layer_decay=0.75 and min_lr=1e-6
+
+*Finetune Freezeout-100 epochs pre-trained model:*
+```bash
+bash record.sh CUDA_VISIBLE_DEVICES=0,1,2,3 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29503 run_finetune.py \
+--world_size 4 --accum_iter 2 \
+--batch_size 128 --model vit_base_patch16 --finetune /raid/home_yedek/utku/freezeout_localmim_rho/ViT/full_pretrain_out_freezeout/checkpoint-99.pth \
+--epochs 100 --warmup_epochs 20 --lr 4e-3 --min_lr 1e-6 --layer_decay 0.75 \
+--weight_decay 0.05 --drop_path 0.1 --reprob 0.25 --mixup 0.8 --cutmix 1.0 --dist_eval \
+--data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
+--output_dir full_finetune_out_freezeout/ --log_dir full_finetune_out_freezeout
+```
+
+*Finetune Regular-100 epochs pre-trained model:*
+```bash
+bash record.sh CUDA_VISIBLE_DEVICES=4,5,6,7 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29504 run_finetune.py \
+--world_size 4 --accum_iter 2 \
+--batch_size 128 --model vit_base_patch16 --finetune /raid/home_yedek/utku/LocalMIM/ViT/full_pretrain_out/checkpoint-99.pth \
+--epochs 100 --warmup_epochs 20 --lr 4e-3 --min_lr 1e-6 --layer_decay 0.75 \
+--weight_decay 0.05 --drop_path 0.1 --reprob 0.25 --mixup 0.8 --cutmix 1.0 --dist_eval \
+--data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
+--output_dir full_finetune_out/ --log_dir full_finetune_out
+```
+
 
 
 
@@ -133,3 +187,39 @@ This is a simplified example and you'll need to adapt it to fit into your existi
 ## Important questions
 
 - The method would benefit from freezing the decoder (4 times usage in a forward pass), but it will be used less as we freeze stages. Freezing the decoder together with the encoder should be kept as an ablation study, as it might behave unexpectedly.
+
+
+## Imp details
+
+### Changed for finetunning:
+```python
+def str_to_pil_interp(mode_str):
+    if isinstance(mode_str,str):
+        return _str_to_pil_interpolation[mode_str]
+    else:
+        return _str_to_pil_interpolation[mode_str.value]
+
+
+def str_to_interp_mode(mode_str):
+    if has_interpolation_mode:
+        if isinstance(mode_str,str):
+            return _str_to_torch_interpolation[mode_str]
+        else:
+            return _str_to_torch_interpolation[mode_str.value]
+    else:
+        if isinstance(mode_str,str):
+            return _str_to_pil_interpolation[mode_str]
+        else:
+            return _str_to_pil_interpolation[mode_str.value]
+```
+
+Commented out the lines below in the vision_transformer.py code of timm models:
+
+```python
+def forward_head(self, x, pre_logits: bool = False):
+        # if self.global_pool:
+        #     x = x[:, self.num_prefix_tokens:].mean(dim=1) if self.global_pool == 'avg' else x[:, 0]
+        # x = self.fc_norm(x)
+        x = self.head_drop(x)
+        return x if pre_logits else self.head(x)
+```
