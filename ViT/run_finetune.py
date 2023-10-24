@@ -21,7 +21,6 @@ import torch
 import torch.backends.cudnn as cudnn
 from torch.utils.tensorboard import SummaryWriter
 
-import timm
 from timm.models.layers import trunc_normal_
 from timm.data.mixup import Mixup
 from timm.loss import LabelSmoothingCrossEntropy, SoftTargetCrossEntropy
@@ -45,7 +44,7 @@ def get_args():
     parser.add_argument('--accum_iter', default=1, type=int, help='Accumulate gradient iterations (for increasing the effective batch size under memory constraints)')
 
     # Model parameters
-    parser.add_argument('--model', default='vit_large_patch16', type=str, help='Name of model to train')
+    parser.add_argument('--model', default='vit_base_patch16', type=str, help='Name of model to train')
     parser.add_argument('--input_size', default=224, type=int, help='images input size')
     parser.add_argument('--drop_path', type=float, default=0.1, help='Drop path rate (default: 0.1)')
 
@@ -78,16 +77,16 @@ def get_args():
     parser.add_argument('--mixup_mode', type=str, default='batch', help='How to apply mixup/cutmix params. Per "batch", "pair", or "elem"')
 
     # * Finetuning params
-    parser.add_argument('--finetune', default='', help='finetune from checkpoint')
+    parser.add_argument('--finetune', default='/raid/home_yedek/utku/LocalMIM/ViT/full_pretrain_out/checkpoint-99.pth', help='finetune from checkpoint')
     parser.add_argument('--global_pool', action='store_true')
     parser.set_defaults(global_pool=True)
     parser.add_argument('--cls_token', action='store_false', dest='global_pool', help='Use class token instead of global pool for classification')
 
     # Dataset parameters
-    parser.add_argument('--data_path', default='./dataset/ImageNet/', type=str, help='dataset path')
+    parser.add_argument('--data_path', default='/raid/utku/datasets/imagenet/classification/train/image_folders', type=str, help='dataset path')
     parser.add_argument('--nb_classes', default=1000, type=int, help='number of the classification types')
-    parser.add_argument('--output_dir', default='./output/MAE_ViT_B_Finetune', help='path where to save, empty for no saving')
-    parser.add_argument('--log_dir', default=None, help='path where to tensorboard log')
+    parser.add_argument('--output_dir', default='full_finetune_out_temp', help='path where to save, empty for no saving')
+    parser.add_argument('--log_dir', default="full_finetune_out_temp", help='path where to tensorboard log')
     parser.add_argument('--device', default='cuda', help='device to use for training / testing')
     parser.add_argument('--seed', default=0, type=int)
     parser.add_argument('--resume', default='', help='resume from checkpoint')
@@ -103,7 +102,7 @@ def get_args():
 
     # distributed training parameters
     parser.add_argument('--world_size', default=1, type=int, help='number of distributed processes')
-    parser.add_argument('--local_rank', default=-1, type=int)
+    parser.add_argument('--local_rank', default=0, type=int)
     parser.add_argument('--dist_on_itp', action='store_true')
     parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
 
