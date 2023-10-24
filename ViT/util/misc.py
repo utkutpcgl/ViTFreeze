@@ -19,6 +19,7 @@ from pathlib import Path
 import torch
 import torch.distributed as dist
 from torch._six import inf
+from util.freezeout_utils import align_optimizer_to_checkpoint
 
 
 class SmoothedValue(object):
@@ -251,7 +252,7 @@ class NativeScalerWithGradNormCount:
             else:
                 self._scaler.unscale_(optimizer)
                 norm = get_grad_norm_(parameters)
-            self._scaler.step(optimizer)
+            self._scaler.step(optimizer) # TODO there is an error here while resuming training
             self._scaler.update()
         else:
             norm = None
@@ -280,6 +281,7 @@ def get_grad_norm_(parameters, norm_type: float = 2.0) -> torch.Tensor:
 
 
 def save_model(args, epoch, model, model_without_ddp, optimizer, loss_scaler):
+    """NOTE Save model, optimizer loss scalar and args in the checkpoint"""
     output_dir = Path(args.output_dir)
     epoch_name = str(epoch)
     if loss_scaler is not None:
@@ -287,13 +289,14 @@ def save_model(args, epoch, model, model_without_ddp, optimizer, loss_scaler):
         for checkpoint_path in checkpoint_paths:
             to_save = {'model': model_without_ddp.state_dict(), 'optimizer': optimizer.state_dict(),
                        'epoch': epoch, 'scaler': loss_scaler.state_dict(), 'args': args}
-            save_on_master(to_save, checkpoint_path)
+            save_on_master(to_save, checkpoint_path) # Save on master rank
     else:
         client_state = {'epoch': epoch}
         model.save_checkpoint(save_dir=args.output_dir, tag="checkpoint-%s" % epoch_name, client_state=client_state)
 
 
 def auto_load_model(args, model_without_ddp, optimizer, loss_scaler):
+    """NOTE Modifies the model, optimizer, args.start_epoch, loss_scaler, resume model checkpoint based on the checkpoint."""
     output_dir = Path(args.output_dir)
     if args.auto_resume and len(args.resume) == 0:
         import glob
@@ -315,8 +318,11 @@ def auto_load_model(args, model_without_ddp, optimizer, loss_scaler):
         model_without_ddp.load_state_dict(checkpoint['model'])
         print("Resume checkpoint %s" % args.resume)
         if 'optimizer' in checkpoint and 'epoch' in checkpoint and not (hasattr(args, 'eval') and args.eval):
+            # NOTE modifications made to the optimizer param_groups enforces the line below
+            align_optimizer_to_checkpoint(optimizer=optimizer, checkpoint_state_dict=checkpoint['optimizer'], model=model_without_ddp)
             optimizer.load_state_dict(checkpoint['optimizer'])
             args.start_epoch = checkpoint['epoch'] + 1
+            print("Start epoch is: ", args.start_epoch)
             if 'scaler' in checkpoint:
                 loss_scaler.load_state_dict(checkpoint['scaler'])
             print("With optim & sched!")
