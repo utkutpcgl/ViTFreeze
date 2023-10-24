@@ -1,0 +1,422 @@
+/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py:180: FutureWarning: The module torch.distributed.launch is deprecated
+and will be removed in future. Use torchrun.
+Note that --use_env is set by default in torchrun.
+If your script expects `--local_rank` argument to be set, please
+change it to read from `os.environ['LOCAL_RANK']` instead. See 
+https://pytorch.org/docs/stable/distributed.html#launch-utility for 
+further instructions
+
+  warnings.warn(
+| distributed init (rank 0): env://, gpu 0
+| distributed init (rank 2): env://, gpu 2
+| distributed init (rank 3): env://, gpu 3
+| distributed init (rank 1): env://, gpu 1
+[10:19:16.290986] Namespace(batch_size=128, epochs=100, accum_iter=2, model='vit_base_patch16', input_size=224, drop_path=0.1, clip_grad=None, weight_decay=0.05, lr=0.004, blr=0.001, layer_decay=0.75, min_lr=1e-06, warmup_epochs=20, color_jitter=None, aa='rand-m9-mstd0.5-inc1', smoothing=0.1, reprob=0.25, remode='pixel', recount=1, resplit=False, mixup=0.8, cutmix=1.0, cutmix_minmax=None, mixup_prob=1.0, mixup_switch_prob=0.5, mixup_mode='batch', finetune='/raid/home_yedek/utku/LocalMIM/ViT/full_pretrain_out/checkpoint-99.pth', global_pool=True, data_path='/raid/utku/datasets/imagenet/classification/train/image_folders', nb_classes=1000, output_dir='full_finetune_out/', log_dir='full_finetune_out', device='cuda', seed=0, resume='', auto_resume=True, start_epoch=0, eval=False, dist_eval=True, num_workers=10, pin_mem=True, world_size=4, local_rank=0, dist_on_itp=False, dist_url='env://', rank=0, gpu=0, distributed=True, dist_backend='nccl')
+[10:19:21.587489] Dataset ImageFolder
+    Number of datapoints: 1281167
+    Root location: /raid/utku/datasets/imagenet/classification/train/image_folders
+    StandardTransform
+Transform: Compose(
+               RandomResizedCropAndInterpolation(size=(224, 224), scale=(0.08, 1.0), ratio=(0.75, 1.3333), interpolation=bicubic)
+               RandomHorizontalFlip(p=0.5)
+               RandAugment(n=2, ops=
+           	AugmentOp(name=AutoContrast, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=Equalize, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=Invert, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=Rotate, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=PosterizeIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=SolarizeIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=SolarizeAdd, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ColorIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ContrastIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=BrightnessIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=SharpnessIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ShearX, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ShearY, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=TranslateXRel, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=TranslateYRel, p=0.5, m=9, mstd=0.5))
+               ToTensor()
+               Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+               RandomErasing(p=0.25, mode=pixel, count=(1, 1))
+           )
+[10:19:27.584820] Dataset ImageFolder
+    Number of datapoints: 1281167
+    Root location: /raid/utku/datasets/imagenet/classification/train/image_folders
+    StandardTransform
+Transform: Compose(
+               Resize(size=256, interpolation=bicubic, max_size=None, antialias=None)
+               CenterCrop(size=(224, 224))
+               ToTensor()
+               Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+           )
+[10:19:27.585221] Sampler_train = <torch.utils.data.distributed.DistributedSampler object at 0x7f747b1e76d0>
+[10:19:27.585257] Warning: Enabling distributed evaluation with an eval dataset not divisible by process number. This will slightly alter validation results as extra duplicate entries are added to achieve equal num of samples per-process.
+[10:19:27.588295] Mixup is activated!
+[10:19:29.699386] Load pre-trained checkpoint from: /raid/home_yedek/utku/LocalMIM/ViT/full_pretrain_out/checkpoint-99.pth
+[10:19:29.790136] _IncompatibleKeys(missing_keys=['fc_norm.weight', 'fc_norm.bias', 'head.weight', 'head.bias'], unexpected_keys=['norm.0.weight', 'norm.0.bias', 'norm.1.weight', 'norm.1.bias', 'norm.2.weight', 'norm.2.bias', 'norm.3.weight', 'norm.3.bias', 'decoder.0.mask_token', 'decoder.0.pos_embed', 'decoder.0.embed.weight', 'decoder.0.embed.bias', 'decoder.0.blocks.0.norm1.weight', 'decoder.0.blocks.0.norm1.bias', 'decoder.0.blocks.0.attn.qkv.weight', 'decoder.0.blocks.0.attn.qkv.bias', 'decoder.0.blocks.0.attn.proj.weight', 'decoder.0.blocks.0.attn.proj.bias', 'decoder.0.blocks.0.norm2.weight', 'decoder.0.blocks.0.norm2.bias', 'decoder.0.blocks.0.mlp.fc1.weight', 'decoder.0.blocks.0.mlp.fc1.bias', 'decoder.0.blocks.0.mlp.fc2.weight', 'decoder.0.blocks.0.mlp.fc2.bias', 'decoder.0.norm.weight', 'decoder.0.norm.bias', 'decoder.0.pred.0.weight', 'decoder.0.pred.0.bias', 'decoder.0.pred.1.weight', 'decoder.0.pred.1.bias', 'decoder.0.pred.3.weight', 'decoder.0.pred.3.bias', 'decoder.0.pred.4.weight', 'decoder.0.pred.4.bias', 'decoder.1.mask_token', 'decoder.1.pos_embed', 'decoder.1.embed.weight', 'decoder.1.embed.bias', 'decoder.1.blocks.0.norm1.weight', 'decoder.1.blocks.0.norm1.bias', 'decoder.1.blocks.0.attn.qkv.weight', 'decoder.1.blocks.0.attn.qkv.bias', 'decoder.1.blocks.0.attn.proj.weight', 'decoder.1.blocks.0.attn.proj.bias', 'decoder.1.blocks.0.norm2.weight', 'decoder.1.blocks.0.norm2.bias', 'decoder.1.blocks.0.mlp.fc1.weight', 'decoder.1.blocks.0.mlp.fc1.bias', 'decoder.1.blocks.0.mlp.fc2.weight', 'decoder.1.blocks.0.mlp.fc2.bias', 'decoder.1.norm.weight', 'decoder.1.norm.bias', 'decoder.1.pred.0.weight', 'decoder.1.pred.0.bias', 'decoder.1.pred.1.weight', 'decoder.1.pred.1.bias', 'decoder.2.mask_token', 'decoder.2.pos_embed', 'decoder.2.embed.weight', 'decoder.2.embed.bias', 'decoder.2.blocks.0.norm1.weight', 'decoder.2.blocks.0.norm1.bias', 'decoder.2.blocks.0.attn.qkv.weight', 'decoder.2.blocks.0.attn.qkv.bias', 'decoder.2.blocks.0.attn.proj.weight', 'decoder.2.blocks.0.attn.proj.bias', 'decoder.2.blocks.0.norm2.weight', 'decoder.2.blocks.0.norm2.bias', 'decoder.2.blocks.0.mlp.fc1.weight', 'decoder.2.blocks.0.mlp.fc1.bias', 'decoder.2.blocks.0.mlp.fc2.weight', 'decoder.2.blocks.0.mlp.fc2.bias', 'decoder.2.norm.weight', 'decoder.2.norm.bias', 'decoder.2.pred.0.weight', 'decoder.2.pred.0.bias', 'decoder.3.mask_token', 'decoder.3.pos_embed', 'decoder.3.embed.weight', 'decoder.3.embed.bias', 'decoder.3.blocks.0.norm1.weight', 'decoder.3.blocks.0.norm1.bias', 'decoder.3.blocks.0.attn.qkv.weight', 'decoder.3.blocks.0.attn.qkv.bias', 'decoder.3.blocks.0.attn.proj.weight', 'decoder.3.blocks.0.attn.proj.bias', 'decoder.3.blocks.0.norm2.weight', 'decoder.3.blocks.0.norm2.bias', 'decoder.3.blocks.0.mlp.fc1.weight', 'decoder.3.blocks.0.mlp.fc1.bias', 'decoder.3.blocks.0.mlp.fc2.weight', 'decoder.3.blocks.0.mlp.fc2.bias', 'decoder.3.norm.weight', 'decoder.3.norm.bias', 'decoder.3.pred.1.weight', 'decoder.3.pred.1.bias', 'hog_enc.0.conv.weight', 'hog_enc.1.conv.weight', 'hog_enc.2.conv.weight', 'hog_enc.3.conv.weight'])
+[10:19:29.870780] number of params (M): 86.57
+[10:19:29.870855] base lr: 1.00e-03
+[10:19:29.870872] actual lr: 4.00e-03
+[10:19:29.870904] accumulate grad iterations: 2
+[10:19:29.870918] effective batch size: 1024
+[10:19:30.274532] parameter groups: 
+{
+  "layer_0_no_decay": {
+    "lr_scale": 0.023757264018058777,
+    "weight_decay": 0.0,
+    "params": [
+      "cls_token",
+      "pos_embed",
+      "patch_embed.proj.bias"
+    ]
+  },
+  "layer_0_decay": {
+    "lr_scale": 0.023757264018058777,
+    "weight_decay": 0.05,
+    "params": [
+      "patch_embed.proj.weight"
+    ]
+  },
+  "layer_1_no_decay": {
+    "lr_scale": 0.03167635202407837,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.0.norm1.weight",
+      "blocks.0.norm1.bias",
+      "blocks.0.attn.qkv.bias",
+      "blocks.0.attn.proj.bias",
+      "blocks.0.norm2.weight",
+      "blocks.0.norm2.bias",
+      "blocks.0.mlp.fc1.bias",
+      "blocks.0.mlp.fc2.bias"
+    ]
+  },
+  "layer_1_decay": {
+    "lr_scale": 0.03167635202407837,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.0.attn.qkv.weight",
+      "blocks.0.attn.proj.weight",
+      "blocks.0.mlp.fc1.weight",
+      "blocks.0.mlp.fc2.weight"
+    ]
+  },
+  "layer_2_no_decay": {
+    "lr_scale": 0.04223513603210449,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.1.norm1.weight",
+      "blocks.1.norm1.bias",
+      "blocks.1.attn.qkv.bias",
+      "blocks.1.attn.proj.bias",
+      "blocks.1.norm2.weight",
+      "blocks.1.norm2.bias",
+      "blocks.1.mlp.fc1.bias",
+      "blocks.1.mlp.fc2.bias"
+    ]
+  },
+  "layer_2_decay": {
+    "lr_scale": 0.04223513603210449,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.1.attn.qkv.weight",
+      "blocks.1.attn.proj.weight",
+      "blocks.1.mlp.fc1.weight",
+      "blocks.1.mlp.fc2.weight"
+    ]
+  },
+  "layer_3_no_decay": {
+    "lr_scale": 0.056313514709472656,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.2.norm1.weight",
+      "blocks.2.norm1.bias",
+      "blocks.2.attn.qkv.bias",
+      "blocks.2.attn.proj.bias",
+      "blocks.2.norm2.weight",
+      "blocks.2.norm2.bias",
+      "blocks.2.mlp.fc1.bias",
+      "blocks.2.mlp.fc2.bias"
+    ]
+  },
+  "layer_3_decay": {
+    "lr_scale": 0.056313514709472656,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.2.attn.qkv.weight",
+      "blocks.2.attn.proj.weight",
+      "blocks.2.mlp.fc1.weight",
+      "blocks.2.mlp.fc2.weight"
+    ]
+  },
+  "layer_4_no_decay": {
+    "lr_scale": 0.07508468627929688,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.3.norm1.weight",
+      "blocks.3.norm1.bias",
+      "blocks.3.attn.qkv.bias",
+      "blocks.3.attn.proj.bias",
+      "blocks.3.norm2.weight",
+      "blocks.3.norm2.bias",
+      "blocks.3.mlp.fc1.bias",
+      "blocks.3.mlp.fc2.bias"
+    ]
+  },
+  "layer_4_decay": {
+    "lr_scale": 0.07508468627929688,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.3.attn.qkv.weight",
+      "blocks.3.attn.proj.weight",
+      "blocks.3.mlp.fc1.weight",
+      "blocks.3.mlp.fc2.weight"
+    ]
+  },
+  "layer_5_no_decay": {
+    "lr_scale": 0.1001129150390625,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.4.norm1.weight",
+      "blocks.4.norm1.bias",
+      "blocks.4.attn.qkv.bias",
+      "blocks.4.attn.proj.bias",
+      "blocks.4.norm2.weight",
+      "blocks.4.norm2.bias",
+      "blocks.4.mlp.fc1.bias",
+      "blocks.4.mlp.fc2.bias"
+    ]
+  },
+  "layer_5_decay": {
+    "lr_scale": 0.1001129150390625,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.4.attn.qkv.weight",
+      "blocks.4.attn.proj.weight",
+      "blocks.4.mlp.fc1.weight",
+      "blocks.4.mlp.fc2.weight"
+    ]
+  },
+  "layer_6_no_decay": {
+    "lr_scale": 0.13348388671875,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.5.norm1.weight",
+      "blocks.5.norm1.bias",
+      "blocks.5.attn.qkv.bias",
+      "blocks.5.attn.proj.bias",
+      "blocks.5.norm2.weight",
+      "blocks.5.norm2.bias",
+      "blocks.5.mlp.fc1.bias",
+      "blocks.5.mlp.fc2.bias"
+    ]
+  },
+  "layer_6_decay": {
+    "lr_scale": 0.13348388671875,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.5.attn.qkv.weight",
+      "blocks.5.attn.proj.weight",
+      "blocks.5.mlp.fc1.weight",
+      "blocks.5.mlp.fc2.weight"
+    ]
+  },
+  "layer_7_no_decay": {
+    "lr_scale": 0.177978515625,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.6.norm1.weight",
+      "blocks.6.norm1.bias",
+      "blocks.6.attn.qkv.bias",
+      "blocks.6.attn.proj.bias",
+      "blocks.6.norm2.weight",
+      "blocks.6.norm2.bias",
+      "blocks.6.mlp.fc1.bias",
+      "blocks.6.mlp.fc2.bias"
+    ]
+  },
+  "layer_7_decay": {
+    "lr_scale": 0.177978515625,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.6.attn.qkv.weight",
+      "blocks.6.attn.proj.weight",
+      "blocks.6.mlp.fc1.weight",
+      "blocks.6.mlp.fc2.weight"
+    ]
+  },
+  "layer_8_no_decay": {
+    "lr_scale": 0.2373046875,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.7.norm1.weight",
+      "blocks.7.norm1.bias",
+      "blocks.7.attn.qkv.bias",
+      "blocks.7.attn.proj.bias",
+      "blocks.7.norm2.weight",
+      "blocks.7.norm2.bias",
+      "blocks.7.mlp.fc1.bias",
+      "blocks.7.mlp.fc2.bias"
+    ]
+  },
+  "layer_8_decay": {
+    "lr_scale": 0.2373046875,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.7.attn.qkv.weight",
+      "blocks.7.attn.proj.weight",
+      "blocks.7.mlp.fc1.weight",
+      "blocks.7.mlp.fc2.weight"
+    ]
+  },
+  "layer_9_no_decay": {
+    "lr_scale": 0.31640625,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.8.norm1.weight",
+      "blocks.8.norm1.bias",
+      "blocks.8.attn.qkv.bias",
+      "blocks.8.attn.proj.bias",
+      "blocks.8.norm2.weight",
+      "blocks.8.norm2.bias",
+      "blocks.8.mlp.fc1.bias",
+      "blocks.8.mlp.fc2.bias"
+    ]
+  },
+  "layer_9_decay": {
+    "lr_scale": 0.31640625,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.8.attn.qkv.weight",
+      "blocks.8.attn.proj.weight",
+      "blocks.8.mlp.fc1.weight",
+      "blocks.8.mlp.fc2.weight"
+    ]
+  },
+  "layer_10_no_decay": {
+    "lr_scale": 0.421875,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.9.norm1.weight",
+      "blocks.9.norm1.bias",
+      "blocks.9.attn.qkv.bias",
+      "blocks.9.attn.proj.bias",
+      "blocks.9.norm2.weight",
+      "blocks.9.norm2.bias",
+      "blocks.9.mlp.fc1.bias",
+      "blocks.9.mlp.fc2.bias"
+    ]
+  },
+  "layer_10_decay": {
+    "lr_scale": 0.421875,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.9.attn.qkv.weight",
+      "blocks.9.attn.proj.weight",
+      "blocks.9.mlp.fc1.weight",
+      "blocks.9.mlp.fc2.weight"
+    ]
+  },
+  "layer_11_no_decay": {
+    "lr_scale": 0.5625,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.10.norm1.weight",
+      "blocks.10.norm1.bias",
+      "blocks.10.attn.qkv.bias",
+      "blocks.10.attn.proj.bias",
+      "blocks.10.norm2.weight",
+      "blocks.10.norm2.bias",
+      "blocks.10.mlp.fc1.bias",
+      "blocks.10.mlp.fc2.bias"
+    ]
+  },
+  "layer_11_decay": {
+    "lr_scale": 0.5625,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.10.attn.qkv.weight",
+      "blocks.10.attn.proj.weight",
+      "blocks.10.mlp.fc1.weight",
+      "blocks.10.mlp.fc2.weight"
+    ]
+  },
+  "layer_12_no_decay": {
+    "lr_scale": 0.75,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.11.norm1.weight",
+      "blocks.11.norm1.bias",
+      "blocks.11.attn.qkv.bias",
+      "blocks.11.attn.proj.bias",
+      "blocks.11.norm2.weight",
+      "blocks.11.norm2.bias",
+      "blocks.11.mlp.fc1.bias",
+      "blocks.11.mlp.fc2.bias"
+    ]
+  },
+  "layer_12_decay": {
+    "lr_scale": 0.75,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.11.attn.qkv.weight",
+      "blocks.11.attn.proj.weight",
+      "blocks.11.mlp.fc1.weight",
+      "blocks.11.mlp.fc2.weight"
+    ]
+  },
+  "layer_13_no_decay": {
+    "lr_scale": 1.0,
+    "weight_decay": 0.0,
+    "params": [
+      "fc_norm.weight",
+      "fc_norm.bias",
+      "head.bias"
+    ]
+  },
+  "layer_13_decay": {
+    "lr_scale": 1.0,
+    "weight_decay": 0.05,
+    "params": [
+      "head.weight"
+    ]
+  }
+}
+[10:19:30.275992] criterion = SoftTargetCrossEntropy()
+[10:19:30.276849] Auto resume checkpoint: 
+[10:19:30.276913] Start training for 100 epochs
+[10:19:30.278824] log_dir: full_finetune_out
+[10:19:38.919691] Epoch: [0]  [   0/2502]  eta: 6:00:16  lr: 0.000000  loss: 6.9078 (6.9078)  time: 8.6397  data: 2.5274  max mem: 13378
+[10:19:58.662246] Epoch: [0]  [  50/2502]  eta: 0:22:44  lr: 0.000004  loss: 6.9077 (6.9077)  time: 0.3904  data: 0.0007  max mem: 14369
+[10:20:18.181410] Epoch: [0]  [ 100/2502]  eta: 0:18:59  lr: 0.000008  loss: 6.9073 (6.9076)  time: 0.3888  data: 0.0007  max mem: 14369
+[10:20:37.803210] Epoch: [0]  [ 150/2502]  eta: 0:17:31  lr: 0.000012  loss: 6.9067 (6.9074)  time: 0.3926  data: 0.0007  max mem: 14369
+[10:20:57.460797] Epoch: [0]  [ 200/2502]  eta: 0:16:38  lr: 0.000016  loss: 6.9041 (6.9068)  time: 0.3934  data: 0.0007  max mem: 14369
+[10:21:17.226204] Epoch: [0]  [ 250/2502]  eta: 0:15:59  lr: 0.000020  loss: 6.8969 (6.9055)  time: 0.3952  data: 0.0007  max mem: 14369
+[10:21:36.929804] Epoch: [0]  [ 300/2502]  eta: 0:15:26  lr: 0.000024  loss: 6.8629 (6.9009)  time: 0.3948  data: 0.0007  max mem: 14369
+[10:21:56.660314] Epoch: [0]  [ 350/2502]  eta: 0:14:57  lr: 0.000028  loss: 6.7976 (6.8891)  time: 0.3946  data: 0.0007  max mem: 14369
+[10:22:16.446103] Epoch: [0]  [ 400/2502]  eta: 0:14:30  lr: 0.000032  loss: 6.7413 (6.8722)  time: 0.3957  data: 0.0007  max mem: 14369
+[10:22:36.198685] Epoch: [0]  [ 450/2502]  eta: 0:14:05  lr: 0.000036  loss: 6.6915 (6.8542)  time: 0.3961  data: 0.0007  max mem: 14369
+[10:22:56.025501] Epoch: [0]  [ 500/2502]  eta: 0:13:42  lr: 0.000040  loss: 6.6307 (6.8328)  time: 0.3965  data: 0.0007  max mem: 14369
+[10:23:15.876640] Epoch: [0]  [ 550/2502]  eta: 0:13:19  lr: 0.000044  loss: 6.5790 (6.8111)  time: 0.3960  data: 0.0007  max mem: 14369
+[10:23:35.682202] Epoch: [0]  [ 600/2502]  eta: 0:12:56  lr: 0.000048  loss: 6.5440 (6.7919)  time: 0.3940  data: 0.0007  max mem: 14369
+[10:23:55.472483] Epoch: [0]  [ 650/2502]  eta: 0:12:34  lr: 0.000052  loss: 6.4503 (6.7697)  time: 0.3958  data: 0.0007  max mem: 14369
+[10:24:15.250116] Epoch: [0]  [ 700/2502]  eta: 0:12:12  lr: 0.000056  loss: 6.3374 (6.7455)  time: 0.3969  data: 0.0007  max mem: 14369
+[10:24:35.135713] Epoch: [0]  [ 750/2502]  eta: 0:11:51  lr: 0.000060  loss: 6.4829 (6.7235)  time: 0.3968  data: 0.0008  max mem: 14369
+[10:24:54.944793] Epoch: [0]  [ 800/2502]  eta: 0:11:29  lr: 0.000064  loss: 6.3736 (6.7021)  time: 0.3966  data: 0.0007  max mem: 14369
+[10:25:14.794797] Epoch: [0]  [ 850/2502]  eta: 0:11:08  lr: 0.000068  loss: 6.3422 (6.6770)  time: 0.3972  data: 0.0007  max mem: 14369
+[10:25:34.581678] Epoch: [0]  [ 900/2502]  eta: 0:10:47  lr: 0.000072  loss: 6.2659 (6.6536)  time: 0.3964  data: 0.0007  max mem: 14369
+[10:25:54.471786] Epoch: [0]  [ 950/2502]  eta: 0:10:26  lr: 0.000076  loss: 6.0253 (6.6315)  time: 0.3964  data: 0.0007  max mem: 14369
+[10:26:14.337991] Epoch: [0]  [1000/2502]  eta: 0:10:06  lr: 0.000080  loss: 6.2732 (6.6113)  time: 0.3975  data: 0.0007  max mem: 14369
+[10:26:34.194917] Epoch: [0]  [1050/2502]  eta: 0:09:45  lr: 0.000084  loss: 6.2980 (6.5899)  time: 0.3968  data: 0.0008  max mem: 14369
+[10:26:53.998204] Epoch: [0]  [1100/2502]  eta: 0:09:24  lr: 0.000088  loss: 6.1153 (6.5680)  time: 0.3967  data: 0.0007  max mem: 14369
+[10:27:13.774335] Epoch: [0]  [1150/2502]  eta: 0:09:04  lr: 0.000092  loss: 6.0486 (6.5485)  time: 0.3947  data: 0.0008  max mem: 14369
+[10:27:33.588891] Epoch: [0]  [1200/2502]  eta: 0:08:43  lr: 0.000096  loss: 6.0781 (6.5309)  time: 0.3945  data: 0.0007  max mem: 14369
+[10:27:53.489660] Epoch: [0]  [1250/2502]  eta: 0:08:23  lr: 0.000100  loss: 5.9686 (6.5090)  time: 0.3987  data: 0.0008  max mem: 14369
+[10:28:13.268055] Epoch: [0]  [1300/2502]  eta: 0:08:03  lr: 0.000104  loss: 6.1097 (6.4920)  time: 0.3950  data: 0.0007  max mem: 14369
+[10:28:33.109670] Epoch: [0]  [1350/2502]  eta: 0:07:42  lr: 0.000108  loss: 6.0243 (6.4710)  time: 0.3974  data: 0.0007  max mem: 14369
+[10:28:52.916459] Epoch: [0]  [1400/2502]  eta: 0:07:22  lr: 0.000112  loss: 5.9643 (6.4542)  time: 0.3972  data: 0.0007  max mem: 14369
+[10:29:12.758599] Epoch: [0]  [1450/2502]  eta: 0:07:02  lr: 0.000116  loss: 5.9383 (6.4364)  time: 0.3968  data: 0.0007  max mem: 14369
+[10:29:32.586984] Epoch: [0]  [1500/2502]  eta: 0:06:42  lr: 0.000120  loss: 5.7303 (6.4150)  time: 0.3957  data: 0.0009  max mem: 14369
+[10:29:52.381568] Epoch: [0]  [1550/2502]  eta: 0:06:21  lr: 0.000124  loss: 5.7862 (6.3971)  time: 0.3954  data: 0.0007  max mem: 14369
+[10:30:12.266527] Epoch: [0]  [1600/2502]  eta: 0:06:01  lr: 0.000128  loss: 5.8841 (6.3790)  time: 0.3990  data: 0.0007  max mem: 14369
+[10:30:32.085600] Epoch: [0]  [1650/2502]  eta: 0:05:41  lr: 0.000132  loss: 5.7249 (6.3592)  time: 0.3952  data: 0.0007  max mem: 14369
