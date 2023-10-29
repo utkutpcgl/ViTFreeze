@@ -165,11 +165,16 @@ class MaskedAutoencoderViT(AttributeAwareModule):
     def __init__(self, img_size=224, patch_size=16, in_chans=3, embed_dim=1024, depth=24, num_heads=16, decoder_embed_dim=512,
                  decoder_depth=1, decoder_num_heads=16, mlp_ratio=4., norm_layer=nn.LayerNorm, hog_nbins=9, hog_bias=False, **kwargs):
         super().__init__()
-        # Freezeout specific           
-        self.how_scale = "cubic" # scaling method  
-        self.t_0 = 0.8 # NOTE 0.8 for cubic scaling and 0.5 for linear scaling method.
+        # Freezeout specific
+        # TODO get how_scale and t_0 from kwargs.  
         self.scale_lr = True # Scale the learning rate for the gradients to integrate to the same values (w.r.t. lr without freezeout)
-
+        self.how_scale = kwargs.get('how_scale')  # scaling method
+        if self.how_scale == "cubic":
+            self.t_0 = 0.8 # NOTE 0.8 for cubic scaling and 0.5 for linear scaling method.
+        elif self.how_scale == "linear":
+            self.t_0 = 0.5
+        else:
+            raise Exception("Not valid how_scale.")
         # NOTE dynamically add attributes to instances of Python classes at runtime
         # MIM encoder specifics
         self.patch_embed = PatchEmbed(img_size, patch_size, in_chans, embed_dim)
@@ -325,6 +330,9 @@ class MaskedAutoencoderViT(AttributeAwareModule):
         imgs: [N, 3, H, W]
         mask: [N, L], 0 is keep, 1 is remove,
         """
+        # TODO if layer until an output has been frozen, you neglect the operations on that output (speed up)
+        # TODO while calculating the loss giving more weight to initial layer outputs can help freezeout (also provide a curriculum)
+        # TODO moving the encoder output layers (to the decoder) to later layers during training can provide a curriculum
         target = [self.HOG(imgs, k) for k in range(len(self.hog_enc))]
 
         loss = 0.
@@ -335,6 +343,8 @@ class MaskedAutoencoderViT(AttributeAwareModule):
         return loss
 
     def forward(self, imgs, mask_ratio=0.75):  # [B, C, H, W]
+        # TODO until which layer has the network been frozen, 
+        # if that layer index corresponds to a latent index discard that index and corresponding ops of decoder and hog layer.
         latent, mask, ids_restore = self.forward_encoder(imgs, mask_ratio)
         pred = [self.decoder[i](latent[i], ids_restore) for i in range(len(latent))]
         loss = self.forward_loss(imgs, pred, mask)
