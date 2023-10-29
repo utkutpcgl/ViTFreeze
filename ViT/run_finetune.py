@@ -83,7 +83,7 @@ def get_args():
     parser.add_argument('--cls_token', action='store_false', dest='global_pool', help='Use class token instead of global pool for classification')
 
     # Dataset parameters
-    parser.add_argument('--data_path', default='/raid/utku/datasets/imagenet/classification/train/image_folders', type=str, help='dataset path')
+    parser.add_argument('--data_path', default='/raid/utku/datasets/imagenet/classification/', type=str, help='dataset path')
     parser.add_argument('--nb_classes', default=1000, type=int, help='number of the classification types')
     parser.add_argument('--output_dir', default='full_finetune_out_temp', help='path where to save, empty for no saving')
     parser.add_argument('--log_dir', default="full_finetune_out_temp", help='path where to tensorboard log')
