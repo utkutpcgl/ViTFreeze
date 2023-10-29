@@ -56,7 +56,7 @@ python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29503 run_f
 --batch_size 128 --model vit_base_patch16 --finetune /raid/home_yedek/utku/freezeout_localmim_rho/ViT/full_pretrain_out_freezeout/checkpoint-99.pth \
 --epochs 100 --warmup_epochs 20 --lr 4e-3 --min_lr 1e-6 --layer_decay 0.75 \
 --weight_decay 0.05 --drop_path 0.1 --reprob 0.25 --mixup 0.8 --cutmix 1.0 --dist_eval \
---data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
+--data_path /raid/utku/datasets/imagenet/classification/ \
 --output_dir full_finetune_out_freezeout/ --log_dir full_finetune_out_freezeout
 ```
 
@@ -65,10 +65,10 @@ python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29503 run_f
 bash record.sh CUDA_VISIBLE_DEVICES=4,5,6,7 OMP_NUM_THREADS=1 \
 python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29504 run_finetune.py \
 --world_size 4 --accum_iter 2 \
---batch_size 128 --model vit_base_patch16 --finetune /raid/home_yedek/utku/LocalMIM/ViT/full_pretrain_out/checkpoint-99.pth \
+--batch_size 128 --model vit_base_patch16 --finetune /raid/home_yedek/utku/freezeout_localmim_rho/ViT/full_pretrain_out/checkpoint-99.pth \
 --epochs 100 --warmup_epochs 20 --lr 4e-3 --min_lr 1e-6 --layer_decay 0.75 \
 --weight_decay 0.05 --drop_path 0.1 --reprob 0.25 --mixup 0.8 --cutmix 1.0 --dist_eval \
---data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
+--data_path /raid/utku/datasets/imagenet/classification/ \
 --output_dir full_finetune_out/ --log_dir full_finetune_out
 ```
 
