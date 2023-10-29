@@ -9,6 +9,7 @@
 # --------------------------------------------------------
 
 import os
+from pathlib import Path
 import PIL
 from torchvision import datasets, transforms
 
@@ -18,7 +19,8 @@ from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 
 def build_dataset(is_train, args):
     transform = build_transform(is_train, args)
-    root = args.data_path
+    root = Path(args.data_path)/ ('train' if is_train else 'val') /'image_folders'
+    print(f"{'Train' if is_train else 'Val'} data path is: ", root)
     dataset = datasets.ImageFolder(root, transform=transform)
     print(dataset)
     return dataset
