@@ -169,12 +169,15 @@ class MaskedAutoencoderViT(AttributeAwareModule):
         # TODO get how_scale and t_0 from kwargs.  
         self.scale_lr = True # Scale the learning rate for the gradients to integrate to the same values (w.r.t. lr without freezeout)
         self.how_scale = kwargs.get('how_scale')  # scaling method
-        if self.how_scale == "cubic":
-            self.t_0 = 0.8 # NOTE 0.8 for cubic scaling and 0.5 for linear scaling method.
-        elif self.how_scale == "linear":
-            self.t_0 = 0.5
-        else:
-            raise Exception("Not valid how_scale.")
+        self.t_0 = kwargs.get('t_0')  # scaling method
+        if self.t_0 is None:
+            if self.how_scale == "cubic":
+                self.t_0 = 0.8 # NOTE 0.8 for cubic scaling and 0.5 for linear scaling method.
+            elif self.how_scale == "linear":
+                self.t_0 = 0.5
+            else:
+                raise Exception("Not valid how_scale.")
+        print(f"Scaling method is {self.how_scale} and t_0 is {self.t_0}")
         # NOTE dynamically add attributes to instances of Python classes at runtime
         # MIM encoder specifics
         self.patch_embed = PatchEmbed(img_size, patch_size, in_chans, embed_dim)
@@ -201,11 +204,12 @@ class MaskedAutoencoderViT(AttributeAwareModule):
         #     Block(embed_dim, num_heads, mlp_ratio, qkv_bias=True, norm_layer=norm_layer) for _ in range(depth)])
         self.ID = [1, 3, depth-3, depth-1] # NOTE layers that are the inputs to decoder (fed features)
         self.scale = [4.0, 2.0, 1.0, 0.5] # NOTE scaling factors of the decoder outputs
-
+        self.encoder_layer_indexes = []
         norms = []# Freezeout specific
         for ID_layer_index in self.ID:# Freezeout specific
             norm = norm_layer(embed_dim)
             block_layer_index = blocks[ID_layer_index].layer_index
+            self.encoder_layer_indexes.append(block_layer_index)
             norm.layer_index = block_layer_index # Freezeout specific
             norm.active = True# Freezeout specific
             norms.append(norm)# Freezeout specific
@@ -342,9 +346,14 @@ class MaskedAutoencoderViT(AttributeAwareModule):
 
         return loss
 
-    def forward(self, imgs, mask_ratio=0.75):  # [B, C, H, W]
+    def forward(self, imgs, last_frozen_layer_index, mask_ratio=0.75):  # [B, C, H, W]
         # TODO until which layer has the network been frozen, 
         # if that layer index corresponds to a latent index discard that index and corresponding ops of decoder and hog layer.
+        for ele_idx, encoder_layer_index in enumerate(self.encoder_layer_indexes):
+            if encoder_layer_index <= last_frozen_layer_index:
+                # TODO remove self.ID (decoder input), self.hog_enc and self.decoder to calculate the loss without extra ops.
+                del self.ID[ele_idx], self.hog_enc[ele_idx], self.decoder
+
         latent, mask, ids_restore = self.forward_encoder(imgs, mask_ratio)
         pred = [self.decoder[i](latent[i], ids_restore) for i in range(len(latent))]
         loss = self.forward_loss(imgs, pred, mask)
