@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# To make sure it works in a tmux session, load the user's profile
+# This makes sure that all the user's custom settings and variables are loaded.
+echo "came here"
+
 # Initialize default log file
 LOG_FILE="cli_logs.txt"
 
