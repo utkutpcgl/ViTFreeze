@@ -3,6 +3,8 @@ __pycache__/
 *events*
 *.py[cod]
 *$py.class
+runs/*
+**/*events*
 
 # C extensions
 *.so
