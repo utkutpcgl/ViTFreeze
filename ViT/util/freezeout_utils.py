@@ -195,6 +195,7 @@ def adjust_learning_rate_freezeout(optimizer, epoch, cur_local_iteration, param_
     cur_global_iteration = cur_local_iteration + epoch*iter_per_epoch
     fractional_epoch = epoch + cur_local_iteration/iter_per_epoch # cur_global_iteration / iter_per_epoch
     if cur_global_iteration < total_warmup_iterations:
+        min_active_layer_index = 0
         # Update all param groups equally in warm-up iterations
         lr = args.lr*cur_global_iteration/total_warmup_iterations
         for param_group in optimizer.param_groups:
@@ -205,7 +206,9 @@ def adjust_learning_rate_freezeout(optimizer, epoch, cur_local_iteration, param_
         freezeout_param_groups = param_groups["freezeout"]
         non_freezeout_param_groups = param_groups["non_freezeout"]
         update_non_freezeout_layers_lr(non_freezeout_param_groups, regular_cosine_lr, cur_global_iteration, writer=writer)
-        update_freezeout_layers_lr(cur_global_iteration, optimizer, freezeout_param_groups, active_freezeout_modules, writer=writer)
+        min_active_layer_index = update_freezeout_layers_lr(cur_global_iteration, optimizer, freezeout_param_groups, active_freezeout_modules, writer=writer)
+    return min_active_layer_index
+        
 
 def update_freezeout_layers_lr(cur_global_iteration, optim, freezeout_param_groups, active_freezeout_modules, writer):
     """initial_lr: The default learning rate of the overall model before scaling (after warmup)
@@ -241,7 +244,9 @@ def update_freezeout_layers_lr(cur_global_iteration, optim, freezeout_param_grou
                 target_freezeout_param['lr'] = lr
         # Add the learning rate of this layer to the log
         log_lr_freezeout(layer_index=m.layer_index, lr=lr, iteration=cur_global_iteration, writer=writer)
+    min_active_layer_index = min(freezeout_active_layer_set)
     assert len(freezeout_active_layer_set) == len(freezeout_param_groups), "optimizer's freezeout_param_groups should all be updated"
+    return min_active_layer_index
 
 @jit(nopython=True)
 def compute_lr(layer_wise_initial_lr, cur_global_iteration, max_iteration):
