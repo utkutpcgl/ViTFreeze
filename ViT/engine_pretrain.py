@@ -45,11 +45,11 @@ def train_one_epoch(model, data_loader, optimizer, device, epoch, loss_scaler, p
         if data_iter_step % accum_iter == 0:
             # Default was: lr_sched.adjust_learning_rate(optimizer, data_iter_step/len(data_loader)+epoch, args)
             # NOTE lr and attributes have to be set for all models (all ranks.)
-            last_frozen_layer_index = fo_sched.adjust_learning_rate_freezeout(optimizer,  epoch, data_iter_step, param_groups, active_freezeout_modules=active_freezeout_modules, iter_per_epoch=len(data_loader), writer=log_writer, args=args) # Freezeout specific
+            min_active_layer_index = fo_sched.adjust_learning_rate_freezeout(optimizer,  epoch, data_iter_step, param_groups, active_freezeout_modules=active_freezeout_modules, iter_per_epoch=len(data_loader), writer=log_writer, args=args) # Freezeout specific
 
         samples = samples.to(device, non_blocking=True)
         with torch.cuda.amp.autocast():
-            loss = model(samples, last_frozen_layer_index=last_frozen_layer_index, mask_ratio=args.mask_ratio)
+            loss = model(samples, min_active_layer_index=min_active_layer_index, mask_ratio=args.mask_ratio)
 
         loss_value = loss.item()
         if not math.isfinite(loss_value):
