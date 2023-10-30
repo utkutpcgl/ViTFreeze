@@ -166,7 +166,6 @@ class MaskedAutoencoderViT(AttributeAwareModule):
                  decoder_depth=1, decoder_num_heads=16, mlp_ratio=4., norm_layer=nn.LayerNorm, hog_nbins=9, hog_bias=False, **kwargs):
         super().__init__()
         # Freezeout specific
-        # TODO get how_scale and t_0 from kwargs.  
         self.scale_lr = True # Scale the learning rate for the gradients to integrate to the same values (w.r.t. lr without freezeout)
         self.how_scale = kwargs.get('how_scale')  # scaling method
         self.t_0 = kwargs.get('t_0')  # scaling method
@@ -184,7 +183,7 @@ class MaskedAutoencoderViT(AttributeAwareModule):
         self.patch_embed.layer_index = 0 # Freezeout specific
         self.patch_embed.active = True # Freezeout specific
         num_patches = self.patch_embed.num_patches
-        # TODO UTKU Normally the cls token serves as global image context summarizer, but here (MIM) it does not have a clear purpose, can it carry info to later layers?
+        # NOTE UTKU Normally the cls token serves as global image context summarizer, but here (MIM) it does not have a clear purpose, can it carry info to later layers?
         self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim)) # NOTE nn.Parameter is not considered part of the model, hence, cls_token can not be accessed in model.modules()
         self.pos_embed = nn.Parameter(torch.zeros(1, 1+num_patches, embed_dim), requires_grad=False)  # fixed sin-cos embedding
 
@@ -198,21 +197,23 @@ class MaskedAutoencoderViT(AttributeAwareModule):
             blocks.append(block) # Freezeout specific
             self.cum_layer_index += 1 # Freezeout specific
         self.blocks = nn.ModuleList(blocks) # Freezeout specific
+        self.cum_layer_index -= 1 # Freezeout specific -> Subtract the final residual increment.
 
         # Original blocks
         # self.blocks = nn.ModuleList([
         #     Block(embed_dim, num_heads, mlp_ratio, qkv_bias=True, norm_layer=norm_layer) for _ in range(depth)])
         self.ID = [1, 3, depth-3, depth-1] # NOTE layers that are the inputs to decoder (fed features)
         self.scale = [4.0, 2.0, 1.0, 0.5] # NOTE scaling factors of the decoder outputs
-        self.encoder_layer_indexes = []
+        encoder_layer_indexes = []
         norms = []# Freezeout specific
         for ID_layer_index in self.ID:# Freezeout specific
             norm = norm_layer(embed_dim)
             block_layer_index = blocks[ID_layer_index].layer_index
-            self.encoder_layer_indexes.append(block_layer_index)
+            encoder_layer_indexes.append(block_layer_index)
             norm.layer_index = block_layer_index # Freezeout specific
             norm.active = True# Freezeout specific
             norms.append(norm)# Freezeout specific
+        self.encoder_layer_indexes_tensor = torch.tensor(encoder_layer_indexes, dtype=int)
         self.norm = nn.ModuleList(norms)# Freezeout specific
         # Original normalization layers: self.norm = nn.ModuleList([norm_layer(embed_dim) for _ in range(len(self.ID))])
         self.initialize_weights()
@@ -326,17 +327,28 @@ class MaskedAutoencoderViT(AttributeAwareModule):
         else:
             s = int(1/s)
             mask = mask.reshape(B, H//s, s, H//s, s).transpose(2, 3).mean((-2, -1)).reshape(B, -1)
-
         return mask
+
+    def update_forward_freezeout(self, min_active_layer_index):
+        # URGENT TODO  if layer until an output has been frozen, you neglect the operations on that output (speed up)
+        # TODO while calculating the loss giving more weight to initial layer outputs can help freezeout (also provide a curriculum)
+        # TODO moving the encoder output layers (to the decoder) to later layers during training can provide a curriculum
+        # TODO until which layer has the network been frozen, 
+        # if that layer index corresponds to a latent index discard that index and corresponding ops of decoder and hog layer.
+        decoder_input_count = sum(self.encoder_layer_indexes_tensor >= min_active_layer_index)
+        # URGENT TODO remove self.ID (decoder input), self.hog_enc and self.decoder to calculate the loss without extra ops.
+        if len(self.ID) > decoder_input_count:
+            self.ID = self.ID[-decoder_input_count:]
+            self.norm = self.norm[-decoder_input_count:]
+            self.decoder = self.decoder[-decoder_input_count:]
+            self.hog_enc = self.hog_enc[-decoder_input_count:]
+            self.scale = self.scale[-decoder_input_count:]
 
     def forward_loss(self, imgs, pred, mask):
         """
         imgs: [N, 3, H, W]
         mask: [N, L], 0 is keep, 1 is remove,
         """
-        # TODO if layer until an output has been frozen, you neglect the operations on that output (speed up)
-        # TODO while calculating the loss giving more weight to initial layer outputs can help freezeout (also provide a curriculum)
-        # TODO moving the encoder output layers (to the decoder) to later layers during training can provide a curriculum
         target = [self.HOG(imgs, k) for k in range(len(self.hog_enc))]
 
         loss = 0.
@@ -346,14 +358,8 @@ class MaskedAutoencoderViT(AttributeAwareModule):
 
         return loss
 
-    def forward(self, imgs, last_frozen_layer_index, mask_ratio=0.75):  # [B, C, H, W]
-        # TODO until which layer has the network been frozen, 
-        # if that layer index corresponds to a latent index discard that index and corresponding ops of decoder and hog layer.
-        for ele_idx, encoder_layer_index in enumerate(self.encoder_layer_indexes):
-            if encoder_layer_index <= last_frozen_layer_index:
-                # TODO remove self.ID (decoder input), self.hog_enc and self.decoder to calculate the loss without extra ops.
-                del self.ID[ele_idx], self.hog_enc[ele_idx], self.decoder
-
+    def forward(self, imgs, min_active_layer_index, mask_ratio=0.75):  # [B, C, H, W]
+        self.update_forward_freezeout(min_active_layer_index) # TODO check if this is correct.
         latent, mask, ids_restore = self.forward_encoder(imgs, mask_ratio)
         pred = [self.decoder[i](latent[i], ids_restore) for i in range(len(latent))]
         loss = self.forward_loss(imgs, pred, mask)
