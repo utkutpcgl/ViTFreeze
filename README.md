@@ -18,13 +18,25 @@ OMP_NUM_THREADS=1 python -m torch.distributed.launch --nproc_per_node=8 run_pret
 
 *Freezeout Pretrain for 100 epochs:*
 ```bash
+bash record.sh CUDA_VISIBLE_DEVICES=0,1,2,3 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29501 run_pretrain.py \
+--epochs 100 --batch_size 256 --warmup_epochs 10 \
+--blr 2e-4 --world_size 4 --accum_iter 2 --model MIM_vit_base_patch16 \
+--data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
+--output_dir full_pretrain_out_freezeout_linear_t0_5 --log_dir full_pretrain_out_freezeout_linear_t0_5 \
+--how_scale linear --t_0 0.5
+```
+
+- 8 GPU:
+
+```bash
 bash record.sh CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 OMP_NUM_THREADS=1 \
 python3 -m torch.distributed.launch --nproc_per_node=8 --master_port=29502 run_pretrain.py \
 --epochs 100 --batch_size 256 --warmup_epochs 10 \
 --blr 2e-4 --world_size 8 --accum_iter 1 --model MIM_vit_base_patch16 \
 --data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
---output_dir full_pretrain_out_freezeout_linear_t0_5 --log_dir full_pretrain_out_freezeout_linear_t0_5 \
---how_scale linear --t_0 0.5
+--output_dir full_pretrain_out_freezeout_cubic_t0_8_fast --log_dir full_pretrain_out_freezeout_linear_t0_5 \
+--how_scale cubic --t_0 0.8
 ```
 
 *Regular Pretrain for 100 epochs:*
@@ -61,6 +73,17 @@ python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29503 run_f
 --output_dir full_finetune_out_freezeout/ --log_dir full_finetune_out_freezeout
 ```
 
+- 8 GPU:
+```bash
+bash record.sh CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=8 --master_port=29502 run_pretrain.py \
+--epochs 100 --batch_size 256 --warmup_epochs 10 \
+--blr 2e-4 --world_size 8 --accum_iter 1 --model MIM_vit_base_patch16 \
+--data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
+--output_dir full_pretrain_out_freezeout_cubic_t0_8_fast --log_dir full_pretrain_out_freezeout_cubic_t0_8_fast \
+--how_scale cubic --t_0 0.8
+```
+
 *Finetune Regular-100 epochs pre-trained model:*
 ```bash
 bash record.sh CUDA_VISIBLE_DEVICES=4,5,6,7 OMP_NUM_THREADS=1 \
@@ -72,6 +95,21 @@ python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29504 run_f
 --data_path /raid/utku/datasets/imagenet/classification/ \
 --output_dir full_finetune_out/ --log_dir full_finetune_out
 ```
+
+- 8 GPU:
+```bash
+bash record.sh CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=8 --master_port=29504 run_finetune.py \
+--world_size 8 --accum_iter 1 \
+--batch_size 128 --model vit_base_patch16 --finetune /raid/home_yedek/utku/freezeout_localmim_rho/ViT/full_pretrain_out/checkpoint-99.pth \
+--epochs 100 --warmup_epochs 20 --lr 4e-3 --min_lr 1e-6 --layer_decay 0.75 \
+--weight_decay 0.05 --drop_path 0.1 --reprob 0.25 --mixup 0.8 --cutmix 1.0 --dist_eval \
+--data_path /raid/utku/datasets/imagenet/classification/ \
+--output_dir full_finetune_out/ --log_dir full_finetune_out
+```
+
+
+
 
 
 
