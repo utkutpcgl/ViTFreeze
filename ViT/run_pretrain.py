@@ -48,8 +48,8 @@ def get_args():
 
     # Model parameters
     parser.add_argument('--model', default='MIM_vit_base_patch16', type=str, help='Name of model to train') # NOTE was mae_vit_large_patch16
-    parser.add_argument('--how_scale', required=True, type=str, help='Select how to scale the model.') # NOTE was mae_vit_large_patch16
-    parser.add_argument('--t_0', required=True, type=float, help='Select freezeout specific t_0 (when to freeze the intial layer)') # NOTE was mae_vit_large_patch16
+    parser.add_argument('--how_scale', default="cubic", type=str, help='Select how to scale the model.') # NOTE was mae_vit_large_patch16
+    parser.add_argument('--t_0', default=0.8, type=float, help='Select freezeout specific t_0 (when to freeze the intial layer)') # NOTE was mae_vit_large_patch16
     parser.add_argument('--input_size', default=224, type=int, help='images input size') # 224 always
     parser.add_argument('--mask_ratio', default=0.75, type=float, help='Masking ratio (percentage of removed patches).') # 0.75 always
     parser.add_argument('--hog_nbins', default=9, type=int, help='nbins for HOG feature') # NOTE paper says 18 but here and in the repo it says 9??
