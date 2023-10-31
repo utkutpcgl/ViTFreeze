@@ -28,7 +28,6 @@ python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29501 run_p
 ```
 
 - 8 GPU:
-
 ```bash
 bash record.sh CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 OMP_NUM_THREADS=1 \
 python3 -m torch.distributed.launch --nproc_per_node=8 --master_port=29502 run_pretrain.py \
@@ -38,6 +37,18 @@ python3 -m torch.distributed.launch --nproc_per_node=8 --master_port=29502 run_p
 --output_dir full_pretrain_out_freezeout_cubic_t0_8_fast --log_dir full_pretrain_out_freezeout_linear_t0_5 \
 --how_scale cubic --t_0 0.8
 ```
+
+- DEBUG TRAIN
+```bash
+bash record.sh CUDA_VISIBLE_DEVICES=0,1,2,3 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29501 run_pretrain.py \
+--epochs 3 --batch_size 2 --warmup_epochs 0 \
+--blr 2e-4 --world_size 4 --accum_iter 1 --model MIM_vit_base_patch16 \
+--data_path /raid/utku/datasets/imagenet/classification/train/demo_dataset \
+--output_dir debug --log_dir debug \
+--how_scale linear --t_0 0.5
+```
+
 
 *Regular Pretrain for 100 epochs:*
 
