@@ -17,7 +17,7 @@ import torch.nn as nn
 from timm.models.vision_transformer import PatchEmbed, Block # NOTE has internal skip connections.
 from util.pos_embed import get_2d_sincos_pos_embed
 import numpy as np
-from util.freezeout_utils import AttributeAwareModule
+from util.freezeout_utils import AttributeAwareModule, remove_param_from_optimizer
 
 
 class LayerNorm(nn.Module):
@@ -329,20 +329,31 @@ class MaskedAutoencoderViT(AttributeAwareModule):
             mask = mask.reshape(B, H//s, s, H//s, s).transpose(2, 3).mean((-2, -1)).reshape(B, -1)
         return mask
 
-    def update_forward_freezeout(self, min_active_layer_index):
+    # TODO while calculating the loss giving more weight to initial layer outputs can help freezeout (also provide a curriculum)
+    # TODO moving the encoder output layers (to the decoder) to later layers during training can provide a curriculum
+    def update_forward_freezeout(self, min_active_layer_index, optim):
         # URGENT TODO  if layer until an output has been frozen, you neglect the operations on that output (speed up)
-        # TODO while calculating the loss giving more weight to initial layer outputs can help freezeout (also provide a curriculum)
-        # TODO moving the encoder output layers (to the decoder) to later layers during training can provide a curriculum
-        # TODO until which layer has the network been frozen, 
-        # if that layer index corresponds to a latent index discard that index and corresponding ops of decoder and hog layer.
         decoder_input_count = sum(self.encoder_layer_indexes_tensor >= min_active_layer_index)
-        # URGENT TODO remove self.ID (decoder input), self.hog_enc and self.decoder to calculate the loss without extra ops.
         if len(self.ID) > decoder_input_count:
-            self.ID = self.ID[-decoder_input_count:]
-            self.norm = self.norm[-decoder_input_count:]
-            self.decoder = self.decoder[-decoder_input_count:]
-            self.hog_enc = self.hog_enc[-decoder_input_count:]
-            self.scale = self.scale[-decoder_input_count:]
+            # TODO remove the parameters (self.ID[0] to self.hog_enc[0]) from the optimizer also by using the logic below
+            modules_to_remove = [self.norm[0], self.decoder[0], self.hog_enc[0]]
+            params_to_remove = [p for m in modules_to_remove for p in m.parameters()]
+            
+            for param in params_to_remove:
+                remove_param_from_optimizer(optim, param)
+            
+            del self.ID[0]
+            del self.norm[0]
+            del self.decoder[0]
+            del self.hog_enc[0]
+            del self.scale[0]
+
+            # self.ID = self.ID[-decoder_input_count:]
+            # self.norm = self.norm[-decoder_input_count:]
+            # self.decoder = self.decoder[-decoder_input_count:]
+            # self.hog_enc = self.hog_enc[-decoder_input_count:]
+            # self.scale = self.scale[-decoder_input_count:]
+            
 
     def forward_loss(self, imgs, pred, mask):
         """
@@ -358,8 +369,8 @@ class MaskedAutoencoderViT(AttributeAwareModule):
 
         return loss
 
-    def forward(self, imgs, min_active_layer_index, mask_ratio=0.75):  # [B, C, H, W]
-        self.update_forward_freezeout(min_active_layer_index) # TODO check if this is correct.
+    def forward(self, imgs, min_active_layer_index, optim, mask_ratio=0.75):  # [B, C, H, W]
+        self.update_forward_freezeout(min_active_layer_index, optim=optim) # TODO check if this is correct.
         latent, mask, ids_restore = self.forward_encoder(imgs, mask_ratio)
         pred = [self.decoder[i](latent[i], ids_restore) for i in range(len(latent))]
         loss = self.forward_loss(imgs, pred, mask)

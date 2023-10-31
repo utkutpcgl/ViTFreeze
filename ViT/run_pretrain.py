@@ -108,6 +108,8 @@ def main(args):
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
     dataset_train = datasets.ImageFolder(args.data_path, transform=transform_train)
+    assert len(dataset_train) != 0
+    print(len(dataset_train))
     num_tasks = misc.get_world_size()
     global_rank = misc.get_rank()
     sampler_train = torch.utils.data.DistributedSampler(dataset_train, num_replicas=num_tasks, rank=global_rank, shuffle=True)
@@ -142,6 +144,7 @@ def main(args):
     t_0 = model.t_0 # freezeout spec
     num_of_layers = model.cum_layer_index # freezeout spec
     iterations_per_epoch = len(data_loader_train) # NOTE (len(dataset)/batch_size).
+    assert iterations_per_epoch != 0
     assert hasattr(model.patch_embed, "layer_index")
     freezeout_module_level_specifier_count = 0
     for module in model.modules():
@@ -157,6 +160,19 @@ def main(args):
     print("freezeout_module_level_specifier_count: ", freezeout_module_level_specifier_count)
     assert freezeout_module_level_specifier_count == FREEZEOUT_LAYER_COUNT_VIT_B
     model_without_ddp = model
+
+
+    # problematic_params = {}
+
+    # # Find parameters at the specified indices
+    # target_indices = {147, 148, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179,180,181}
+
+    # for idx, (name, param) in enumerate(model.named_parameters()):
+    #     if idx in target_indices:
+    #         problematic_params[idx] = (name, param)
+    # print(problematic_params)
+    # raise Exception
+
     
     if args.distributed:
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=False)
