@@ -17,7 +17,7 @@ import torch.nn as nn
 from timm.models.vision_transformer import PatchEmbed, Block # NOTE has internal skip connections.
 from util.pos_embed import get_2d_sincos_pos_embed
 import numpy as np
-from util.freezeout_utils import AttributeAwareModule, remove_param_from_optimizer
+from util.freezeout_utils import AttributeAwareModule
 
 
 class LayerNorm(nn.Module):
@@ -203,9 +203,10 @@ class MaskedAutoencoderViT(AttributeAwareModule):
         # self.blocks = nn.ModuleList([
         #     Block(embed_dim, num_heads, mlp_ratio, qkv_bias=True, norm_layer=norm_layer) for _ in range(depth)])
         self.ID = [1, 3, depth-3, depth-1] # NOTE layers that are the inputs to decoder (fed features)
-        self.scale = [4.0, 2.0, 1.0, 0.5] # NOTE scaling factors of the decoder outputs
+        self.decoder_scales = [4.0, 2.0, 1.0, 0.5] # NOTE scaling factors of the decoder outputs
         encoder_layer_indexes = []
-        norms = []# Freezeout specific
+        norms = [] # Freezeout specific
+        hog_encs = []
         for ID_layer_index in self.ID:# Freezeout specific
             norm = norm_layer(embed_dim)
             block_layer_index = blocks[ID_layer_index].layer_index
@@ -214,20 +215,42 @@ class MaskedAutoencoderViT(AttributeAwareModule):
             norm.active = True# Freezeout specific
             norms.append(norm)# Freezeout specific
         self.encoder_layer_indexes_tensor = torch.tensor(encoder_layer_indexes, dtype=int)
-        self.norm = nn.ModuleList(norms)# Freezeout specific
-        # Original normalization layers: self.norm = nn.ModuleList([norm_layer(embed_dim) for _ in range(len(self.ID))])
-        self.initialize_weights()
-
+        self.hog_pool_kernel_sizes = [4, 8, 16, 32]
+        
         # MIM decoder specifics
-        self.decoder = nn.ModuleList([
-            MAE_Decoder(embed_dim, decoder_embed_dim, in_chans*hog_nbins, s, num_patches, decoder_depth, decoder_num_heads, mlp_ratio, True, norm_layer)
-            for s in self.scale])
+        norms = [] # Freezeout specific
+        decoders = [] # Freezeout specific
+        hog_encs = []
+        for ID_layer_index, decoder_scale, hog_pool_kernel_size in zip(self.ID, self.decoder_scales, self.hog_pool_kernel_sizes):# Freezeout specific
+            encoder_layer_index = blocks[ID_layer_index].layer_index
+            encoder_layer_indexes.append(encoder_layer_index)
+
+            norm = norm_layer(embed_dim)
+            norm.layer_index = encoder_layer_index # Freezeout specific
+            norm.active = True# Freezeout specific
+            norms.append(norm)# Freezeout specific
+
+            decoder = MAE_Decoder(embed_dim, decoder_embed_dim, in_chans*hog_nbins, decoder_scale, num_patches, decoder_depth, decoder_num_heads, mlp_ratio, True, norm_layer)
+            decoder.layer_index = encoder_layer_index # Freezeout specific
+            decoder.active = True# Freezeout specific
+            decoders.append(decoder)# Freezeout specific
+
+            hog_enc = HOGLayer(nbins=hog_nbins, pool=hog_pool_kernel_size, bias=hog_bias)
+            hog_enc.layer_index = encoder_layer_index # Freezeout specific
+            hog_enc.active = True# Freezeout specific
+            hog_encs.append(hog_enc)# Freezeout specific
+
+        self.norm = nn.ModuleList(norms)# Freezeout specific
+        self.decoder = nn.ModuleList(decoders)# Freezeout specific
+        self.hog_enc = nn.ModuleList(hog_encs)# Freezeout specific
 
         # target, NOTE not learnable hog layer
-        self.hog_enc = nn.ModuleList([HOGLayer(nbins=hog_nbins, pool=k, bias=hog_bias) for k in [4, 8, 16, 32]])
         for hog_enc in self.hog_enc:
             for param in hog_enc.parameters():
                 param.requires_grad = False
+        # Original normalization layers: self.norm = nn.ModuleList([norm_layer(embed_dim) for _ in range(len(self.ID))])
+        self.initialize_weights()
+
         
     def initialize_weights(self):
         # initialization
@@ -319,7 +342,7 @@ class MaskedAutoencoderViT(AttributeAwareModule):
         return latent, mask, ids_restore
 
     def recal_mask(self, mask, k):
-        B, L, s = mask.size(0), mask.size(1), self.scale[k]
+        B, L, s = mask.size(0), mask.size(1), self.decoder_scales[k]
         H = W = int(L**.5)
         if s >= 1.:
             s = int(s)
@@ -331,28 +354,16 @@ class MaskedAutoencoderViT(AttributeAwareModule):
 
     # TODO while calculating the loss giving more weight to initial layer outputs can help freezeout (also provide a curriculum)
     # TODO moving the encoder output layers (to the decoder) to later layers during training can provide a curriculum
-    def update_forward_freezeout(self, min_active_layer_index, optim):
+    def update_forward_freezeout(self, min_active_layer_index):
         # URGENT TODO  if layer until an output has been frozen, you neglect the operations on that output (speed up)
         decoder_input_count = sum(self.encoder_layer_indexes_tensor >= min_active_layer_index)
         if len(self.ID) > decoder_input_count:
-            # TODO remove the parameters (self.ID[0] to self.hog_enc[0]) from the optimizer also by using the logic below
-            modules_to_remove = [self.norm[0], self.decoder[0], self.hog_enc[0]]
-            params_to_remove = [p for m in modules_to_remove for p in m.parameters()]
-            
-            for param in params_to_remove:
-                remove_param_from_optimizer(optim, param)
-            
+            # NOTE removed the parameters (self.ID[0] to self.hog_enc[0]) from the optimizer in update_freezeout_layers_lr
             del self.ID[0]
             del self.norm[0]
             del self.decoder[0]
             del self.hog_enc[0]
-            del self.scale[0]
-
-            # self.ID = self.ID[-decoder_input_count:]
-            # self.norm = self.norm[-decoder_input_count:]
-            # self.decoder = self.decoder[-decoder_input_count:]
-            # self.hog_enc = self.hog_enc[-decoder_input_count:]
-            # self.scale = self.scale[-decoder_input_count:]
+            del self.decoder_scales[0]
             
 
     def forward_loss(self, imgs, pred, mask):
@@ -369,8 +380,8 @@ class MaskedAutoencoderViT(AttributeAwareModule):
 
         return loss
 
-    def forward(self, imgs, min_active_layer_index, optim, mask_ratio=0.75):  # [B, C, H, W]
-        self.update_forward_freezeout(min_active_layer_index, optim=optim) # TODO check if this is correct.
+    def forward(self, imgs, min_active_layer_index, mask_ratio=0.75):  # [B, C, H, W]
+        self.update_forward_freezeout(min_active_layer_index) # TODO check if this is correct.
         latent, mask, ids_restore = self.forward_encoder(imgs, mask_ratio)
         pred = [self.decoder[i](latent[i], ids_restore) for i in range(len(latent))]
         loss = self.forward_loss(imgs, pred, mask)

@@ -51,7 +51,7 @@ def train_one_epoch(model, data_loader, optimizer, device, epoch, loss_scaler, p
 
         samples = samples.to(device, non_blocking=True)
         with torch.cuda.amp.autocast():
-            loss = model(samples, min_active_layer_index=min_active_layer_index, optim=optimizer,mask_ratio=args.mask_ratio)
+            loss = model(samples, min_active_layer_index=min_active_layer_index,mask_ratio=args.mask_ratio)
 
         loss_value = loss.item()
         if not math.isfinite(loss_value):

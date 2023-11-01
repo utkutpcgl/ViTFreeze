@@ -8,8 +8,10 @@ import torch
 from multiprocessing import Pool, cpu_count
 from numba import jit
 
-DECODER_EXTRA_NB_LAYER_COUNT = 4 # NOTE normalization layers fed to decoder adds 4 more neihbouring layers (len(model.ID))
-FREEZEOUT_LAYER_COUNT_VIT_B = 13 + DECODER_EXTRA_NB_LAYER_COUNT 
+DECODER_EXTRA_NORM_LAYER_COUNT = 4 # NOTE normalization layers fed to decoder adds 4 more neihbouring layers (len(model.ID))
+DECODER_EXTRA_LAYER_COUNT = 4 # NOTE decoder adds 4 more neihbouring layers (len(model.ID))
+HOG_EXTRA_LAYER_COUNT = 4 # NOTE HOG adds 4 more neihbouring layers
+FREEZEOUT_LAYER_COUNT_VIT_B = 13 + DECODER_EXTRA_NORM_LAYER_COUNT + DECODER_EXTRA_LAYER_COUNT + HOG_EXTRA_LAYER_COUNT # There are 13 freezable blocks (layers) in the transformer.
 ITERATION_LOG_PERIOD = 100 # log every # iterations
 
 
@@ -254,6 +256,15 @@ def compute_lr(layer_wise_initial_lr, cur_global_iteration, max_iteration):
 
 def get_freezeout_modules(model):
     return [m for m in model.modules() if hasattr(m, 'freezeout_module_level_specifier') and m.active]
+
+def get_param_group_index(optim, param):
+    for i, optim_param_group in enumerate(optim.param_groups):
+        optim_param_group_list = optim_param_group["params"]
+        assert len(optim_param_group_list) == 1
+        optim_param = optim_param_group_list[0]
+        if param.shape == optim_param.shape and (param==optim_param).all():
+            return i
+    # raise Exception("Could not find param in optim.param_groups")
 
 def remove_param_from_optimizer(optim, pg_index):
     # Remove corresponding state
