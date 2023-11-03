@@ -199,28 +199,14 @@ class MaskedAutoencoderViT(AttributeAwareModule):
         self.blocks = nn.ModuleList(blocks) # Freezeout specific
         self.cum_layer_index -= 1 # Freezeout specific -> Subtract the final residual increment.
 
-        # Original blocks
-        # self.blocks = nn.ModuleList([
-        #     Block(embed_dim, num_heads, mlp_ratio, qkv_bias=True, norm_layer=norm_layer) for _ in range(depth)])
+        # MIM decoder specifics
         self.ID = [1, 3, depth-3, depth-1] # NOTE layers that are the inputs to decoder (fed features)
         self.decoder_scales = [4.0, 2.0, 1.0, 0.5] # NOTE scaling factors of the decoder outputs
-        encoder_layer_indexes = []
-        norms = [] # Freezeout specific
-        hog_encs = []
-        for ID_layer_index in self.ID:# Freezeout specific
-            norm = norm_layer(embed_dim)
-            block_layer_index = blocks[ID_layer_index].layer_index
-            encoder_layer_indexes.append(block_layer_index)
-            norm.layer_index = block_layer_index # Freezeout specific
-            norm.active = True# Freezeout specific
-            norms.append(norm)# Freezeout specific
-        self.encoder_layer_indexes_tensor = torch.tensor(encoder_layer_indexes, dtype=int)
         self.hog_pool_kernel_sizes = [4, 8, 16, 32]
-        
-        # MIM decoder specifics
         norms = [] # Freezeout specific
         decoders = [] # Freezeout specific
         hog_encs = []
+        encoder_layer_indexes = []
         for ID_layer_index, decoder_scale, hog_pool_kernel_size in zip(self.ID, self.decoder_scales, self.hog_pool_kernel_sizes):# Freezeout specific
             encoder_layer_index = blocks[ID_layer_index].layer_index
             encoder_layer_indexes.append(encoder_layer_index)
@@ -240,6 +226,7 @@ class MaskedAutoencoderViT(AttributeAwareModule):
             hog_enc.active = True# Freezeout specific
             hog_encs.append(hog_enc)# Freezeout specific
 
+        self.encoder_layer_indexes_tensor = torch.tensor(encoder_layer_indexes, dtype=int)
         self.norm = nn.ModuleList(norms)# Freezeout specific
         self.decoder = nn.ModuleList(decoders)# Freezeout specific
         self.hog_enc = nn.ModuleList(hog_encs)# Freezeout specific
