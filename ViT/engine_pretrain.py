@@ -38,8 +38,6 @@ def train_one_epoch(model, data_loader, optimizer, device, epoch, loss_scaler, p
         print('log_dir: {}'.format(log_writer.log_dir))
 
     time_consume = 0.
-    print("HEREEE")
-    print(data_loader)
     for data_iter_step, (samples, _) in enumerate(metric_logger.log_every(data_loader, print_freq, header)):
         torch.cuda.synchronize()
         start = time.time()
