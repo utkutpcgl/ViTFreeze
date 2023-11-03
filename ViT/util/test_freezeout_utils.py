@@ -55,10 +55,10 @@ def simulate_lr_logging(log_writer):
             module.lr_ratio = lr_scale_fn(t_0 + (1 - t_0) * float(module.layer_index) / num_of_layers) # freezout specific
             module.initial_lr = args.lr/module.lr_ratio if model.scale_lr else args.lr # freezout specific
             # NOTE iterations set auto instead of 1000 (so in freezeout), warmup is not included.
-            module.max_iteration = (args.epochs-args.warmup_epochs) * iter_per_epoch * module.lr_ratio
+            module.max_iteration_warmup_subtracted = (args.epochs-args.warmup_epochs) * iter_per_epoch * module.lr_ratio
             module.freezeout_module_level_specifier = None # Just a module level specifier to distinguish module freezeout layer levels.
             log_writer.add_scalar('LR Ratios', module.lr_ratio, module.layer_index)
-            log_writer.add_scalar('Max Iterations', module.max_iteration, module.layer_index)
+            log_writer.add_scalar('Max Iterations', module.max_iteration_warmup_subtracted, module.layer_index)
 
     # Using the provided function to create parameter groups
     param_groups = create_param_groups(model, log_writer=log_writer)

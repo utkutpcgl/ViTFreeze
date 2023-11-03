@@ -195,6 +195,7 @@ def adjust_learning_rate_freezeout(optimizer, epoch, cur_local_iteration, param_
     """Freezeout decay the learning rate with half-cycle cosine after linnear warmup, step=iteration"""
     total_warmup_iterations = iter_per_epoch*args.warmup_epochs
     cur_global_iteration = cur_local_iteration + epoch*iter_per_epoch
+    cur_global_iteration_warmup_subtracted = cur_global_iteration - total_warmup_iterations
     fractional_epoch = epoch + cur_local_iteration/iter_per_epoch # cur_global_iteration / iter_per_epoch
     if cur_global_iteration < total_warmup_iterations:
         min_active_layer_index = 0
@@ -208,15 +209,15 @@ def adjust_learning_rate_freezeout(optimizer, epoch, cur_local_iteration, param_
         freezeout_param_groups = param_groups["freezeout"]
         non_freezeout_param_groups = param_groups["non_freezeout"]
         update_non_freezeout_layers_lr(non_freezeout_param_groups, regular_cosine_lr, cur_global_iteration, writer=writer)
-        min_active_layer_index = update_freezeout_layers_lr(cur_global_iteration, optimizer, freezeout_param_groups, active_freezeout_modules, writer=writer)
+        min_active_layer_index = update_freezeout_layers_lr(cur_global_iteration, cur_global_iteration_warmup_subtracted, optimizer, freezeout_param_groups, active_freezeout_modules, writer=writer)
     return min_active_layer_index
         
 
-def update_freezeout_layers_lr(cur_global_iteration, optim, freezeout_param_groups, active_freezeout_modules, writer):
+def update_freezeout_layers_lr(cur_global_iteration, cur_global_iteration_warmup_subtracted, optim, freezeout_param_groups, active_freezeout_modules, writer):
     """initial_lr: The default learning rate of the overall model before scaling (after warmup)
     Here we assume the min_lr=0 in cosine annealing (orginally -> min_lr + (lr-min_lr)*...)"""
     # NOTE cur_global_iteration incremented by train loop
-    # Loop over all modules, requires -> cur_global_iteration and module. active, max_iteration, layer_index,
+    # Loop over all modules, requires -> cur_global_iteration and module. active, max_iteration_warmup_subtracted, layer_index,
     freezeout_active_layer_set = set()
     for m in active_freezeout_modules:
         # If a module is active and at the freezeout layer level of model.modules() hierarchy.:
@@ -224,7 +225,7 @@ def update_freezeout_layers_lr(cur_global_iteration, optim, freezeout_param_grou
             continue # NOTE does not enter if no more active.
         # If we've passed this layer's freezing point, deactivate it.
         target_freezeout_param_group = freezeout_param_groups.get(m.layer_index)
-        if cur_global_iteration > m.max_iteration: 
+        if cur_global_iteration_warmup_subtracted > m.max_iteration_warmup_subtracted: 
             lr = 0
             m.active = False
             m.requires_grad = False # NOTE detach is no longer necessary in the forward passes.
@@ -232,7 +233,6 @@ def update_freezeout_layers_lr(cur_global_iteration, optim, freezeout_param_grou
             # optim.param_groups.remove(target_freezeout_param_group) -> default one.
             if target_freezeout_param_group is None:
                 continue
-            target_freezeout_param_group = freezeout_param_groups[m.layer_index]
             for pg_index, pg in reversed(list(enumerate(optim.param_groups))):
                 if pg.get('layer_index') == m.layer_index:  # Assuming you have 'layer_index' in param_groups
                     remove_param_from_optimizer(optim,pg_index)
@@ -241,7 +241,7 @@ def update_freezeout_layers_lr(cur_global_iteration, optim, freezeout_param_grou
             freezeout_active_layer_set.add(m.layer_index) # NOTE will see same layer_index twice for decoder input layers
             # update the LR
             layer_wise_initial_lr = m.initial_lr # NOTE lr_ratio already scaled lrs per layer
-            lr = compute_lr(layer_wise_initial_lr, cur_global_iteration, max_iteration=m.max_iteration)
+            lr = compute_lr(layer_wise_initial_lr, cur_global_iteration_warmup_subtracted, max_iteration_warmup_subtracted=m.max_iteration_warmup_subtracted)
             for target_freezeout_param in target_freezeout_param_group:
                 target_freezeout_param['lr'] = lr
         # Add the learning rate of this layer to the log
@@ -251,20 +251,12 @@ def update_freezeout_layers_lr(cur_global_iteration, optim, freezeout_param_grou
     return min_active_layer_index
 
 @jit(nopython=True)
-def compute_lr(layer_wise_initial_lr, cur_global_iteration, max_iteration):
-    return (layer_wise_initial_lr/2) * (1+np.cos(np.pi*cur_global_iteration/max_iteration))
+def compute_lr(layer_wise_initial_lr, cur_global_iteration_warmup_subtracted, max_iteration_warmup_subtracted):
+    return (layer_wise_initial_lr/2) * (1+np.cos(np.pi*cur_global_iteration_warmup_subtracted/max_iteration_warmup_subtracted))
 
 def get_freezeout_modules(model):
     return [m for m in model.modules() if hasattr(m, 'freezeout_module_level_specifier') and m.active]
 
-def get_param_group_index(optim, param):
-    for i, optim_param_group in enumerate(optim.param_groups):
-        optim_param_group_list = optim_param_group["params"]
-        assert len(optim_param_group_list) == 1
-        optim_param = optim_param_group_list[0]
-        if param.shape == optim_param.shape and (param==optim_param).all():
-            return i
-    # raise Exception("Could not find param in optim.param_groups")
 
 def remove_param_from_optimizer(optim, pg_index):
     # Remove corresponding state
