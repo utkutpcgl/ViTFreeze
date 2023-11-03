@@ -43,7 +43,7 @@ scale_fn = {'linear':lambda x: x,
 def get_args():
     parser = argparse.ArgumentParser('MAE pre-training', add_help=False)
     parser.add_argument('--batch_size', default=128, type=int, help='Batch size per GPU (effective batch size is batch_size*accum_iter*ngpus') # 8*256 = 2048 for base model
-    parser.add_argument('--epochs', default=5, type=int) # 100 for initial training
+    parser.add_argument('--epochs', default=4, type=int) # 100 for initial training
     parser.add_argument('--accum_iter', default=1, type=int, help='Accumulate gradient iterations (for increasing the effective batch size under memory constraints)')
 
     # Model parameters
@@ -61,7 +61,7 @@ def get_args():
     parser.add_argument('--lr', type=float, default=None, help='learning rate (absolute lr)')
     parser.add_argument('--blr', type=float, default=1e-3, help='absolute_lr = base_lr*total_batch_size/256') # 2*10^-4 for base model
     parser.add_argument('--min_lr', type=float, default=1e-6, help='lower lr bound for cyclic schedulers that hit 0') # NOTE the paper provides no information, the repo does not modify it.
-    parser.add_argument('--warmup_epochs', type=int, default=0, help='epochs to warmup LR')
+    parser.add_argument('--warmup_epochs', type=int, default=1, help='epochs to warmup LR')
 
     # Dataset parameters
     #TODO update when necessray data_path.
@@ -154,7 +154,7 @@ def main(args):
             module.lr_ratio = lr_scale_fn(t_0 + (1 - t_0) * float(module.layer_index) / num_of_layers) # freezout specific
             module.initial_lr = args.lr/module.lr_ratio if model.scale_lr else args.lr # freezout specific
             # NOTE iterations set auto instead of 1000 (so in freezeout), warmup is not included.
-            module.max_iteration = (args.epochs-args.warmup_epochs) * iterations_per_epoch * module.lr_ratio # freezout specific, the maximum count a layer will be trained for (after max_iteration it will be frozen), hardcoded 1000 iterations per epoch.
+            module.max_iteration_warmup_subtracted = (args.epochs-args.warmup_epochs) * iterations_per_epoch * module.lr_ratio # freezout specific, the maximum count a layer will be trained for (after max_iteration_warmup_subtracted it will be frozen), hardcoded 1000 iterations per epoch.
             module.freezeout_module_level_specifier = None # Just a module level specifier to distinguish module freezeout layer levels.
             freezeout_module_level_specifier_count+=1
     print("freezeout_module_level_specifier_count: ", freezeout_module_level_specifier_count)
@@ -175,7 +175,7 @@ def main(args):
 
     
     if args.distributed:
-        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=False)
+        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=True)
         model_without_ddp = model.module
     
     # NOTE I want only parameters of the encoder layer to have these freezeout specific param_groups.
