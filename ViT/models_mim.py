@@ -322,7 +322,6 @@ class MaskedAutoencoderViT(AttributeAwareModule):
             # Freezeout originally: x = block(x) if block.active else block(x).detach()
             x = block(x)
             if i in self.ID:
-                print(x.shape)
                 norm = self.norm[self.ID.index(i)]
                 assert norm.layer_index == block.layer_index, "norm and block layer indices are mismatched"
                 latent.append(norm(x))
