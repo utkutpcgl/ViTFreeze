@@ -63,6 +63,17 @@ python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29502 run_p
 --output_dir full_pretrain_out --log_dir full_pretrain_out
 ```
 
+- 8 GPU:
+```bash
+bash record.sh CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=8 --master_port=29502 run_pretrain.py \
+--epochs 100 --batch_size 256 --warmup_epochs 10 \
+--blr 2e-4 --world_size 8 --accum_iter 1 --weight_decay 0.05 \
+--model MIM_vit_base_patch16 --hog_nbins 9 --mask_ratio 0.75 \
+--data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
+--output_dir full_pretrain_out_fast --log_dir full_pretrain_out_fast
+```
+
 ### Fine Tuning:
 
 Explained in the repos README.md as this, to finetune ViT-B:
@@ -139,7 +150,7 @@ python3 -m torch.distributed.launch --nproc_per_node=8 --master_port=29504 run_f
 
 
 
-## Steps
+## Steps for Freezeout
 
 - Simple guide: [https://chat.openai.com/share/30777d71-4944-41ad-80a3-17dfca5bac7a](https://chat.openai.com/share/30777d71-4944-41ad-80a3-17dfca5bac7a)
 
@@ -287,3 +298,19 @@ def forward_head(self, x, pre_logits: bool = False):
         x = self.head_drop(x)
         return x if pre_logits else self.head(x)
 ```
+
+
+## Steps for feature masking
+*Steps*:
+- first understand what the encoder,decoder,hog encoder and does by dry running (hand tracing)
+For each stage freezeout feature encoder output update:
+- Eliminate the img forward pass.
+- Store img feature outputs (128,196,728) just like images.
+- Mask them by keeping the order and mask information (%75)
+- Pass this from the encoder.
+- Pass the output features to the decoder.
+
+- *BIG TODO*: Make the decoder output match the input to the encoder (128,196,728) (not the whole image):
+    - Are the hog_enc layers necessary here? The paper refers to the method without HOG, where is the imp (can be helpful).
+    - The decoder output shape is different for each layer originally, how to handle this?
+    - Should I prune the decoder outputs simultaneously as I prune the encoder inputs for symmetry (ideally I should)?
