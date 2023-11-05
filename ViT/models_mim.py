@@ -302,7 +302,7 @@ class MaskedAutoencoderViT(AttributeAwareModule):
 
     def forward_encoder(self, x, mask_ratio):
         # embed patches
-        x = self.patch_embed(x)  # [B, num_patches, d]
+        x = self.patch_embed(x)  # [B, num_patches, d] -> torch.Size([128, 196, 768])
         # add pos embed
         x = x + self.pos_embed[:, 1:]
 
@@ -322,6 +322,7 @@ class MaskedAutoencoderViT(AttributeAwareModule):
             # Freezeout originally: x = block(x) if block.active else block(x).detach()
             x = block(x)
             if i in self.ID:
+                print(x.shape)
                 norm = self.norm[self.ID.index(i)]
                 assert norm.layer_index == block.layer_index, "norm and block layer indices are mismatched"
                 latent.append(norm(x))
@@ -358,7 +359,8 @@ class MaskedAutoencoderViT(AttributeAwareModule):
         imgs: [N, 3, H, W]
         mask: [N, L], 0 is keep, 1 is remove,
         """
-        target = [self.HOG(imgs, k) for k in range(len(self.hog_enc))]
+        target = [self.HOG(imgs, k) for k in range(len(self.hog_enc))] # NOTE target shapes are equal to pred shapes (HOG layer makes img and decoder output shapes equal.)
+        # TODO I need decoder outputs to be matched with input feature shapes always.
 
         loss = 0.
         for k in range(len(pred)):
@@ -369,8 +371,12 @@ class MaskedAutoencoderViT(AttributeAwareModule):
 
     def forward(self, imgs, min_active_layer_index, mask_ratio=0.75):  # [B, C, H, W]
         self.update_forward_freezeout(min_active_layer_index) # TODO check if this is correct.
-        latent, mask, ids_restore = self.forward_encoder(imgs, mask_ratio)
-        pred = [self.decoder[i](latent[i], ids_restore) for i in range(len(latent))]
+        latent, mask, ids_restore = self.forward_encoder(imgs, mask_ratio) # NOTE All latent shapes are [128, 50, 768], Actually masks 75% of torch.Size([128, 196, 768])
+        pred = [self.decoder[i](latent[i], ids_restore) for i in range(len(latent))] #NOTE pred shapes are:
+        # [14:52:06.828329] torch.Size([128, 3136, 27]) -> 56^2  early layer output
+        # [14:52:06.828900] torch.Size([128, 784, 27]) -> 28^2
+        # [14:52:06.829180] torch.Size([128, 196, 27]) -> 14^2
+        # [14:52:06.829448] torch.Size([128, 49, 27]) -> 7^2 final layer output
         loss = self.forward_loss(imgs, pred, mask)
         return loss
 
