@@ -12,7 +12,7 @@ DECODER_EXTRA_NORM_LAYER_COUNT = 4 # NOTE normalization layers fed to decoder ad
 DECODER_EXTRA_LAYER_COUNT = 4 # NOTE decoder adds 4 more neihbouring layers (len(model.ID))
 HOG_EXTRA_LAYER_COUNT = 4 # NOTE HOG adds 4 more neihbouring layers
 FREEZEOUT_LAYER_COUNT_VIT_B = 13 + DECODER_EXTRA_NORM_LAYER_COUNT + DECODER_EXTRA_LAYER_COUNT + HOG_EXTRA_LAYER_COUNT # There are 13 freezable blocks (layers) in the transformer.
-ITERATION_LOG_PERIOD = 100 # log every # iterations
+ITERATION_LOG_PERIOD = 625 # log every # iterations
 
 
 # ---------------------------------- ATTRIBUTE AWARE LEAVES
@@ -228,14 +228,13 @@ def update_freezeout_layers_lr(cur_global_iteration, cur_global_iteration_warmup
         if cur_global_iteration_warmup_subtracted > m.max_iteration_warmup_subtracted: 
             lr = 0
             m.active = False
-            m.requires_grad = False # NOTE detach is no longer necessary in the forward passes.
             # Also make sure we remove all this layer from the optimizer
             # optim.param_groups.remove(target_freezeout_param_group) -> default one.
             if target_freezeout_param_group is None:
                 continue
             for pg_index, pg in reversed(list(enumerate(optim.param_groups))):
                 if pg.get('layer_index') == m.layer_index:  # Assuming you have 'layer_index' in param_groups
-                    remove_param_from_optimizer(optim,pg_index)
+                    remove_param_from_optimizer_and_grad_comp(optim,pg_index)
             del freezeout_param_groups[m.layer_index]
         else:
             freezeout_active_layer_set.add(m.layer_index) # NOTE will see same layer_index twice for decoder input layers
@@ -258,9 +257,10 @@ def get_freezeout_modules(model):
     return [m for m in model.modules() if hasattr(m, 'freezeout_module_level_specifier') and m.active]
 
 
-def remove_param_from_optimizer(optim, pg_index):
+def remove_param_from_optimizer_and_grad_comp(optim, pg_index):
     # Remove corresponding state
     for param in optim.param_groups[pg_index]['params']:
+        param.requires_grad = False
         if param in optim.state:
             del optim.state[param]
     del optim.param_groups[pg_index]
@@ -275,7 +275,7 @@ def align_optimizer_to_checkpoint(optimizer, checkpoint_state_dict, model):
         if layer_index not in checkpoint_layer_indexes:
             for pg_index, pg in reversed(list(enumerate(optimizer.param_groups))):
                 if pg.get('layer_index') == layer_index:  # Assuming you have 'layer_index' in param_groups
-                    remove_param_from_optimizer(optimizer, pg_index)
+                    remove_param_from_optimizer_and_grad_comp(optimizer, pg_index)
 
 
 def update_non_freezeout_layers_lr(non_freezeout_param_groups, regular_cosine_lr, cur_global_iteration, writer):
