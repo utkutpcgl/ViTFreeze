@@ -19,13 +19,13 @@ OMP_NUM_THREADS=1 python -m torch.distributed.launch --nproc_per_node=8 run_pret
 
 *Freezeout Pretrain for 100 epochs:*
 ```bash
-bash record.sh CUDA_VISIBLE_DEVICES=0,1,2,3 OMP_NUM_THREADS=1 \
+bash record.sh CUDA_VISIBLE_DEVICES=4,5,6,7 OMP_NUM_THREADS=1 \
 python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29501 run_pretrain.py \
 --epochs 100 --batch_size 256 --warmup_epochs 10 \
 --blr 2e-4 --world_size 4 --accum_iter 2 --model MIM_vit_base_patch16 \
 --data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
---output_dir full_pretrain_out_freezeout_linear_t0_5 --log_dir full_pretrain_out_freezeout_linear_t0_5 \
---how_scale linear --t_0 0.5
+--output_dir full_pretrain_out_freezeout_cubic_t0_85 --log_dir full_pretrain_out_freezeout_cubic_t0_85 \
+--how_scale cubic --t_0 0.85
 ```
 
 - 8 GPU:
@@ -314,3 +314,10 @@ For each stage freezeout feature encoder output update:
     - Are the hog_enc layers necessary here? The paper refers to the method without HOG, where is the imp (can be helpful).
     - The decoder output shape is different for each layer originally, how to handle this?
     - Should I prune the decoder outputs simultaneously as I prune the encoder inputs for symmetry (ideally I should)?
+
+
+
+
+# IMPORTANT REFERENCES
+- Large initial learning rates generalize better, as small learning rates tend to memorize hard to fit easy to generalize patterns easier: Towards Explaining the Regularization Effect of Initial Large Learning Rate in Training Neural Networks. 
+- Large learning rates generalize better: On the Benefits of Large Learning Rates for Kernel Methods. 
