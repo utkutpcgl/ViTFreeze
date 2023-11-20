@@ -42,9 +42,10 @@ scale_fn = {'linear':lambda x: x,
 
 def get_args():
     parser = argparse.ArgumentParser('MAE pre-training', add_help=False)
-    parser.add_argument('--batch_size', default=128, type=int, help='Batch size per GPU (effective batch size is batch_size*accum_iter*ngpus') # 8*256 = 2048 for base model
-    parser.add_argument('--epochs', default=4, type=int) # 100 for initial training
+    parser.add_argument('--batch_size', default=256, type=int, help='Batch size per GPU (effective batch size is batch_size*accum_iter*ngpus') # 8*256 = 2048 for base model
+    parser.add_argument('--epochs', default=9, type=int) # 100 for initial training
     parser.add_argument('--accum_iter', default=1, type=int, help='Accumulate gradient iterations (for increasing the effective batch size under memory constraints)')
+    parser.add_argument('--debug', action='store_true', help='Debug mode')
 
     # Model parameters
     parser.add_argument('--model', default='MIM_vit_base_patch16', type=str, help='Name of model to train') # NOTE was mae_vit_large_patch16
@@ -92,6 +93,7 @@ def get_args():
 def main(args):
     misc.init_distributed_mode(args)
     print(args)
+    is_debug = args.debug 
 
     device = torch.device(args.device)
 
@@ -108,19 +110,35 @@ def main(args):
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
     dataset_train = datasets.ImageFolder(args.data_path, transform=transform_train)
+    num_tasks = misc.get_world_size()
+    if is_debug:
+        dataset_train.samples = dataset_train.samples * num_tasks
+        dataset_train.targets = dataset_train.targets * num_tasks 
     assert len(dataset_train) != 0
     print(len(dataset_train))
-    num_tasks = misc.get_world_size()
     global_rank = misc.get_rank()
-    sampler_train = torch.utils.data.DistributedSampler(dataset_train, num_replicas=num_tasks, rank=global_rank, shuffle=True)
-    print("Sampler_train = %s" % str(sampler_train))
-    data_loader_train = torch.utils.data.DataLoader(
-        dataset_train,
-        sampler=sampler_train,
-        batch_size=args.batch_size,
-        num_workers=args.num_workers,
-        pin_memory=args.pin_mem,
-        drop_last=True)
+    if args.distributed:
+        sampler_train = torch.utils.data.DistributedSampler(dataset_train, num_replicas=num_tasks, rank=global_rank, shuffle=True)
+        print("Sampler_train = %s" % str(sampler_train))
+        data_loader_train = torch.utils.data.DataLoader(
+            dataset_train,
+            sampler=sampler_train,
+            batch_size=args.batch_size,
+            num_workers=args.num_workers,
+            pin_memory=args.pin_mem,
+            drop_last=True,
+            persistent_workers=True,
+            )
+    else:
+        data_loader_train = torch.utils.data.DataLoader(
+            dataset_train,
+            batch_size=args.batch_size,
+            num_workers=args.num_workers,
+            pin_memory=args.pin_mem,
+            drop_last=True,
+            persistent_workers=True,
+            shuffle=True
+            )
 
     if global_rank == 0 and args.log_dir is not None:
         os.makedirs(args.log_dir, exist_ok=True)
@@ -184,7 +202,7 @@ def main(args):
     optimizer_param_groups = create_param_groups(model_without_ddp,log_writer=log_writer)
     # NOTE parameters groups set with explicit learning_rate (or other params) will ignore the learning rate of AdamW arguments.
     optimizer = torch.optim.AdamW(optimizer_param_groups, betas=(0.9, 0.95)) # freezout specific optimizer
-    loss_scaler = NativeScaler()
+    loss_scaler = NativeScaler() # TODO remove this and calculate the loss normally for the no ddp case.
 
     misc.auto_load_model(args=args, model_without_ddp=model_without_ddp, optimizer=optimizer, loss_scaler=loss_scaler)
 
@@ -195,6 +213,7 @@ def main(args):
 
     print(f"Start training for {args.epochs} epochs")
     start_time = time.time()
+    model.train(True) # NOTE will not work with loading pretrained weights.
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
             data_loader_train.sampler.set_epoch(epoch)
