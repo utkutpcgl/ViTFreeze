@@ -228,6 +228,7 @@ def update_freezeout_layers_lr(cur_global_iteration, cur_global_iteration_warmup
         if cur_global_iteration_warmup_subtracted > m.max_iteration_warmup_subtracted: 
             lr = 0
             m.active = False
+            m.eval() # NOTE did not make a huge difference.
             # Also make sure we remove all this layer from the optimizer
             # optim.param_groups.remove(target_freezeout_param_group) -> default one.
             if target_freezeout_param_group is None:
@@ -260,7 +261,7 @@ def get_freezeout_modules(model):
 def remove_param_from_optimizer_and_grad_comp(optim, pg_index):
     # Remove corresponding state
     for param in optim.param_groups[pg_index]['params']:
-        param.requires_grad = False
+        param.requires_grad = False # changed iteration speed 1/16 approx.
         if param in optim.state:
             del optim.state[param]
     del optim.param_groups[pg_index]
