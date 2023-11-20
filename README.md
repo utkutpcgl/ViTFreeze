@@ -39,15 +39,37 @@ python3 -m torch.distributed.launch --nproc_per_node=8 --master_port=29502 run_p
 --how_scale cubic --t_0 0.8
 ```
 
+- 1 GPU:
+```bash
+bash record.sh CUDA_VISIBLE_DEVICES=6 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29500  run_pretrain.py \
+--epochs 100 --batch_size 256 --warmup_epochs 10 \
+--blr 2e-4 --world_size 1 --accum_iter 8 --model MIM_vit_base_patch16 \
+--data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
+--output_dir full_pretrain_out_freezeout_cubic_t0_8_1gpu --log_dir full_pretrain_out_freezeout_cubic_t0_8_1gpu \
+--how_scale cubic --t_0 0.8
+```
+
 - DEBUG TRAIN
 ```bash
-bash record.sh CUDA_VISIBLE_DEVICES=0,1,2,3 OMP_NUM_THREADS=1 \
-python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29501 run_pretrain.py \
---epochs 3 --batch_size 2 --warmup_epochs 0 \
---blr 2e-4 --world_size 4 --accum_iter 1 --model MIM_vit_base_patch16 \
+bash record.sh CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=8 --master_port=29501 run_pretrain.py \
+--epochs 9 --batch_size 32 --warmup_epochs 1 \
+--blr 2e-4 --world_size 8 --accum_iter 1 --model MIM_vit_base_patch16 \
 --data_path /raid/utku/datasets/imagenet/classification/train/demo_dataset \
---output_dir debug --log_dir debug \
---how_scale linear --t_0 0.5
+--output_dir debug --log_dir debug --debug \
+--how_scale cubic --t_0 0.8
+```
+
+- PROFILE DEBUG TRAIN
+```bash
+bash record.sh CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=8 --master_port=29501 run_pretrain.py \
+--epochs 4 --batch_size 256 --warmup_epochs 0 \
+--blr 2e-4 --world_size 8 --accum_iter 1 --model MIM_vit_base_patch16 \
+--data_path /raid/utku/datasets/imagenet/classification/train/demo_dataset \
+--output_dir debug --log_dir debug --debug \
+--how_scale cubic --t_0 0.8
 ```
 
 
@@ -72,6 +94,17 @@ python3 -m torch.distributed.launch --nproc_per_node=8 --master_port=29502 run_p
 --model MIM_vit_base_patch16 --hog_nbins 9 --mask_ratio 0.75 \
 --data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
 --output_dir full_pretrain_out_fast --log_dir full_pretrain_out_fast
+```
+
+- 1 GPU
+```bash
+bash record.sh CUDA_VISIBLE_DEVICES=7 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29501 run_pretrain.py \
+--epochs 100 --batch_size 256 --warmup_epochs 10 \
+--blr 2e-4 --world_size 1 --accum_iter 8 --weight_decay 0.05 \
+--model MIM_vit_base_patch16 --hog_nbins 9 --mask_ratio 0.75 \
+--data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
+--output_dir full_pretrain_out_1gpu --log_dir full_pretrain_out_1gpu
 ```
 
 ### Fine Tuning:
