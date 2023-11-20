@@ -22,9 +22,7 @@ import util.misc as misc
 import util.lr_sched as lr_sched
 import util.freezeout_utils as fo_sched
 
-
 def train_one_epoch(model, data_loader, optimizer, device, epoch, loss_scaler, param_groups, active_freezeout_modules, log_writer=None, args=None):
-    model.train(True)
     metric_logger = misc.MetricLogger(delimiter="  ")
     metric_logger.add_meter('lr', misc.SmoothedValue(window_size=1, fmt='{value:.6f}'))
     header = 'Epoch: [{}]'.format(epoch)
@@ -42,12 +40,12 @@ def train_one_epoch(model, data_loader, optimizer, device, epoch, loss_scaler, p
         torch.cuda.synchronize()
         start = time.time()
         # we use a per iteration (instead of per epoch) lr scheduler
+        samples = samples.to(device, non_blocking=True) # NOTE this should be faster if placed before adjust_learning_rate_freezeout.
         if data_iter_step % accum_iter == 0:
             # Default was: lr_sched.adjust_learning_rate(optimizer, data_iter_step/len(data_loader)+epoch, args)
             # NOTE lr and attributes have to be set for all models (all ranks.)
             min_active_layer_index = fo_sched.adjust_learning_rate_freezeout(optimizer,  epoch, data_iter_step, param_groups, active_freezeout_modules=active_freezeout_modules, iter_per_epoch=len(data_loader), writer=log_writer, args=args) # Freezeout specific
 
-        samples = samples.to(device, non_blocking=True)
         with torch.cuda.amp.autocast():
             loss = model(samples, min_active_layer_index=min_active_layer_index,mask_ratio=args.mask_ratio)
 
