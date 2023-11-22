@@ -17,7 +17,7 @@ import timm.models.vision_transformer
 
 class VisionTransformer(timm.models.vision_transformer.VisionTransformer):
     """
-    Vision Transformer with support for global average pooling
+    Vision Transformer with support for global average pooling (NOTE used only for finetune)
     """
     def __init__(self, global_pool=False, **kwargs):
         super(VisionTransformer, self).__init__(**kwargs)
