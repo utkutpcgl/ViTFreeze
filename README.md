@@ -37,7 +37,7 @@ LocalMIM involves partitioning the input image into regions and using these for 
 ### Progressive Layer Freezing
 We introduce a layer-wise cosine annealing schedule for learning rates, progressively freezing the layers and shifting them to inference mode to save on computation.
 
-<img src="image/README/lr_schedule_with_warmup.png" width="100%" height="100%">
+<img src="image/README/lr_schedule_with_warmup.png" width="75%" height="75%">
 
 *Figure 2: Layer Freezing Schedule.*
 
