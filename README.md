@@ -2,8 +2,6 @@
 # Local Masking Meets Progressive Freezing: Efficient Vision Transformers
 *NOTE: Repo is under development.*
 
-(TODO provide link to arxiv here)
-
 ## Introduction
 This repository contains the implementation of our novel approach for self-supervised learning in Vision Transformers (ViTs), as described in our paper "Local Masking Meets Progressive Freezing: Crafting Efficient Vision Transformers for Self-Supervised Learning". Our method introduces Local Masked Image Modeling (LocalMIM) and a progressive layer freezing mechanism to enhance the training efficiency of ViTs.
 
