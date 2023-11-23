@@ -11,7 +11,7 @@ This repository contains the implementation of our novel approach for self-super
   - [Table of Contents](#table-of-contents)
   - [Method Overview](#method-overview)
     - [LocalMIM](#localmim)
-    - [Progressive Layer Freezing](#progressive-layer-freezing)
+    - [Progressive Layer Freezing (VIT Freeze)](#progressive-layer-freezing-vit-freeze)
   - [Key Results](#key-results)
   - [Installation](#installation)
   - [Re-produce Results](#re-produce-results)
@@ -32,7 +32,7 @@ Our approach combines the benefits of local masking, which allows for multi-scal
 ### LocalMIM
 LocalMIM involves partitioning the input image into regions and using these for reconstruction at different scales. This aids the model in capturing fine-grained details as well as broader contextual information.
 
-### Progressive Layer Freezing
+### Progressive Layer Freezing (VIT Freeze)
 We introduce a layer-wise cosine annealing schedule for learning rates, progressively freezing the layers and shifting them to inference mode to save on computation.
 
 <img src="image/README/lr_schedule_with_warmup.png" width="75%" height="75%">
@@ -46,7 +46,7 @@ Our method achieved a reduction in training time by approximately 12.5% with onl
 
 ## Installation
 
-Instructions for setting up the environment and installing required packages.
+The recommended way is to setup [docker](docker/Dockerfile). But you can try:
 
 ```bash
 # Clone the repository
@@ -155,3 +155,5 @@ python3 -m torch.distributed.launch --nproc_per_node=8 --master_port=29504 run_f
 ### Citation
 If you find our approach useful in your research, please consider citing our paper:
 
+
+* Further details about this project can be found [here](author_README.md).

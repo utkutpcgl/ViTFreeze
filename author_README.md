@@ -1,4 +1,4 @@
-# freezeout_localmim_rho
+# DETAILS
 
 ## Running Experiments
 
