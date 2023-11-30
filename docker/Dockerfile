@@ -7,7 +7,7 @@ RUN apt-get install -y git
 
 # Clone the repository
 WORKDIR /workspace
-RUN git clone https://github.com/utkutpcgl/freezeout_localmim_rho.git
+RUN git clone https://github.com/utkutpcgl/ViTFreeze.git
 RUN pip install -r requirements.txt
 
 # Apply modifications to timm package
