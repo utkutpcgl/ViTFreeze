@@ -3,9 +3,12 @@ __pycache__/
 *events*
 *.py[cod]
 *$py.class
+runs/
 runs/*
 **/runs
 **/*events*
+**pth
+**json
 
 # C extensions
 *.so
