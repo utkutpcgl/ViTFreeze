@@ -49,13 +49,18 @@ def get_args():
 
     # Model parameters
     parser.add_argument('--model', default='MIM_vit_base_patch16', type=str, help='Name of model to train') # NOTE was mae_vit_large_patch16
-    parser.add_argument('--how_scale', default="cubic", type=str, help='Select how to scale the model.') # NOTE was mae_vit_large_patch16
-    parser.add_argument('--t_0', default=0.8, type=float, help='Select freezeout specific t_0 (when to freeze the intial layer)') # NOTE was mae_vit_large_patch16
     parser.add_argument('--input_size', default=224, type=int, help='images input size') # 224 always
     parser.add_argument('--mask_ratio', default=0.75, type=float, help='Masking ratio (percentage of removed patches).') # 0.75 always
     parser.add_argument('--hog_nbins', default=9, type=int, help='nbins for HOG feature') # NOTE paper says 18 but here and in the repo it says 9??
     parser.add_argument('--hog_bias', action='store_true', help='hog bias')
     parser.set_defaults(hog_bias=False)
+    # Freezeout model parameters
+    parser.add_argument('--not_scale_lr',  action='store_true', help='Scale learning rate per layer.')
+    parser.set_defaults(not_scale_lr=False)
+    parser.add_argument('--non_layerwise_lr',  action='store_true', help='Update learning rate per layer with different cosine schedule (max_iteration)')
+    parser.set_defaults(non_layerwise_lr=False)
+    parser.add_argument('--how_scale', default="cubic", type=str, help='Select how to scale the model.')
+    parser.add_argument('--t_0', default=0.8, type=float, help='Select freezeout specific t_0 (when to freeze the intial layer)')
 
     # Optimizer parameters
     parser.add_argument('--weight_decay', type=float, default=0.05, help='weight decay (default: 0.05)')
@@ -156,7 +161,8 @@ def main(args):
     print("effective batch size: %d" % eff_batch_size)
 
     # define the model
-    model = models_mim.__dict__[args.model](hog_nbins=args.hog_nbins, hog_bias=args.hog_bias, how_scale=args.how_scale, t_0=args.t_0)
+    scale_lr = not args.not_scale_lr
+    model = models_mim.__dict__[args.model](hog_nbins=args.hog_nbins, hog_bias=args.hog_bias, how_scale=args.how_scale, t_0=args.t_0, scale_lr=scale_lr)
     model.to(device)
     lr_scale_fn = scale_fn[model.how_scale] # freezeout spec
     t_0 = model.t_0 # freezeout spec
@@ -217,8 +223,8 @@ def main(args):
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
             data_loader_train.sampler.set_epoch(epoch)
-        train_stats = train_one_epoch(model, data_loader_train, optimizer, device, epoch, loss_scaler, param_groups, active_freezeout_modules=active_freezeout_modules, log_writer=log_writer, args=args)
-        if args.output_dir and (epoch%50 == 0 or epoch+1 == args.epochs):
+        train_stats = train_one_epoch(model, data_loader_train, optimizer, device, epoch, loss_scaler, param_groups, active_freezeout_modules=active_freezeout_modules, non_layerwsise_lr=args.non_layerwsise_lr,log_writer=log_writer, args=args)
+        if args.output_dir and ((epoch+1)%5 == 0 or epoch+1 == args.epochs):
             misc.save_model(args=args, model=model, model_without_ddp=model_without_ddp, optimizer=optimizer, loss_scaler=loss_scaler, epoch=epoch)
 
         log_stats = {**{f'train_{k}': v for k, v in train_stats.items()}, 'epoch': epoch}

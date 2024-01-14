@@ -166,7 +166,8 @@ class MaskedAutoencoderViT(AttributeAwareModule):
                  decoder_depth=1, decoder_num_heads=16, mlp_ratio=4., norm_layer=nn.LayerNorm, hog_nbins=9, hog_bias=False, **kwargs):
         super().__init__()
         # Freezeout specific
-        self.scale_lr = True # Scale the learning rate for the gradients to integrate to the same values (w.r.t. lr without freezeout)
+        # Previously scale_lr was true by default.
+        self.scale_lr = kwargs['scale_lr'] # Scale the learning rate for the gradients to integrate to the same values (w.r.t. lr without freezeout)
         self.how_scale = kwargs.get('how_scale')  # scaling method
         self.t_0 = kwargs.get('t_0')  # scaling method
         if self.t_0 is None:
@@ -339,7 +340,6 @@ class MaskedAutoencoderViT(AttributeAwareModule):
             mask = mask.reshape(B, H//s, s, H//s, s).transpose(2, 3).mean((-2, -1)).reshape(B, -1)
         return mask
 
-    # TODO while calculating the loss giving more weight to initial layer outputs can help freezeout (also provide a curriculum)
     # TODO moving the encoder output layers (to the decoder) to later layers during training can provide a curriculum
     def update_forward_freezeout(self, min_active_layer_index):
         # URGENT TODO  if layer until an output has been frozen, you neglect the operations on that output (speed up)
@@ -354,6 +354,7 @@ class MaskedAutoencoderViT(AttributeAwareModule):
             
 
     def forward_loss(self, imgs, pred, mask):
+        # TODO while calculating the loss giving more weight to initial layer outputs can help freezeout (also provide a curriculum)
         """
         imgs: [N, 3, H, W]
         mask: [N, L], 0 is keep, 1 is remove,
@@ -365,6 +366,8 @@ class MaskedAutoencoderViT(AttributeAwareModule):
         for k in range(len(pred)):
             M = self.recal_mask(mask, k)
             loss += (((pred[k]-target[k])**2).mean(dim=-1)*M).sum()/M.sum()
+            # linear_loss_scaler = len(pred) - k
+            # loss *= linear_loss_scaler
 
         return loss
 
