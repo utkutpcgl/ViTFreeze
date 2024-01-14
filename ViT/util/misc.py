@@ -309,7 +309,7 @@ def auto_load_model(args, model_without_ddp, optimizer, loss_scaler):
         if latest_ckpt >= 0:
             args.resume = os.path.join(output_dir, 'checkpoint-%d.pth' % latest_ckpt)
         print("Auto resume checkpoint: %s" % args.resume)
-
+    
     if args.resume:
         if args.resume.startswith('https'):
             checkpoint = torch.hub.load_state_dict_from_url(args.resume, map_location='cpu', check_hash=True)
@@ -318,14 +318,29 @@ def auto_load_model(args, model_without_ddp, optimizer, loss_scaler):
         model_without_ddp.load_state_dict(checkpoint['model'])
         print("Resume checkpoint %s" % args.resume)
         if 'optimizer' in checkpoint and 'epoch' in checkpoint and not (hasattr(args, 'eval') and args.eval):
-            # NOTE modifications made to the optimizer param_groups enforces the line below
-            align_optimizer_to_checkpoint(optimizer=optimizer, checkpoint_state_dict=checkpoint['optimizer'], model=model_without_ddp)
             optimizer.load_state_dict(checkpoint['optimizer'])
             args.start_epoch = checkpoint['epoch'] + 1
-            print("Start epoch is: ", args.start_epoch)
             if 'scaler' in checkpoint:
                 loss_scaler.load_state_dict(checkpoint['scaler'])
             print("With optim & sched!")
+
+    # TODO weight loading not implemented for freezeout:
+    # if args.resume:
+    #     if args.resume.startswith('https'):
+    #         checkpoint = torch.hub.load_state_dict_from_url(args.resume, map_location='cpu', check_hash=True)
+    #     else:
+    #         checkpoint = torch.load(args.resume, map_location='cpu')
+    #     model_without_ddp.load_state_dict(checkpoint['model'])
+    #     print("Resume checkpoint %s" % args.resume)
+    #     if 'optimizer' in checkpoint and 'epoch' in checkpoint and not (hasattr(args, 'eval') and args.eval):
+    #         # NOTE modifications made to the optimizer param_groups enforces the line below
+    #         align_optimizer_to_checkpoint(optimizer=optimizer, checkpoint_state_dict=checkpoint['optimizer'], model=model_without_ddp)
+    #         optimizer.load_state_dict(checkpoint['optimizer'])
+    #         args.start_epoch = checkpoint['epoch'] + 1
+    #         print("Start epoch is: ", args.start_epoch)
+    #         if 'scaler' in checkpoint:
+    #             loss_scaler.load_state_dict(checkpoint['scaler'])
+    #         print("With optim & sched!")
 
 
 def all_reduce_mean(x):
