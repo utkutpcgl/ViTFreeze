@@ -191,7 +191,7 @@ def validate_same_objects(optimizer, freezeout_param_groups):
 
 
 # ---------------------------------- ADJUST LEARNING RATES
-def adjust_learning_rate_freezeout(optimizer, epoch, cur_local_iteration, param_groups, active_freezeout_modules, iter_per_epoch, args, writer, non_layerwsise_lr):
+def adjust_learning_rate_freezeout(optimizer, epoch, cur_local_iteration, param_groups, active_freezeout_modules, iter_per_epoch, args, writer, non_layerwise_lr):
     """Freezeout decay the learning rate with half-cycle cosine after linnear warmup, step=iteration"""
     total_warmup_iterations = iter_per_epoch*args.warmup_epochs
     cur_global_iteration = cur_local_iteration + epoch*iter_per_epoch
@@ -209,7 +209,7 @@ def adjust_learning_rate_freezeout(optimizer, epoch, cur_local_iteration, param_
         freezeout_param_groups = param_groups["freezeout"]
         non_freezeout_param_groups = param_groups["non_freezeout"]
         update_non_freezeout_layers_lr(non_freezeout_param_groups, regular_cosine_lr, cur_global_iteration, writer=writer)
-        min_active_layer_index = update_freezeout_layers_lr(cur_global_iteration, cur_global_iteration_warmup_subtracted, optimizer, freezeout_param_groups, active_freezeout_modules, writer=writer, non_layerwsise_lr=non_layerwsise_lr, regular_cosine_lr=regular_cosine_lr)
+        min_active_layer_index = update_freezeout_layers_lr(cur_global_iteration, cur_global_iteration_warmup_subtracted, optimizer, freezeout_param_groups, active_freezeout_modules, writer=writer, non_layerwise_lr=non_layerwise_lr, regular_cosine_lr=regular_cosine_lr)
     return min_active_layer_index
         
 
