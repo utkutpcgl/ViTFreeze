@@ -472,21 +472,30 @@ For each stage freezeout feature encoder output update:
 - The model achieves peak results much earlier than the target epoch count. Is this due to freezeout learning rate scheduling? Or is it part of the nature of localmim?
 
 # IMPORTANT OBSERVATIONS
+- Multi-scale learning might enable early freezing of layers without accuracy drop (like freezeout). Having more tasks for the initial layers might be a better way for AdamW, while lr increasing in for SGD was useful, it is not effective for AdamW, as it is not sensitive to learning rate. Multi-scale training, by default might benefit early layer convergence and freezing a lot, and early layers might be more important for transfer learning in MIM. -> If my intuition is right, multi-scale training might allow much earlier layer freezing.
 - The freezout learning rate schedule harms the model performance and does not help with convergence speed.
-- The model achieves peak results much earlier than the target epoch count-> Is this due to freezeout learning rate scheduling? Or is it part of the nature of localmim?
-- In the worst case freezeout learning rate scheduling will not help convergence speed (early trainint termination and early freezing ability). Then, only localmim architecture might help freezout, or worse, mae is better with freezeout. Then, no lr scheduling or multi-scale learning is helpful, where the paper is trash.
+- localmim intrinsically converges much faster, the 100 vs 1600 epoch is not very different compared to MAE.
 - Stagewise task losses magnitudes are 4,3,2,1 -> This means there is a default lr scheduling like freezeout. To apply freezeout, you should reduce the learning rates per stage first, then scale the learning rates to match freezeout. -> Rather than scaling with 4,3,2,1 -> scaling with 1/4, 1/3, 1/2, 1 might help the convergence and avoid extreme gradient updates for initial layers.
 - The model achieves peak results much earlier than the target epoch count -> lowering the learning rate prematurely might harm especially less epoch trainings (100 epoch). Hence, cosine anealing might be very bad for low epoch pre-training, or maybe even long trainings. Exhausting the dataset in self-supervised learning might be much more difficult than regular supevised training. Train a model with constant learning rate or something similar. If this is caused by freezing the model that is also nice (artificial speed up), which might show that training early layers is much more valuable.
 - The model perfors better when there is not lr scaling or freezing operation but by directly stopping training at early epochs like 80-70, learning rate scheduling turned out to be useless with Adam probably.
 
 # IDEAS and TODOs
 *Important*
-- Multi-scale learning might enable early freezing of layers without accuracy drop (like freezeout). Having more tasks for the initial layers might be a better way for AdamW, while lr increasing in for SGD was useful, it is not effective for AdamW, as it is not sensitive to learning rate. Multi-scale training, by default might benefit early layer convergence and freezing a lot, and early layers might be more important for transfer learning in MIM. -> If my intuition is right, multi-scale training might allow much earlier layer freezing.
-- TODO I think, giving the same weights to the tasks are not fair, final stage is more important. Reduce the weights of early stages (even curriculum is possible). Also, doubling lr is not the same as doubling the task weight, as doubling the task weight for AdamW should correspond to doubling the lr in SGD.
-- TODO train the 0.8 t0 70-65-60-55-50-45-40 models, adjust the learning rate (keep it high) and pre-train again if the original model also stops improving. But the max achieved leraning rate for 100 and 1600 are not much different (it is 83.3 to 84)
-- TODO sabit learning rate ile dene (cosine hasar veriyor olabilir mi lr fazla erken düşürürerek?), Learning rate sabit kalsa daha iyi sonuç alınır mı. 
+TODO lr schedule per layer olmadan:
+- I think, giving the same weights to the tasks are not fair, final stage is more important. Reduce the weights of early stages (even curriculum is possible). Also, doubling lr is not the same as doubling the task weight, as doubling the task weight for AdamW should correspond to doubling the lr in SGD.
+- Train the model without lr scaling or layerwise lr for different t0 values (0.8, 0.7, 0.9, 0.6) and train different model checkpoints (70-65-60-55-50-45-40), adjust the learning rate (keep it high) and pre-train again if the original model also stops improving. But the max achieved leraning rate for 100 and 1600 are not much different (it is 83.3 to 84)
+- Add more stage tasks (multi-scale) for greater early layer convergence speed.
 
-- non_layerwise_lr ile train at ve düz localmim train freezeout layer scheduledan daha mı iyi gör. 
+
+TODO curious thoughts:
+- Great Idea: Self distillation might improve the use of initial layers for the SSL task and improve convergence speed. Transitive distillation might work well (similar to multi-scale training.).
+- nlp layer dropping method.
+- sabit learning rate ile dene (cosine hasar veriyor olabilir mi lr fazla erken düşürürerek?), Learning rate sabit kalsa daha iyi sonuç alınır mı. 
+
+TODO Fine-tuning hızlandırmak:
+- pre-training yerine finetuning de freeze etmek hızlandırmak için daha iyi olabilir gibi duruyor, intuitive olarak freezing transfer learning de kullanılıyor (ama lower epoch sonuçları bariz daha kötü finetune edilen modeling, freezing iyi çalışmayabilir).
+- fine-tuning'in de multi-scale olması mantıklı duruyor.
+
 
 
 *mid*

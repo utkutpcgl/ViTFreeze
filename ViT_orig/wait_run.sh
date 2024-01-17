@@ -4,9 +4,8 @@
 REMOTE_HOST="192.168.1.100"
 REMOTE_USER="kuartis-dgx1"
 PASSWORD="kuartis2012"
-TARGET_PID=1421782
 
-TARGET_PIDS=(1421782 2335973) # Add your PIDs here
+TARGET_PIDS=(3972200) # Add your PIDs here
 
 # Create an SSH command with sshpass
 SSH_COMMAND="sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no -T ${REMOTE_USER}@${REMOTE_HOST}"

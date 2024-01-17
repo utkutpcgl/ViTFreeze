@@ -10,7 +10,7 @@ def find_accuracy_lines(file_path):
     with open(file_path, 'r') as file:
         for line in file:
             match = re.search(pattern, line)
-            if match and epoch % 5 == 0:  # Only append if epoch is a multiple of 5
+            if match and epoch % 10 == 0:  # Only append if epoch is a multiple of 5
                 acc1 = float(match.group(1))
                 acc1_values.append(acc1)
             epoch += 1
@@ -29,7 +29,7 @@ with open('accuracy_results.csv', 'w', newline='') as csvfile:
 
     # Write header row
     header = ['File Path']
-    header.extend([f'Epoch {i}' for i in range(5, 105, 5)])  # Assuming a maximum of 100 epochs
+    header.extend([f'Epoch {i}' for i in range(10, 110, 10)])  # Assuming a maximum of 100 epochs
     csvwriter.writerow(header)
 
     for path in file_paths:
