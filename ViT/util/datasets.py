@@ -17,8 +17,9 @@ from timm.data import create_transform
 from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 
 
-def build_dataset(is_train, args):
-    transform = build_transform(is_train, args)
+def build_dataset(is_train, args, train_transform=True):
+    # Both has to be train and the transform has to be active for transforms to be applied.
+    transform = build_transform(is_train and train_transform, args)
     root = Path(args.data_path)/ ('train' if is_train else 'val') /'image_folders'
     print(f"{'Train' if is_train else 'Val'} data path is: ", root)
     dataset = datasets.ImageFolder(root, transform=transform)
