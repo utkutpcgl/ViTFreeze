@@ -55,7 +55,17 @@ class MAE_Decoder(nn.Module):
 
         # pred head
         hidden = embed_dim
-        if scale == 4.0:
+        if scale == 8.0:
+            layers = [nn.ConvTranspose2d(embed_dim, embed_dim//2, kernel_size=2, stride=2),
+                      LayerNorm(embed_dim//2),
+                      nn.GELU(),
+                      nn.ConvTranspose2d(embed_dim//2, embed_dim//4, kernel_size=2, stride=2),
+                      LayerNorm(embed_dim//4),
+                      nn.GELU(),
+                      nn.ConvTranspose2d(embed_dim//4, embed_dim//8, kernel_size=2, stride=2)
+                      ]
+            hidden = embed_dim//8
+        elif scale == 4.0:
             layers = [nn.ConvTranspose2d(embed_dim, embed_dim//2, kernel_size=2, stride=2),
                       LayerNorm(embed_dim//2),
                       nn.GELU(),
@@ -169,6 +179,7 @@ class MaskedAutoencoderViT(AttributeAwareModule):
         # Previously scale_lr was true by default.
         self.scale_lr = kwargs['scale_lr'] # Scale the learning rate for the gradients to integrate to the same values (w.r.t. lr without freezeout)
         self.how_scale = kwargs.get('how_scale')  # scaling method
+        self.all_stages = kwargs.get('all_stages')  # Use all steges for reconstruction, by default is false.
         self.t_0 = kwargs.get('t_0')  # scaling method
         if self.t_0 is None:
             if self.how_scale == "cubic":
@@ -201,9 +212,17 @@ class MaskedAutoencoderViT(AttributeAwareModule):
         self.cum_layer_index -= 1 # Freezeout specific -> Subtract the final residual increment.
 
         # MIM decoder specifics
-        self.ID = [1, 3, depth-3, depth-1] # NOTE layers that are the inputs to decoder (fed features)
-        self.decoder_scales = [4.0, 2.0, 1.0, 0.5] # NOTE scaling factors of the decoder outputs
-        self.hog_pool_kernel_sizes = [4, 8, 16, 32]
+        
+        if self.all_stages:
+            self.ID = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] # NOTE layers that are the inputs to decoder (fed features) -
+            self.decoder_scales = [8.0, 4.0, 4.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 1.0, 1.0, 0.5] # NOTE scaling factors of the decoder outputs
+            self.hog_pool_kernel_sizes = [2, 4, 4, 8, 8, 8, 8, 8, 8, 16, 16, 32]
+        else: #use reguler localmim stages.
+            self.ID = [1, 3, depth-3, depth-1] # NOTE layers that are the inputs to decoder (fed features) -> 2,4,10,12 -> 1,3,9,11
+            self.decoder_scales = [4.0, 2.0, 1.0, 0.5] # NOTE scaling factors of the decoder outputs
+            self.hog_pool_kernel_sizes = [4, 8, 16, 32]
+
+        id_dec_hog_zip = []
         norms = [] # Freezeout specific
         decoders = [] # Freezeout specific
         hog_encs = []
@@ -366,8 +385,8 @@ class MaskedAutoencoderViT(AttributeAwareModule):
         for k in range(len(pred)):
             M = self.recal_mask(mask, k)
             loss += (((pred[k]-target[k])**2).mean(dim=-1)*M).sum()/M.sum()
-            # linear_loss_scaler = len(pred) - k
-            # loss *= linear_loss_scaler
+            # loss += ((((pred[k]-target[k])**2).mean(dim=-1)*M).sum()/M.sum())*(1/(k+1))
+            # loss += ((((pred[k]-target[k])**2).mean(dim=-1)*M).sum()/M.sum())*(len(pred) - k)
 
         return loss
 

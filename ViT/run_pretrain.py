@@ -55,6 +55,8 @@ def get_args():
     parser.add_argument('--hog_bias', action='store_true', help='hog bias')
     parser.set_defaults(hog_bias=False)
     # Freezeout model parameters
+    parser.add_argument('--all_stages', action='store_true', help='all_stages')
+    parser.set_defaults(all_stages=False)
     parser.add_argument('--not_scale_lr',  action='store_true', help='Scale learning rate per layer.')
     parser.set_defaults(not_scale_lr=False)
     parser.add_argument('--non_layerwise_lr',  action='store_true', help='Update learning rate per layer with different cosine schedule (max_iteration)')
@@ -162,7 +164,8 @@ def main(args):
 
     # define the model
     scale_lr = not args.not_scale_lr
-    model = models_mim.__dict__[args.model](hog_nbins=args.hog_nbins, hog_bias=args.hog_bias, how_scale=args.how_scale, t_0=args.t_0, scale_lr=scale_lr)
+    all_stages = args.all_stages
+    model = models_mim.__dict__[args.model](hog_nbins=args.hog_nbins, hog_bias=args.hog_bias, how_scale=args.how_scale, t_0=args.t_0, scale_lr=scale_lr, all_stages=all_stages)
     model.to(device)
     lr_scale_fn = scale_fn[model.how_scale] # freezeout spec
     t_0 = model.t_0 # freezeout spec
@@ -182,7 +185,10 @@ def main(args):
             module.freezeout_module_level_specifier = None # Just a module level specifier to distinguish module freezeout layer levels.
             freezeout_module_level_specifier_count+=1
     print("freezeout_module_level_specifier_count: ", freezeout_module_level_specifier_count)
-    assert freezeout_module_level_specifier_count == FREEZEOUT_LAYER_COUNT_VIT_B
+    if all_stages:
+        assert freezeout_module_level_specifier_count == FREEZEOUT_LAYER_COUNT_VIT_B + 8*3
+    else:
+        assert freezeout_module_level_specifier_count == FREEZEOUT_LAYER_COUNT_VIT_B
     model_without_ddp = model
 
 
