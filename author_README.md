@@ -50,33 +50,36 @@ python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29505  run_
 --how_scale cubic --t_0 0.8
 ```
 
+- NON LAYER WISE AND NOT SCALE LR
 ```bash
-bash record.sh CUDA_VISIBLE_DEVICES=2 OMP_NUM_THREADS=1 \
-python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29502  run_pretrain.py \
---epochs 100 --batch_size 256 --warmup_epochs 10 \
---blr 2e-4 --world_size 1 --accum_iter 8 --model MIM_vit_base_patch16 \
---data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
---output_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_6 --log_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_6 \
---how_scale cubic --t_0 0.6 \
---not_scale_lr --non_layerwise_lr
-
 bash record.sh CUDA_VISIBLE_DEVICES=1 OMP_NUM_THREADS=1 \
 python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29501  run_pretrain.py \
 --epochs 100 --batch_size 256 --warmup_epochs 10 \
 --blr 2e-4 --world_size 1 --accum_iter 8 --model MIM_vit_base_patch16 \
 --data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
---output_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_7 --log_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_7 \
---how_scale cubic --t_0 0.7 \
+--output_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_1234_loss_scaler --log_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_1234_loss_scaler \
+--how_scale cubic --t_0 0.8 \
 --not_scale_lr --non_layerwise_lr
 
-bash record.sh CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 \
-python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29500  run_pretrain.py \
+bash record.sh CUDA_VISIBLE_DEVICES=5 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29505  run_pretrain.py \
 --epochs 100 --batch_size 256 --warmup_epochs 10 \
 --blr 2e-4 --world_size 1 --accum_iter 8 --model MIM_vit_base_patch16 \
 --data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
---output_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8 --log_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8 \
+--output_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_1overk_loss_scaler_all_stages --log_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_1overk_loss_scaler_all_stages \
 --how_scale cubic --t_0 0.8 \
---not_scale_lr --non_layerwise_lr
+--not_scale_lr --non_layerwise_lr --all_stages
+
+
+bash record.sh CUDA_VISIBLE_DEVICES=7 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29507  run_pretrain.py \
+--epochs 100 --batch_size 256 --warmup_epochs 10 \
+--blr 2e-4 --world_size 1 --accum_iter 8 --model MIM_vit_base_patch16 \
+--data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
+--output_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_all_stages --log_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_all_stages \
+--how_scale cubic --t_0 0.8 \
+--not_scale_lr --non_layerwise_lr --all_stages
+
 ```
 
 
@@ -303,6 +306,42 @@ python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29507 run_l
 --data_path /raid/utku/datasets/imagenet/classification/ \
 --output_dir linprob_out/bench_2 --log_dir linprob_out/bench_2
 ```
+
+### k-NN Clasification:
+- results should be independent of batch-size 
+- model vit_base_patch16
+- orig image is 256, and it is cropped to 224
+- cls_token 
+- world_size 1
+- accum_iter 8
+
+
+```bash
+bash record.sh CUDA_VISIBLE_DEVICES=6 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29509 run_knn.py \
+--world_size 1 \
+--batch_size 128 --model vit_base_patch16 --finetune /raid/home_yedek/utku/ViTFreeze/ViT/pretrain/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr/checkpoint-99.pth \
+--dist_eval \
+--data_path /raid/utku/datasets/imagenet/classification/ \
+--output_dir knn_out/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr_checkpoint-99 --log_dir knn_out/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr_checkpoint-99
+
+bash record.sh CUDA_VISIBLE_DEVICES=6 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29506 run_knn.py \
+--world_size 1 \
+--batch_size 128 --model vit_base_patch16 --finetune /raid/home_yedek/utku/ViTFreeze/ViT/pretrain/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_save5/checkpoint-99.pth \
+--dist_eval \
+--data_path /raid/utku/datasets/imagenet/classification/ \
+--output_dir knn_out/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_save5_checkpoint-99 --log_dir knn_out/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_save5_checkpoint-99
+
+bash record.sh CUDA_VISIBLE_DEVICES=6 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29509 run_knn.py \
+--world_size 1 \
+--batch_size 128 --model vit_base_patch16 --finetune /raid/home_yedek/utku/ViTFreeze/ViT_orig/full_pretrain_out_1gpu/checkpoint-99.pth \
+--dist_eval \
+--data_path /raid/utku/datasets/imagenet/classification/ \
+--output_dir knn_out/fullpretrain/full_pretrain_out_1gpu_checkpoint-99 --log_dir knn_out/fullpretrain/full_pretrain_out_1gpu_checkpoint-99
+```
+
 
 
 
