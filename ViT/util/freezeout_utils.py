@@ -205,7 +205,8 @@ def adjust_learning_rate_freezeout(optimizer, epoch, cur_local_iteration, param_
             assert "lr_scale" not in param_group, "lr_scale should be only in fine tuning"
             param_group["lr"] = lr
     else:
-        regular_cosine_lr = args.min_lr+(args.lr-args.min_lr)*0.5*(1.+math.cos(math.pi*(fractional_epoch-args.warmup_epochs)/(args.epochs-args.warmup_epochs)))
+        regular_cosine_lr = args.min_lr+(args.lr-args.min_lr)*0.5*(1.+math.cos(math.pi*(fractional_epoch-args.warmup_epochs)/(args.epochs-args.warmup_epochs))) 
+        # TODO the param_groups might not modify all necessary param groups of the optimizer if t0=1 training does not match original pre-training results (with not_scale_lr and non_laywerise_lr set True)
         freezeout_param_groups = param_groups["freezeout"]
         non_freezeout_param_groups = param_groups["non_freezeout"]
         update_non_freezeout_layers_lr(non_freezeout_param_groups, regular_cosine_lr, cur_global_iteration, writer=writer)

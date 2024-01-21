@@ -180,6 +180,7 @@ class MaskedAutoencoderViT(AttributeAwareModule):
         self.scale_lr = kwargs['scale_lr'] # Scale the learning rate for the gradients to integrate to the same values (w.r.t. lr without freezeout)
         self.how_scale = kwargs.get('how_scale')  # scaling method
         self.all_stages = kwargs.get('all_stages')  # Use all steges for reconstruction, by default is false.
+        self.dont_freeze_pe = kwargs.get('dont_freeze_pe')  # Use all steges for reconstruction, by default is false.
         self.t_0 = kwargs.get('t_0')  # scaling method
         if self.t_0 is None:
             if self.how_scale == "cubic":
@@ -192,14 +193,17 @@ class MaskedAutoencoderViT(AttributeAwareModule):
         # NOTE dynamically add attributes to instances of Python classes at runtime
         # MIM encoder specifics
         self.patch_embed = PatchEmbed(img_size, patch_size, in_chans, embed_dim)
-        self.patch_embed.layer_index = 0 # Freezeout specific
-        self.patch_embed.active = True # Freezeout specific
+        if self.dont_freeze_pe:
+            initial_layer_index = 0
+        else:
+            self.patch_embed.layer_index = 0 # Freezeout specific
+            self.patch_embed.active = True # Freezeout specific
+            initial_layer_index = 1
         num_patches = self.patch_embed.num_patches
         # NOTE UTKU Normally the cls token serves as global image context summarizer, but here (MIM) it does not have a clear purpose, can it carry info to later layers?
         self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim)) # NOTE nn.Parameter is not considered part of the model, hence, cls_token can not be accessed in model.modules()
         self.pos_embed = nn.Parameter(torch.zeros(1, 1+num_patches, embed_dim), requires_grad=False)  # fixed sin-cos embedding
 
-        initial_layer_index = 1 # NOTE there are 2 layers before blocks start
         self.cum_layer_index = initial_layer_index # NOTE serves as a layer count
         blocks = [] # Freezeout specific
         for _ in range(depth): # Freezeout specific
