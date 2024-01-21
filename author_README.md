@@ -182,6 +182,9 @@ For each stage freezeout feature encoder output update:
 # IDEAS and TODOs
 *Important*
 TODO lr schedule per layer olmadan:
+- ViTFreeze code might have a problem, ViT and ViTorig produces different results possibly (to=0.8 at 50 epoch and Vit_orig 50 epoch has different results.). Training further after 50 epoch pretraining improves both training, which supports that there is a problem ViTfreeze code, some parameter lrs might not be modified correctly (or even removed from training?).  This should be fixed in optimizer lr update part of Vitfreeze. There is a possibility that the optimizer lr is not modified!
+- Would it be better to not freeze the patch embedding layer -> m
+- I have not adjusted lrs per layer while doing warmup (but orig lr), might this be the reason for freezeout lr sched to fail?
 - I think, giving the same weights to the tasks are not fair, final stage is more important. Reduce the weights of early stages (even curriculum is possible). Also, doubling lr is not the same as doubling the task weight, as doubling the task weight for AdamW should correspond to doubling the lr in SGD.
 - Train the model without lr scaling or layerwise lr for different t0 values (0.8, 0.7, 0.9, 0.6) and train different model checkpoints (70-65-60-55-50-45-40), adjust the learning rate (keep it high) and pre-train again if the original model also stops improving. But the max achieved leraning rate for 100 and 1600 are not much different (it is 83.3 to 84)
 - Add more stage tasks (multi-scale) for greater early layer convergence speed.
@@ -190,6 +193,7 @@ TODO lr schedule per layer olmadan:
 
 TODO curious thoughts:
 - Great Idea: Self distillation might improve the use of initial layers for the SSL task and improve convergence speed. Transitive distillation might work well (similar to multi-scale training.).
+- Diffusion like stage-wise difficulty based denoising (with many 0-100 difficulties like diffusion for augmentation). Similar idea to curriculum by smoothing.
 - nlp layer dropping method.
 - sabit learning rate ile dene (cosine hasar veriyor olabilir mi lr fazla erken düşürürerek?), Learning rate sabit kalsa daha iyi sonuç alınır mı. 
 
@@ -201,8 +205,11 @@ TODO Fine-tuning hızlandırmak:
 
 *mid*
 - Use every layer for multi-scale reconsturction. The paper claims that this helps early layers to converge faster (just like skip connections) and multi-scale local tasks are working better than global single scale reconstruction. This will help premature freezing performance also. 
-- Increasing masking ratio to increase computation speed etc.
+- Increasing masking ratio to increase computation speed etc. (or mask ratio based curriculum)
 - Try add a curriculum to the model by : 1. Adjusting the stage losses, weights, lrs accordingly 2. With token distance based difficulty.
+- Dual patch normalization (DPN) seems to increase convergence speed (with lower number of epochs results are more significant).
 
 *maybe*
 - TODO 100 epoch pre-trained model linear probing might benefit from larger learning rate like as in localmim fine-tuning code.
+- TODO masked feature modeling -> once a layer is frozen intermediate features can be masked and original image can be reconstructed.
+- TODO removing warmup (with transformer init) might increase freezeout speed performance.
