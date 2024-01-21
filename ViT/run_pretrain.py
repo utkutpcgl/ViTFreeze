@@ -55,6 +55,8 @@ def get_args():
     parser.add_argument('--hog_bias', action='store_true', help='hog bias')
     parser.set_defaults(hog_bias=False)
     # Freezeout model parameters
+    parser.add_argument('--dont_freeze_pe', action='store_true', help='dont_freeze patch embedding layer while freezeout')
+    parser.set_defaults(dont_freeze_pe=False)
     parser.add_argument('--all_stages', action='store_true', help='all_stages')
     parser.set_defaults(all_stages=False)
     parser.add_argument('--not_scale_lr',  action='store_true', help='Scale learning rate per layer.')
@@ -165,14 +167,16 @@ def main(args):
     # define the model
     scale_lr = not args.not_scale_lr
     all_stages = args.all_stages
-    model = models_mim.__dict__[args.model](hog_nbins=args.hog_nbins, hog_bias=args.hog_bias, how_scale=args.how_scale, t_0=args.t_0, scale_lr=scale_lr, all_stages=all_stages)
+    dont_freeze_pe = args.dont_freeze_pe
+    model = models_mim.__dict__[args.model](hog_nbins=args.hog_nbins, hog_bias=args.hog_bias, how_scale=args.how_scale, t_0=args.t_0, scale_lr=scale_lr, all_stages=all_stages, dont_freeze_pe=dont_freeze_pe)
     model.to(device)
     lr_scale_fn = scale_fn[model.how_scale] # freezeout spec
     t_0 = model.t_0 # freezeout spec
     num_of_layers = model.cum_layer_index # freezeout spec
     iterations_per_epoch = len(data_loader_train) # NOTE (len(dataset)/batch_size).
     assert iterations_per_epoch != 0
-    assert hasattr(model.patch_embed, "layer_index")
+    if not dont_freeze_pe:
+        assert hasattr(model.patch_embed, "layer_index")
     freezeout_module_level_specifier_count = 0
     for module in model.modules():
         if hasattr(module,'active'): # freezout specific
@@ -185,10 +189,13 @@ def main(args):
             module.freezeout_module_level_specifier = None # Just a module level specifier to distinguish module freezeout layer levels.
             freezeout_module_level_specifier_count+=1
     print("freezeout_module_level_specifier_count: ", freezeout_module_level_specifier_count)
+    freezeout_layer_count_vitb_modified = FREEZEOUT_LAYER_COUNT_VIT_B
     if all_stages:
-        assert freezeout_module_level_specifier_count == FREEZEOUT_LAYER_COUNT_VIT_B + 8*3
-    else:
-        assert freezeout_module_level_specifier_count == FREEZEOUT_LAYER_COUNT_VIT_B
+        freezeout_layer_count_vitb_modified = FREEZEOUT_LAYER_COUNT_VIT_B + 8*3
+    if dont_freeze_pe:
+        freezeout_layer_count_vitb_modified = FREEZEOUT_LAYER_COUNT_VIT_B - 1
+    print("freezeout_layer_count_vitb_modified: ", freezeout_layer_count_vitb_modified)
+    assert freezeout_module_level_specifier_count == freezeout_layer_count_vitb_modified, "Frozen layer count is not correct."
     model_without_ddp = model
 
 

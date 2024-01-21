@@ -79,9 +79,38 @@ python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29507  run_
 --output_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_all_stages --log_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_all_stages \
 --how_scale cubic --t_0 0.8 \
 --not_scale_lr --non_layerwise_lr --all_stages
-
 ```
 
+- DONT FREEZE PATCH EMBED NON LAYER WISE AND NOT SCALE LR
+```bash
+bash record.sh CUDA_VISIBLE_DEVICES=1,2 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=2 --master_port=29502  run_pretrain.py \
+--epochs 100 --batch_size 512 --warmup_epochs 10 \
+--blr 2e-4 --world_size 2 --accum_iter 2 --model MIM_vit_base_patch16 \
+--data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
+--output_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_dont_freeze_pe --log_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_dont_freeze_pe \
+--how_scale cubic --t_0 0.8 \
+--not_scale_lr --non_layerwise_lr --dont_freeze_pe
+
+bash record.sh CUDA_VISIBLE_DEVICES=5 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29505  run_pretrain.py \
+--epochs 100 --batch_size 256 --warmup_epochs 10 \
+--blr 2e-4 --world_size 1 --accum_iter 8 --model MIM_vit_base_patch16 \
+--data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
+--output_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_1overk_loss_scaler_all_stages --log_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_1overk_loss_scaler_all_stages \
+--how_scale cubic --t_0 0.8 \
+--not_scale_lr --non_layerwise_lr --all_stages
+
+
+bash record.sh CUDA_VISIBLE_DEVICES=7 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29507  run_pretrain.py \
+--epochs 100 --batch_size 256 --warmup_epochs 10 \
+--blr 2e-4 --world_size 1 --accum_iter 8 --model MIM_vit_base_patch16 \
+--data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
+--output_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_all_stages --log_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_all_stages \
+--how_scale cubic --t_0 0.8 \
+--not_scale_lr --non_layerwise_lr --all_stages
+```
 
 - DEBUG TRAIN
 ```bash
@@ -535,6 +564,7 @@ TODO lr schedule per layer olmadan:
 - I think, giving the same weights to the tasks are not fair, final stage is more important. Reduce the weights of early stages (even curriculum is possible). Also, doubling lr is not the same as doubling the task weight, as doubling the task weight for AdamW should correspond to doubling the lr in SGD.
 - Train the model without lr scaling or layerwise lr for different t0 values (0.8, 0.7, 0.9, 0.6) and train different model checkpoints (70-65-60-55-50-45-40), adjust the learning rate (keep it high) and pre-train again if the original model also stops improving. But the max achieved leraning rate for 100 and 1600 are not much different (it is 83.3 to 84)
 - Add more stage tasks (multi-scale) for greater early layer convergence speed.
+- Add stage wise different tasks for more varying supervision and layer-fit tasks.
 
 
 TODO curious thoughts:
