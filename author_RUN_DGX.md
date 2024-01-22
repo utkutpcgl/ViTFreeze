@@ -52,6 +52,15 @@ python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29505  run_
 
 - NON LAYER WISE AND NOT SCALE LR
 ```bash
+bash record.sh CUDA_VISIBLE_DEVICES=0,7 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=2 --master_port=29507  run_pretrain.py \
+--epochs 100 --batch_size 512 --warmup_epochs 10 \
+--blr 2e-4 --world_size 2 --accum_iter 2 --model MIM_vit_base_patch16 \
+--data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
+--output_dir pretrain/non_scale_layerwise_fixed_freezeout_code/freezeout_cubic_t0_1_without_remove_freezeout_layers --log_dir pretrain/non_scale_layerwise_fixed_freezeout_code/freezeout_cubic_t0_1_without_remove_freezeout_layers \
+--how_scale cubic --t_0 1.0 \
+--not_scale_lr --non_layerwise_lr
+
 bash record.sh CUDA_VISIBLE_DEVICES=1 OMP_NUM_THREADS=1 \
 python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29501  run_pretrain.py \
 --epochs 100 --batch_size 256 --warmup_epochs 10 \
@@ -195,6 +204,16 @@ python3 -m torch.distributed.launch --nproc_per_node=8 --master_port=29500 run_f
 
 -- 2 GPU:
 ```bash
+bash record.sh CUDA_VISIBLE_DEVICES=0,7 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=2 --master_port=29507 run_finetune.py \
+--world_size 2 --accum_iter 2 \
+--batch_size 256 --model vit_base_patch16 --finetune /raid/home_yedek/utku/ViTFreeze/ViT/pretrain/non_scale_layerwise/freezeout_cubic_t0_1_like_no_freezeout/checkpoint-49.pth \
+--epochs 100 --warmup_epochs 20 --lr 4e-3 --min_lr 1e-6 --layer_decay 0.75 \
+--weight_decay 0.05 --drop_path 0.1 --reprob 0.25 --mixup 0.8 --cutmix 1.0 --dist_eval \
+--data_path /raid/utku/datasets/imagenet/classification/ \
+--output_dir finetune/non_scale_layerwise/freezeout_cubic_t0_1_like_no_freezeout_checkpoint-49.pth --log_dir finetune/non_scale_layerwise/freezeout_cubic_t0_1_like_no_freezeout_checkpoint-49.pth
+
+
 bash record.sh CUDA_VISIBLE_DEVICES=0,1 OMP_NUM_THREADS=1 \
 python3 -m torch.distributed.launch --nproc_per_node=2 --master_port=29500 run_finetune.py \
 --world_size 2 --accum_iter 4 \
@@ -205,18 +224,20 @@ python3 -m torch.distributed.launch --nproc_per_node=2 --master_port=29500 run_f
 --output_dir finetune/full_finetune_out_freezeout_cubic_t0_8_fast/ --log_dir finetune/full_finetune_out_freezeout_cubic_t0_8_fast
 ```
 
--- 1 GPU:
+-- 4 GPU:
 ```bash
-bash record.sh CUDA_VISIBLE_DEVICES=2 OMP_NUM_THREADS=1 \
-python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29502 run_finetune.py \
---world_size 1 --accum_iter 8 \
---batch_size 128 --model vit_base_patch16 --finetune /raid/home_yedek/utku/ViTFreeze/ViT_orig/full_pretrain_out_slow/checkpoint-90.pth \
+bash record.sh CUDA_VISIBLE_DEVICES=3,4,5,6 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29503 run_finetune.py \
+--world_size 4 --accum_iter 1 \
+--batch_size 256 --model vit_base_patch16 --finetune /raid/home_yedek/utku/ViTFreeze/ViT/pretrain/non_scale_layerwise/freezeout_cubic_t0_1_like_no_freezeout/checkpoint-49.pth \
 --epochs 100 --warmup_epochs 20 --lr 4e-3 --min_lr 1e-6 --layer_decay 0.75 \
 --weight_decay 0.05 --drop_path 0.1 --reprob 0.25 --mixup 0.8 --cutmix 1.0 --dist_eval \
 --data_path /raid/utku/datasets/imagenet/classification/ \
---output_dir finetune/full_pretrain_out_slow/checkpoint-90 --log_dir finetune/full_pretrain_out_slow/checkpoint-90
+--output_dir finetune/non_scale_layerwise/freezeout_cubic_t0_1_like_no_freezeout_checkpoint-49.pth --log_dir finetune/non_scale_layerwise/freezeout_cubic_t0_1_like_no_freezeout_checkpoint-49.pth
+```
 
-
+-- 1 GPU:
+```bash
 bash record.sh CUDA_VISIBLE_DEVICES=3 OMP_NUM_THREADS=1 \
 python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29503 run_finetune.py \
 --world_size 1 --accum_iter 8 \
