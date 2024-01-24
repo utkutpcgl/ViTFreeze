@@ -81,12 +81,19 @@ def create_param_groups(model: nn.Module, default_weight_decay=1e-5, default_lr=
         if hasattr(param, 'active'):
             param_group = {'params': [param], 'lr': param.initial_lr, 'layer_index': param.layer_index} # NOTE no need for activeness information
             # scaling factor (gamma) and the shift (beta), which are both learnable parameters 1-D, also normalization or bias will have 0 wd
-            param_group['weight_decay'] = 0. if (param.ndim <= 1 or name.endswith(".bias")) else default_weight_decay 
+            if (param.ndim <= 1 or name.endswith(".bias")):
+                param_group['weight_decay'] = 0.
+            else:
+                param_group['weight_decay'] = default_weight_decay 
             layer_specific_param_groups.append(param_group)
         else:
             param_group = {'params': [param], 'lr': default_lr}
-            param_group['weight_decay'] = 0. if (param.ndim <= 1 or name.endswith(".bias")) else default_weight_decay 
-            standard_param_groups.append({'params': [param], 'weight_decay': 0., 'lr': default_lr})
+            if (param.ndim <= 1 or name.endswith(".bias")): 
+                param_group['weight_decay'] = 0.
+            else:
+                print(name)
+                param_group['weight_decay'] = default_weight_decay 
+            standard_param_groups.append(param_group)
 
     if log_writer:
         log_text = "Number of leaf parameter is: {}".format(leaf_param_count)
