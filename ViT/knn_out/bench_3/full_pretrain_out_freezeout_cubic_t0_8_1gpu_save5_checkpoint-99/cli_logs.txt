@@ -1,0 +1,905 @@
+/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py:180: FutureWarning: The module torch.distributed.launch is deprecated
+and will be removed in future. Use torchrun.
+Note that --use_env is set by default in torchrun.
+If your script expects `--local_rank` argument to be set, please
+change it to read from `os.environ['LOCAL_RANK']` instead. See 
+https://pytorch.org/docs/stable/distributed.html#launch-utility for 
+further instructions
+
+  warnings.warn(
+| distributed init (rank 0): env://, gpu 0
+[16:56:38.280380] job dir: /raid/home_yedek/utku/ViTFreeze/ViT
+[16:56:38.281382] Namespace(batch_size=128,
+accum_iter=1,
+model='vit_base_patch16',
+input_size=224,
+finetune='/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_save5/checkpoint-99.pth',
+global_pool=False,
+data_path='/raid/utku/datasets/imagenet/classification/',
+nb_classes=1000,
+output_dir='knn_out/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_save5_checkpoint-99',
+log_dir='knn_out/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_save5_checkpoint-99',
+device='cuda',
+seed=0,
+eval=False,
+dist_eval=True,
+num_workers=4,
+pin_mem=True,
+world_size=1,
+local_rank=0,
+dist_on_itp=False,
+dist_url='env://',
+dump_features=None,
+load_features=None,
+rank=0,
+gpu=0,
+distributed=True,
+dist_backend='nccl')
+/opt/conda/lib/python3.10/site-packages/torchvision/transforms/transforms.py:329: UserWarning: Argument 'interpolation' of type int is deprecated since 0.13 and will be removed in 0.15. Please use InterpolationMode enum.
+  warnings.warn(
+[16:56:38.286124] Train data path is:  /raid/utku/datasets/imagenet/classification/train/image_folders
+[16:56:48.770695] Dataset ImageFolder
+    Number of datapoints: 1281167
+    Root location: /raid/utku/datasets/imagenet/classification/train/image_folders
+    StandardTransform
+Transform: Compose(
+               Resize(size=256, interpolation=bicubic, max_size=None, antialias=None)
+               CenterCrop(size=(224, 224))
+               ToTensor()
+               Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+           )
+[16:56:48.772313] Val data path is:  /raid/utku/datasets/imagenet/classification/val/image_folders
+[16:56:49.324044] Dataset ImageFolder
+    Number of datapoints: 50000
+    Root location: /raid/utku/datasets/imagenet/classification/val/image_folders
+    StandardTransform
+Transform: Compose(
+               Resize(size=256, interpolation=bicubic, max_size=None, antialias=None)
+               CenterCrop(size=(224, 224))
+               ToTensor()
+               Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+           )
+[16:56:49.324693] Sampler_train = <torch.utils.data.distributed.DistributedSampler object at 0x7fa40cda5f90>
+[16:56:54.467754] Load pre-trained checkpoint from: /raid/home_yedek/utku/ViTFreeze/ViT/pretrain/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_save5/checkpoint-99.pth
+[16:56:54.714977] missing keys: ['norm.weight', 'norm.bias']
+[16:56:54.715339] unexpected keys: ['decoder.0.mask_token', 'decoder.0.pos_embed', 'decoder.0.embed.weight', 'decoder.0.embed.bias', 'decoder.0.blocks.0.norm1.weight', 'decoder.0.blocks.0.norm1.bias', 'decoder.0.blocks.0.attn.qkv.weight', 'decoder.0.blocks.0.attn.qkv.bias', 'decoder.0.blocks.0.attn.proj.weight', 'decoder.0.blocks.0.attn.proj.bias', 'decoder.0.blocks.0.norm2.weight', 'decoder.0.blocks.0.norm2.bias', 'decoder.0.blocks.0.mlp.fc1.weight', 'decoder.0.blocks.0.mlp.fc1.bias', 'decoder.0.blocks.0.mlp.fc2.weight', 'decoder.0.blocks.0.mlp.fc2.bias', 'decoder.0.norm.weight', 'decoder.0.norm.bias', 'decoder.0.pred.1.weight', 'decoder.0.pred.1.bias', 'hog_enc.0.conv.weight', 'norm.0.weight', 'norm.0.bias']
+[16:56:55.063254] Model = VisionTransformer(
+  (patch_embed): PatchEmbed(
+    (proj): Conv2d(3, 768, kernel_size=(16, 16), stride=(16, 16))
+    (norm): Identity()
+  )
+  (pos_drop): Dropout(p=0.0, inplace=False)
+  (patch_drop): Identity()
+  (norm_pre): Identity()
+  (blocks): Sequential(
+    (0): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (1): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (2): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (3): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (4): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (5): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (6): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (7): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (8): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (9): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (10): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (11): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+  )
+  (norm): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+  (fc_norm): Identity()
+  (head_drop): Dropout(p=0.0, inplace=False)
+  (head): Identity()
+)
+[16:56:55.072750] number of params (M): 85.80
+[16:56:55.442623] Extracting features for train set...
+[16:57:15.142663] Storing features into tensor of shape torch.Size([1281167, 768])
+[16:57:15.144892]   [    1/10009]  eta: 2 days, 6:46:19    time: 19.7003  data: 3.8725  max mem: 4483
+[16:57:24.617249]   [   21/10009]  eta: 3:51:15    time: 0.4735  data: 0.3945  max mem: 5384
+[16:57:39.283581]   [   41/10009]  eta: 2:57:38    time: 0.7332  data: 0.6997  max mem: 5384
+[16:57:53.695498]   [   61/10009]  eta: 2:38:19    time: 0.7204  data: 0.6937  max mem: 5384
+[16:58:09.868022]   [   81/10009]  eta: 2:32:01    time: 0.8085  data: 0.7862  max mem: 5384
+[16:58:24.754745]   [  101/10009]  eta: 2:26:00    time: 0.7442  data: 0.7156  max mem: 5384
+[16:58:43.453495]   [  121/10009]  eta: 2:27:06    time: 0.9348  data: 0.1728  max mem: 5384
+[16:59:01.992108]   [  141/10009]  eta: 2:27:36    time: 0.9268  data: 0.0015  max mem: 5384
+[16:59:20.483928]   [  161/10009]  eta: 2:27:51    time: 0.9244  data: 0.0042  max mem: 5384
+[16:59:39.157954]   [  181/10009]  eta: 2:28:09    time: 0.9336  data: 0.0012  max mem: 5384
+[16:59:57.753086]   [  201/10009]  eta: 2:28:15    time: 0.9296  data: 0.0016  max mem: 5384
+[17:00:16.294845]   [  221/10009]  eta: 2:28:15    time: 0.9269  data: 0.0036  max mem: 5384
+[17:00:34.839016]   [  241/10009]  eta: 2:28:11    time: 0.9270  data: 0.0044  max mem: 5384
+[17:00:53.453094]   [  261/10009]  eta: 2:28:08    time: 0.9306  data: 0.0017  max mem: 5384
+[17:01:12.066578]   [  281/10009]  eta: 2:28:03    time: 0.9305  data: 0.0009  max mem: 5384
+[17:01:30.636746]   [  301/10009]  eta: 2:27:55    time: 0.9284  data: 0.0022  max mem: 5384
+[17:01:49.157393]   [  321/10009]  eta: 2:27:43    time: 0.9259  data: 0.0019  max mem: 5384
+[17:02:07.693322]   [  341/10009]  eta: 2:27:32    time: 0.9267  data: 0.0022  max mem: 5384
+[17:02:26.294197]   [  361/10009]  eta: 2:27:21    time: 0.9299  data: 0.0027  max mem: 5384
+[17:02:44.828954]   [  381/10009]  eta: 2:27:08    time: 0.9266  data: 0.0015  max mem: 5384
+[17:03:03.368485]   [  401/10009]  eta: 2:26:55    time: 0.9269  data: 0.0020  max mem: 5384
+[17:03:21.873215]   [  421/10009]  eta: 2:26:40    time: 0.9251  data: 0.0048  max mem: 5384
+[17:03:40.507611]   [  441/10009]  eta: 2:26:27    time: 0.9316  data: 0.0015  max mem: 5384
+[17:03:59.051601]   [  461/10009]  eta: 2:26:13    time: 0.9271  data: 0.0028  max mem: 5384
+[17:04:17.606371]   [  481/10009]  eta: 2:25:58    time: 0.9276  data: 0.0028  max mem: 5384
+[17:04:36.122595]   [  501/10009]  eta: 2:25:42    time: 0.9257  data: 0.0019  max mem: 5384
+[17:04:54.689921]   [  521/10009]  eta: 2:25:27    time: 0.9282  data: 0.0013  max mem: 5384
+[17:05:13.153625]   [  541/10009]  eta: 2:25:09    time: 0.9230  data: 0.0013  max mem: 5384
+[17:05:31.615837]   [  561/10009]  eta: 2:24:52    time: 0.9230  data: 0.0006  max mem: 5384
+[17:05:50.055005]   [  581/10009]  eta: 2:24:34    time: 0.9219  data: 0.0016  max mem: 5384
+[17:06:08.483913]   [  601/10009]  eta: 2:24:16    time: 0.9213  data: 0.0006  max mem: 5384
+[17:06:26.860832]   [  621/10009]  eta: 2:23:58    time: 0.9187  data: 0.0012  max mem: 5384
+[17:06:45.362901]   [  641/10009]  eta: 2:23:41    time: 0.9250  data: 0.0014  max mem: 5384
+[17:07:03.804968]   [  661/10009]  eta: 2:23:23    time: 0.9220  data: 0.0005  max mem: 5384
+[17:07:22.254954]   [  681/10009]  eta: 2:23:05    time: 0.9224  data: 0.0010  max mem: 5384
+[17:07:40.691257]   [  701/10009]  eta: 2:22:47    time: 0.9217  data: 0.0012  max mem: 5384
+[17:07:59.113014]   [  721/10009]  eta: 2:22:29    time: 0.9210  data: 0.0028  max mem: 5384
+[17:08:17.572912]   [  741/10009]  eta: 2:22:11    time: 0.9229  data: 0.0005  max mem: 5384
+[17:08:36.097508]   [  761/10009]  eta: 2:21:54    time: 0.9261  data: 0.0019  max mem: 5384
+[17:08:54.580860]   [  781/10009]  eta: 2:21:36    time: 0.9240  data: 0.0012  max mem: 5384
+[17:09:13.033079]   [  801/10009]  eta: 2:21:18    time: 0.9225  data: 0.0007  max mem: 5384
+[17:09:31.547278]   [  821/10009]  eta: 2:21:01    time: 0.9256  data: 0.0021  max mem: 5384
+[17:09:50.011065]   [  841/10009]  eta: 2:20:43    time: 0.9231  data: 0.0012  max mem: 5384
+[17:10:08.467991]   [  861/10009]  eta: 2:20:25    time: 0.9227  data: 0.0022  max mem: 5384
+[17:10:26.896320]   [  881/10009]  eta: 2:20:07    time: 0.9213  data: 0.0005  max mem: 5384
+[17:10:45.314644]   [  901/10009]  eta: 2:19:48    time: 0.9208  data: 0.0030  max mem: 5384
+[17:11:03.730488]   [  921/10009]  eta: 2:19:30    time: 0.9207  data: 0.0005  max mem: 5384
+[17:11:22.163018]   [  941/10009]  eta: 2:19:11    time: 0.9215  data: 0.0024  max mem: 5384
+[17:11:40.582394]   [  961/10009]  eta: 2:18:53    time: 0.9209  data: 0.0008  max mem: 5384
+[17:11:58.981329]   [  981/10009]  eta: 2:18:34    time: 0.9198  data: 0.0006  max mem: 5384
+[17:12:17.382864]   [ 1001/10009]  eta: 2:18:16    time: 0.9199  data: 0.0011  max mem: 5384
+[17:12:35.845559]   [ 1021/10009]  eta: 2:17:58    time: 0.9230  data: 0.0013  max mem: 5384
+[17:12:54.305383]   [ 1041/10009]  eta: 2:17:40    time: 0.9229  data: 0.0012  max mem: 5384
+[17:13:12.777036]   [ 1061/10009]  eta: 2:17:22    time: 0.9235  data: 0.0027  max mem: 5384
+[17:13:31.228285]   [ 1081/10009]  eta: 2:17:04    time: 0.9225  data: 0.0006  max mem: 5384
+[17:13:49.688943]   [ 1101/10009]  eta: 2:16:45    time: 0.9229  data: 0.0006  max mem: 5384
+[17:14:08.205942]   [ 1121/10009]  eta: 2:16:28    time: 0.9257  data: 0.0015  max mem: 5384
+[17:14:26.778827]   [ 1141/10009]  eta: 2:16:10    time: 0.9278  data: 0.0013  max mem: 5384
+[17:14:45.276509]   [ 1161/10009]  eta: 2:15:52    time: 0.9248  data: 0.0022  max mem: 5384
+[17:15:03.760062]   [ 1181/10009]  eta: 2:15:34    time: 0.9241  data: 0.0013  max mem: 5384
+[17:15:22.210876]   [ 1201/10009]  eta: 2:15:16    time: 0.9224  data: 0.0020  max mem: 5384
+[17:15:40.632389]   [ 1221/10009]  eta: 2:14:58    time: 0.9210  data: 0.0020  max mem: 5384
+[17:15:59.112277]   [ 1241/10009]  eta: 2:14:40    time: 0.9239  data: 0.0013  max mem: 5384
+[17:16:17.601085]   [ 1261/10009]  eta: 2:14:22    time: 0.9243  data: 0.0023  max mem: 5384
+[17:16:36.101568]   [ 1281/10009]  eta: 2:14:04    time: 0.9249  data: 0.0020  max mem: 5384
+[17:16:54.607460]   [ 1301/10009]  eta: 2:13:46    time: 0.9252  data: 0.0011  max mem: 5384
+[17:17:13.078589]   [ 1321/10009]  eta: 2:13:27    time: 0.9235  data: 0.0012  max mem: 5384
+[17:17:31.627064]   [ 1341/10009]  eta: 2:13:10    time: 0.9273  data: 0.0010  max mem: 5384
+[17:17:50.083705]   [ 1361/10009]  eta: 2:12:51    time: 0.9227  data: 0.0016  max mem: 5384
+[17:18:08.587599]   [ 1381/10009]  eta: 2:12:33    time: 0.9251  data: 0.0012  max mem: 5384
+[17:18:27.045190]   [ 1401/10009]  eta: 2:12:15    time: 0.9228  data: 0.0028  max mem: 5384
+[17:18:45.537636]   [ 1421/10009]  eta: 2:11:57    time: 0.9245  data: 0.0027  max mem: 5384
+[17:19:04.049205]   [ 1441/10009]  eta: 2:11:39    time: 0.9254  data: 0.0017  max mem: 5384
+[17:19:22.564083]   [ 1461/10009]  eta: 2:11:21    time: 0.9256  data: 0.0015  max mem: 5384
+[17:19:41.020604]   [ 1481/10009]  eta: 2:11:03    time: 0.9227  data: 0.0012  max mem: 5384
+[17:19:59.488712]   [ 1501/10009]  eta: 2:10:44    time: 0.9233  data: 0.0006  max mem: 5384
+[17:20:17.929490]   [ 1521/10009]  eta: 2:10:26    time: 0.9219  data: 0.0012  max mem: 5384
+[17:20:36.378635]   [ 1541/10009]  eta: 2:10:08    time: 0.9224  data: 0.0015  max mem: 5384
+[17:20:54.965931]   [ 1561/10009]  eta: 2:09:50    time: 0.9293  data: 0.0005  max mem: 5384
+[17:21:13.422344]   [ 1581/10009]  eta: 2:09:32    time: 0.9227  data: 0.0005  max mem: 5384
+[17:21:31.915369]   [ 1601/10009]  eta: 2:09:13    time: 0.9245  data: 0.0026  max mem: 5384
+[17:21:50.408916]   [ 1621/10009]  eta: 2:08:55    time: 0.9243  data: 0.0013  max mem: 5384
+[17:22:08.844028]   [ 1641/10009]  eta: 2:08:37    time: 0.9217  data: 0.0005  max mem: 5384
+[17:22:27.395494]   [ 1661/10009]  eta: 2:08:19    time: 0.9275  data: 0.0008  max mem: 5384
+[17:22:45.859913]   [ 1681/10009]  eta: 2:08:00    time: 0.9231  data: 0.0013  max mem: 5384
+[17:23:04.310579]   [ 1701/10009]  eta: 2:07:42    time: 0.9224  data: 0.0024  max mem: 5384
+[17:23:22.734779]   [ 1721/10009]  eta: 2:07:23    time: 0.9211  data: 0.0025  max mem: 5384
+[17:23:41.174135]   [ 1741/10009]  eta: 2:07:05    time: 0.9219  data: 0.0029  max mem: 5384
+[17:23:59.599600]   [ 1761/10009]  eta: 2:06:46    time: 0.9212  data: 0.0020  max mem: 5384
+[17:24:18.059752]   [ 1781/10009]  eta: 2:06:28    time: 0.9227  data: 0.0034  max mem: 5384
+[17:24:36.563058]   [ 1801/10009]  eta: 2:06:10    time: 0.9250  data: 0.0016  max mem: 5384
+[17:24:54.981818]   [ 1821/10009]  eta: 2:05:51    time: 0.9208  data: 0.0016  max mem: 5384
+[17:25:13.422930]   [ 1841/10009]  eta: 2:05:33    time: 0.9219  data: 0.0006  max mem: 5384
+[17:25:31.886111]   [ 1861/10009]  eta: 2:05:14    time: 0.9230  data: 0.0017  max mem: 5384
+[17:25:50.355547]   [ 1881/10009]  eta: 2:04:56    time: 0.9234  data: 0.0021  max mem: 5384
+[17:26:08.837662]   [ 1901/10009]  eta: 2:04:38    time: 0.9237  data: 0.0018  max mem: 5384
+[17:26:27.363689]   [ 1921/10009]  eta: 2:04:20    time: 0.9262  data: 0.0015  max mem: 5384
+[17:26:45.833961]   [ 1941/10009]  eta: 2:04:01    time: 0.9234  data: 0.0016  max mem: 5384
+[17:27:04.319145]   [ 1961/10009]  eta: 2:03:43    time: 0.9242  data: 0.0014  max mem: 5384
+[17:27:22.733741]   [ 1981/10009]  eta: 2:03:24    time: 0.9206  data: 0.0017  max mem: 5384
+[17:27:41.167595]   [ 2001/10009]  eta: 2:03:06    time: 0.9216  data: 0.0007  max mem: 5384
+[17:27:59.608218]   [ 2021/10009]  eta: 2:02:47    time: 0.9219  data: 0.0029  max mem: 5384
+[17:28:18.105811]   [ 2041/10009]  eta: 2:02:29    time: 0.9248  data: 0.0019  max mem: 5384
+[17:28:36.555461]   [ 2061/10009]  eta: 2:02:11    time: 0.9224  data: 0.0023  max mem: 5384
+[17:28:55.022881]   [ 2081/10009]  eta: 2:01:52    time: 0.9233  data: 0.0005  max mem: 5384
+[17:29:13.431298]   [ 2101/10009]  eta: 2:01:34    time: 0.9203  data: 0.0033  max mem: 5384
+[17:29:31.861435]   [ 2121/10009]  eta: 2:01:15    time: 0.9214  data: 0.0022  max mem: 5384
+[17:29:50.306641]   [ 2141/10009]  eta: 2:00:57    time: 0.9222  data: 0.0010  max mem: 5384
+[17:30:08.798043]   [ 2161/10009]  eta: 2:00:39    time: 0.9245  data: 0.0013  max mem: 5384
+[17:30:27.261673]   [ 2181/10009]  eta: 2:00:20    time: 0.9231  data: 0.0016  max mem: 5384
+[17:30:45.708769]   [ 2201/10009]  eta: 2:00:02    time: 0.9222  data: 0.0019  max mem: 5384
+[17:31:04.176701]   [ 2221/10009]  eta: 1:59:43    time: 0.9233  data: 0.0030  max mem: 5384
+[17:31:22.617272]   [ 2241/10009]  eta: 1:59:25    time: 0.9219  data: 0.0025  max mem: 5384
+[17:31:41.055121]   [ 2261/10009]  eta: 1:59:06    time: 0.9218  data: 0.0019  max mem: 5384
+[17:31:59.579215]   [ 2281/10009]  eta: 1:58:48    time: 0.9260  data: 0.0023  max mem: 5384
+[17:32:18.011360]   [ 2301/10009]  eta: 1:58:30    time: 0.9214  data: 0.0027  max mem: 5384
+[17:32:36.487301]   [ 2321/10009]  eta: 1:58:11    time: 0.9237  data: 0.0015  max mem: 5384
+[17:32:54.883508]   [ 2341/10009]  eta: 1:57:53    time: 0.9197  data: 0.0012  max mem: 5384
+[17:33:13.366567]   [ 2361/10009]  eta: 1:57:34    time: 0.9240  data: 0.0030  max mem: 5384
+[17:33:31.801591]   [ 2381/10009]  eta: 1:57:16    time: 0.9216  data: 0.0034  max mem: 5384
+[17:33:50.311210]   [ 2401/10009]  eta: 1:56:58    time: 0.9254  data: 0.0007  max mem: 5384
+[17:34:08.754191]   [ 2421/10009]  eta: 1:56:39    time: 0.9220  data: 0.0015  max mem: 5384
+[17:34:27.155962]   [ 2441/10009]  eta: 1:56:21    time: 0.9200  data: 0.0022  max mem: 5384
+[17:34:45.616127]   [ 2461/10009]  eta: 1:56:02    time: 0.9229  data: 0.0028  max mem: 5384
+[17:35:04.121266]   [ 2481/10009]  eta: 1:55:44    time: 0.9252  data: 0.0017  max mem: 5384
+[17:35:22.556087]   [ 2501/10009]  eta: 1:55:25    time: 0.9216  data: 0.0018  max mem: 5384
+[17:35:41.020311]   [ 2521/10009]  eta: 1:55:07    time: 0.9231  data: 0.0019  max mem: 5384
+[17:35:59.455705]   [ 2541/10009]  eta: 1:54:49    time: 0.9217  data: 0.0029  max mem: 5384
+[17:36:17.854557]   [ 2561/10009]  eta: 1:54:30    time: 0.9198  data: 0.0018  max mem: 5384
+[17:36:36.309144]   [ 2581/10009]  eta: 1:54:11    time: 0.9225  data: 0.0045  max mem: 5384
+[17:36:54.752791]   [ 2601/10009]  eta: 1:53:53    time: 0.9221  data: 0.0014  max mem: 5384
+[17:37:13.238479]   [ 2621/10009]  eta: 1:53:35    time: 0.9242  data: 0.0028  max mem: 5384
+[17:37:31.681312]   [ 2641/10009]  eta: 1:53:16    time: 0.9220  data: 0.0017  max mem: 5384
+[17:37:50.140284]   [ 2661/10009]  eta: 1:52:58    time: 0.9228  data: 0.0020  max mem: 5384
+[17:38:08.595190]   [ 2681/10009]  eta: 1:52:39    time: 0.9226  data: 0.0019  max mem: 5384
+[17:38:27.067867]   [ 2701/10009]  eta: 1:52:21    time: 0.9235  data: 0.0005  max mem: 5384
+[17:38:45.495988]   [ 2721/10009]  eta: 1:52:02    time: 0.9213  data: 0.0021  max mem: 5384
+[17:39:03.922690]   [ 2741/10009]  eta: 1:51:44    time: 0.9212  data: 0.0027  max mem: 5384
+[17:39:22.430547]   [ 2761/10009]  eta: 1:51:26    time: 0.9234  data: 0.0020  max mem: 5384
+[17:39:40.885408]   [ 2781/10009]  eta: 1:51:07    time: 0.9226  data: 0.0006  max mem: 5384
+[17:39:59.315663]   [ 2801/10009]  eta: 1:50:49    time: 0.9214  data: 0.0022  max mem: 5384
+[17:40:17.776399]   [ 2821/10009]  eta: 1:50:30    time: 0.9227  data: 0.0020  max mem: 5384
+[17:40:36.202693]   [ 2841/10009]  eta: 1:50:12    time: 0.9212  data: 0.0008  max mem: 5384
+[17:40:54.644808]   [ 2861/10009]  eta: 1:49:53    time: 0.9220  data: 0.0013  max mem: 5384
+[17:41:13.049599]   [ 2881/10009]  eta: 1:49:35    time: 0.9201  data: 0.0014  max mem: 5384
+[17:41:31.602870]   [ 2901/10009]  eta: 1:49:17    time: 0.9276  data: 0.0017  max mem: 5384
+[17:41:50.073620]   [ 2921/10009]  eta: 1:48:58    time: 0.9234  data: 0.0009  max mem: 5384
+[17:42:08.547808]   [ 2941/10009]  eta: 1:48:40    time: 0.9236  data: 0.0028  max mem: 5384
+[17:42:27.020585]   [ 2961/10009]  eta: 1:48:21    time: 0.9235  data: 0.0016  max mem: 5384
+[17:42:45.429356]   [ 2981/10009]  eta: 1:48:03    time: 0.9203  data: 0.0019  max mem: 5384
+[17:43:03.843331]   [ 3001/10009]  eta: 1:47:44    time: 0.9206  data: 0.0020  max mem: 5384
+[17:43:22.259341]   [ 3021/10009]  eta: 1:47:26    time: 0.9207  data: 0.0008  max mem: 5384
+[17:43:40.760153]   [ 3041/10009]  eta: 1:47:07    time: 0.9249  data: 0.0011  max mem: 5384
+[17:43:59.222555]   [ 3061/10009]  eta: 1:46:49    time: 0.9230  data: 0.0015  max mem: 5384
+[17:44:17.653074]   [ 3081/10009]  eta: 1:46:31    time: 0.9214  data: 0.0007  max mem: 5384
+[17:44:36.102854]   [ 3101/10009]  eta: 1:46:12    time: 0.9224  data: 0.0015  max mem: 5384
+[17:44:54.547034]   [ 3121/10009]  eta: 1:45:54    time: 0.9221  data: 0.0019  max mem: 5384
+[17:45:12.968258]   [ 3141/10009]  eta: 1:45:35    time: 0.9209  data: 0.0016  max mem: 5384
+[17:45:31.460493]   [ 3161/10009]  eta: 1:45:17    time: 0.9245  data: 0.0017  max mem: 5384
+[17:45:49.905743]   [ 3181/10009]  eta: 1:44:58    time: 0.9222  data: 0.0035  max mem: 5384
+[17:46:08.383486]   [ 3201/10009]  eta: 1:44:40    time: 0.9238  data: 0.0026  max mem: 5384
+[17:46:26.833772]   [ 3221/10009]  eta: 1:44:21    time: 0.9224  data: 0.0021  max mem: 5384
+[17:46:45.246302]   [ 3241/10009]  eta: 1:44:03    time: 0.9205  data: 0.0018  max mem: 5384
+[17:47:03.643416]   [ 3261/10009]  eta: 1:43:44    time: 0.9197  data: 0.0028  max mem: 5384
+[17:47:22.126910]   [ 3281/10009]  eta: 1:43:26    time: 0.9241  data: 0.0019  max mem: 5384
+[17:47:40.631384]   [ 3301/10009]  eta: 1:43:08    time: 0.9251  data: 0.0023  max mem: 5384
+[17:47:59.083805]   [ 3321/10009]  eta: 1:42:49    time: 0.9225  data: 0.0010  max mem: 5384
+[17:48:17.572767]   [ 3341/10009]  eta: 1:42:31    time: 0.9243  data: 0.0031  max mem: 5384
+[17:48:35.988531]   [ 3361/10009]  eta: 1:42:12    time: 0.9207  data: 0.0039  max mem: 5384
+[17:48:54.440840]   [ 3381/10009]  eta: 1:41:54    time: 0.9225  data: 0.0023  max mem: 5384
+[17:49:12.952987]   [ 3401/10009]  eta: 1:41:36    time: 0.9255  data: 0.0030  max mem: 5384
+[17:49:31.438648]   [ 3421/10009]  eta: 1:41:17    time: 0.9242  data: 0.0016  max mem: 5384
+[17:49:49.880368]   [ 3441/10009]  eta: 1:40:59    time: 0.9220  data: 0.0006  max mem: 5384
+[17:50:08.299678]   [ 3461/10009]  eta: 1:40:40    time: 0.9209  data: 0.0015  max mem: 5384
+[17:50:26.747596]   [ 3481/10009]  eta: 1:40:22    time: 0.9223  data: 0.0044  max mem: 5384
+[17:50:45.197177]   [ 3501/10009]  eta: 1:40:03    time: 0.9222  data: 0.0023  max mem: 5384
+[17:51:03.689127]   [ 3521/10009]  eta: 1:39:45    time: 0.9245  data: 0.0005  max mem: 5384
+[17:51:22.151809]   [ 3541/10009]  eta: 1:39:27    time: 0.9230  data: 0.0018  max mem: 5384
+[17:51:40.591727]   [ 3561/10009]  eta: 1:39:08    time: 0.9219  data: 0.0013  max mem: 5384
+[17:51:59.042024]   [ 3581/10009]  eta: 1:38:50    time: 0.9224  data: 0.0025  max mem: 5384
+[17:52:17.450613]   [ 3601/10009]  eta: 1:38:31    time: 0.9203  data: 0.0026  max mem: 5384
+[17:52:35.962345]   [ 3621/10009]  eta: 1:38:13    time: 0.9253  data: 0.0011  max mem: 5384
+[17:52:54.426691]   [ 3641/10009]  eta: 1:37:54    time: 0.9231  data: 0.0022  max mem: 5384
+[17:53:12.856232]   [ 3661/10009]  eta: 1:37:36    time: 0.9213  data: 0.0028  max mem: 5384
+[17:53:31.286432]   [ 3681/10009]  eta: 1:37:17    time: 0.9214  data: 0.0012  max mem: 5384
+[17:53:49.770353]   [ 3701/10009]  eta: 1:36:59    time: 0.9241  data: 0.0005  max mem: 5384
+[17:54:08.215833]   [ 3721/10009]  eta: 1:36:41    time: 0.9221  data: 0.0012  max mem: 5384
+[17:54:26.658682]   [ 3741/10009]  eta: 1:36:22    time: 0.9220  data: 0.0012  max mem: 5384
+[17:54:45.148806]   [ 3761/10009]  eta: 1:36:04    time: 0.9244  data: 0.0028  max mem: 5384
+[17:55:03.625472]   [ 3781/10009]  eta: 1:35:45    time: 0.9237  data: 0.0020  max mem: 5384
+[17:55:22.036486]   [ 3801/10009]  eta: 1:35:27    time: 0.9204  data: 0.0028  max mem: 5384
+[17:55:40.484720]   [ 3821/10009]  eta: 1:35:08    time: 0.9223  data: 0.0022  max mem: 5384
+[17:55:58.916858]   [ 3841/10009]  eta: 1:34:50    time: 0.9215  data: 0.0018  max mem: 5384
+[17:56:17.412837]   [ 3861/10009]  eta: 1:34:31    time: 0.9247  data: 0.0022  max mem: 5384
+[17:56:35.810230]   [ 3881/10009]  eta: 1:34:13    time: 0.9198  data: 0.0019  max mem: 5384
+[17:56:54.281779]   [ 3901/10009]  eta: 1:33:54    time: 0.9235  data: 0.0023  max mem: 5384
+[17:57:12.765192]   [ 3921/10009]  eta: 1:33:36    time: 0.9241  data: 0.0020  max mem: 5384
+[17:57:31.158348]   [ 3941/10009]  eta: 1:33:18    time: 0.9196  data: 0.0033  max mem: 5384
+[17:57:49.616496]   [ 3961/10009]  eta: 1:32:59    time: 0.9228  data: 0.0014  max mem: 5384
+[17:58:08.037750]   [ 3981/10009]  eta: 1:32:41    time: 0.9210  data: 0.0015  max mem: 5384
+[17:58:26.552358]   [ 4001/10009]  eta: 1:32:22    time: 0.9256  data: 0.0020  max mem: 5384
+[17:58:44.971854]   [ 4021/10009]  eta: 1:32:04    time: 0.9209  data: 0.0005  max mem: 5384
+[17:59:03.387705]   [ 4041/10009]  eta: 1:31:45    time: 0.9207  data: 0.0013  max mem: 5384
+[17:59:21.818617]   [ 4061/10009]  eta: 1:31:27    time: 0.9215  data: 0.0017  max mem: 5384
+[17:59:40.291162]   [ 4081/10009]  eta: 1:31:08    time: 0.9235  data: 0.0042  max mem: 5384
+[17:59:58.738538]   [ 4101/10009]  eta: 1:30:50    time: 0.9223  data: 0.0013  max mem: 5384
+[18:00:17.249600]   [ 4121/10009]  eta: 1:30:32    time: 0.9254  data: 0.0006  max mem: 5384
+[18:00:35.713250]   [ 4141/10009]  eta: 1:30:13    time: 0.9231  data: 0.0013  max mem: 5384
+[18:00:54.159257]   [ 4161/10009]  eta: 1:29:55    time: 0.9222  data: 0.0007  max mem: 5384
+[18:01:12.601234]   [ 4181/10009]  eta: 1:29:36    time: 0.9220  data: 0.0009  max mem: 5384
+[18:01:31.053960]   [ 4201/10009]  eta: 1:29:18    time: 0.9225  data: 0.0041  max mem: 5384
+[18:01:49.540550]   [ 4221/10009]  eta: 1:28:59    time: 0.9242  data: 0.0005  max mem: 5384
+[18:02:07.981070]   [ 4241/10009]  eta: 1:28:41    time: 0.9219  data: 0.0015  max mem: 5384
+[18:02:26.411515]   [ 4261/10009]  eta: 1:28:22    time: 0.9214  data: 0.0006  max mem: 5384
+[18:02:44.860754]   [ 4281/10009]  eta: 1:28:04    time: 0.9224  data: 0.0022  max mem: 5384
+[18:03:03.327242]   [ 4301/10009]  eta: 1:27:46    time: 0.9232  data: 0.0032  max mem: 5384
+[18:03:21.769810]   [ 4321/10009]  eta: 1:27:27    time: 0.9220  data: 0.0015  max mem: 5384
+[18:03:40.184542]   [ 4341/10009]  eta: 1:27:09    time: 0.9206  data: 0.0008  max mem: 5384
+[18:03:58.724938]   [ 4361/10009]  eta: 1:26:50    time: 0.9269  data: 0.0015  max mem: 5384
+[18:04:17.176770]   [ 4381/10009]  eta: 1:26:32    time: 0.9225  data: 0.0011  max mem: 5384
+[18:04:35.651716]   [ 4401/10009]  eta: 1:26:13    time: 0.9237  data: 0.0021  max mem: 5384
+[18:04:54.143089]   [ 4421/10009]  eta: 1:25:55    time: 0.9244  data: 0.0047  max mem: 5384
+[18:05:12.565075]   [ 4441/10009]  eta: 1:25:37    time: 0.9210  data: 0.0030  max mem: 5384
+[18:05:31.010831]   [ 4461/10009]  eta: 1:25:18    time: 0.9222  data: 0.0022  max mem: 5384
+[18:05:49.496322]   [ 4481/10009]  eta: 1:25:00    time: 0.9242  data: 0.0012  max mem: 5384
+[18:06:08.004926]   [ 4501/10009]  eta: 1:24:41    time: 0.9253  data: 0.0023  max mem: 5384
+[18:06:26.450776]   [ 4521/10009]  eta: 1:24:23    time: 0.9222  data: 0.0006  max mem: 5384
+[18:06:44.894834]   [ 4541/10009]  eta: 1:24:04    time: 0.9221  data: 0.0012  max mem: 5384
+[18:07:03.314840]   [ 4561/10009]  eta: 1:23:46    time: 0.9209  data: 0.0023  max mem: 5384
+[18:07:21.803291]   [ 4581/10009]  eta: 1:23:28    time: 0.9243  data: 0.0014  max mem: 5384
+[18:07:40.242685]   [ 4601/10009]  eta: 1:23:09    time: 0.9219  data: 0.0005  max mem: 5384
+[18:07:58.698542]   [ 4621/10009]  eta: 1:22:51    time: 0.9227  data: 0.0030  max mem: 5384
+[18:08:17.125854]   [ 4641/10009]  eta: 1:22:32    time: 0.9213  data: 0.0013  max mem: 5384
+[18:08:35.574887]   [ 4661/10009]  eta: 1:22:14    time: 0.9223  data: 0.0016  max mem: 5384
+[18:08:54.019830]   [ 4681/10009]  eta: 1:21:55    time: 0.9221  data: 0.0021  max mem: 5384
+[18:09:12.440323]   [ 4701/10009]  eta: 1:21:37    time: 0.9209  data: 0.0013  max mem: 5384
+[18:09:30.913465]   [ 4721/10009]  eta: 1:21:18    time: 0.9236  data: 0.0030  max mem: 5384
+[18:09:49.397421]   [ 4741/10009]  eta: 1:21:00    time: 0.9241  data: 0.0032  max mem: 5384
+[18:10:07.837384]   [ 4761/10009]  eta: 1:20:41    time: 0.9219  data: 0.0005  max mem: 5384
+[18:10:26.286950]   [ 4781/10009]  eta: 1:20:23    time: 0.9224  data: 0.0020  max mem: 5384
+[18:10:44.760009]   [ 4801/10009]  eta: 1:20:05    time: 0.9235  data: 0.0013  max mem: 5384
+[18:11:03.232381]   [ 4821/10009]  eta: 1:19:46    time: 0.9235  data: 0.0012  max mem: 5384
+[18:11:21.719777]   [ 4841/10009]  eta: 1:19:28    time: 0.9243  data: 0.0017  max mem: 5384
+[18:11:40.180984]   [ 4861/10009]  eta: 1:19:09    time: 0.9229  data: 0.0019  max mem: 5384
+[18:11:58.655661]   [ 4881/10009]  eta: 1:18:51    time: 0.9236  data: 0.0020  max mem: 5384
+[18:12:17.111923]   [ 4901/10009]  eta: 1:18:32    time: 0.9227  data: 0.0005  max mem: 5384
+[18:12:35.541092]   [ 4921/10009]  eta: 1:18:14    time: 0.9214  data: 0.0020  max mem: 5384
+[18:12:53.965772]   [ 4941/10009]  eta: 1:17:55    time: 0.9211  data: 0.0018  max mem: 5384
+[18:13:12.405421]   [ 4961/10009]  eta: 1:17:37    time: 0.9219  data: 0.0007  max mem: 5384
+[18:13:30.886629]   [ 4981/10009]  eta: 1:17:19    time: 0.9240  data: 0.0028  max mem: 5384
+[18:13:49.332274]   [ 5001/10009]  eta: 1:17:00    time: 0.9222  data: 0.0010  max mem: 5384
+[18:14:07.761324]   [ 5021/10009]  eta: 1:16:42    time: 0.9213  data: 0.0027  max mem: 5384
+[18:14:26.147645]   [ 5041/10009]  eta: 1:16:23    time: 0.9192  data: 0.0026  max mem: 5384
+[18:14:44.603968]   [ 5061/10009]  eta: 1:16:05    time: 0.9227  data: 0.0008  max mem: 5384
+[18:15:03.012765]   [ 5081/10009]  eta: 1:15:46    time: 0.9203  data: 0.0017  max mem: 5384
+[18:15:21.497065]   [ 5101/10009]  eta: 1:15:28    time: 0.9241  data: 0.0041  max mem: 5384
+[18:15:39.895966]   [ 5121/10009]  eta: 1:15:09    time: 0.9198  data: 0.0031  max mem: 5384
+[18:15:58.296164]   [ 5141/10009]  eta: 1:14:51    time: 0.9199  data: 0.0031  max mem: 5384
+[18:16:16.750804]   [ 5161/10009]  eta: 1:14:32    time: 0.9226  data: 0.0025  max mem: 5384
+[18:16:35.202595]   [ 5181/10009]  eta: 1:14:14    time: 0.9225  data: 0.0025  max mem: 5384
+[18:16:53.618244]   [ 5201/10009]  eta: 1:13:55    time: 0.9207  data: 0.0031  max mem: 5384
+[18:17:12.001966]   [ 5221/10009]  eta: 1:13:37    time: 0.9191  data: 0.0016  max mem: 5384
+[18:17:30.455766]   [ 5241/10009]  eta: 1:13:18    time: 0.9226  data: 0.0024  max mem: 5384
+[18:17:48.930571]   [ 5261/10009]  eta: 1:13:00    time: 0.9236  data: 0.0017  max mem: 5384
+[18:18:07.354620]   [ 5281/10009]  eta: 1:12:42    time: 0.9211  data: 0.0012  max mem: 5384
+[18:18:25.803023]   [ 5301/10009]  eta: 1:12:23    time: 0.9223  data: 0.0018  max mem: 5384
+[18:18:44.230886]   [ 5321/10009]  eta: 1:12:05    time: 0.9213  data: 0.0019  max mem: 5384
+[18:19:02.639668]   [ 5341/10009]  eta: 1:11:46    time: 0.9203  data: 0.0011  max mem: 5384
+[18:19:21.071547]   [ 5361/10009]  eta: 1:11:28    time: 0.9215  data: 0.0014  max mem: 5384
+[18:19:39.516109]   [ 5381/10009]  eta: 1:11:09    time: 0.9221  data: 0.0023  max mem: 5384
+[18:19:57.934843]   [ 5401/10009]  eta: 1:10:51    time: 0.9208  data: 0.0008  max mem: 5384
+[18:20:16.409456]   [ 5421/10009]  eta: 1:10:32    time: 0.9236  data: 0.0032  max mem: 5384
+[18:20:34.897669]   [ 5441/10009]  eta: 1:10:14    time: 0.9243  data: 0.0008  max mem: 5384
+[18:20:53.363072]   [ 5461/10009]  eta: 1:09:56    time: 0.9232  data: 0.0016  max mem: 5384
+[18:21:11.779973]   [ 5481/10009]  eta: 1:09:37    time: 0.9207  data: 0.0021  max mem: 5384
+[18:21:30.264457]   [ 5501/10009]  eta: 1:09:19    time: 0.9241  data: 0.0020  max mem: 5384
+[18:21:48.743053]   [ 5521/10009]  eta: 1:09:00    time: 0.9236  data: 0.0012  max mem: 5384
+[18:22:07.180505]   [ 5541/10009]  eta: 1:08:42    time: 0.9218  data: 0.0018  max mem: 5384
+[18:22:25.640853]   [ 5561/10009]  eta: 1:08:23    time: 0.9229  data: 0.0018  max mem: 5384
+[18:22:44.061967]   [ 5581/10009]  eta: 1:08:05    time: 0.9209  data: 0.0020  max mem: 5384
+[18:23:02.542581]   [ 5601/10009]  eta: 1:07:46    time: 0.9239  data: 0.0023  max mem: 5384
+[18:23:21.023475]   [ 5621/10009]  eta: 1:07:28    time: 0.9240  data: 0.0012  max mem: 5384
+[18:23:39.512677]   [ 5641/10009]  eta: 1:07:10    time: 0.9243  data: 0.0015  max mem: 5384
+[18:23:57.950523]   [ 5661/10009]  eta: 1:06:51    time: 0.9218  data: 0.0008  max mem: 5384
+[18:24:16.410513]   [ 5681/10009]  eta: 1:06:33    time: 0.9229  data: 0.0010  max mem: 5384
+[18:24:34.859168]   [ 5701/10009]  eta: 1:06:14    time: 0.9223  data: 0.0034  max mem: 5384
+[18:24:53.303717]   [ 5721/10009]  eta: 1:05:56    time: 0.9221  data: 0.0014  max mem: 5384
+[18:25:11.715465]   [ 5741/10009]  eta: 1:05:37    time: 0.9205  data: 0.0025  max mem: 5384
+[18:25:30.210820]   [ 5761/10009]  eta: 1:05:19    time: 0.9247  data: 0.0032  max mem: 5384
+[18:25:48.645389]   [ 5781/10009]  eta: 1:05:00    time: 0.9216  data: 0.0021  max mem: 5384
+[18:26:07.081608]   [ 5801/10009]  eta: 1:04:42    time: 0.9217  data: 0.0039  max mem: 5384
+[18:26:25.578716]   [ 5821/10009]  eta: 1:04:24    time: 0.9247  data: 0.0009  max mem: 5384
+[18:26:44.005627]   [ 5841/10009]  eta: 1:04:05    time: 0.9212  data: 0.0007  max mem: 5384
+[18:27:02.414826]   [ 5861/10009]  eta: 1:03:47    time: 0.9204  data: 0.0017  max mem: 5384
+[18:27:20.914494]   [ 5881/10009]  eta: 1:03:28    time: 0.9249  data: 0.0006  max mem: 5384
+[18:27:39.318949]   [ 5901/10009]  eta: 1:03:10    time: 0.9201  data: 0.0016  max mem: 5384
+[18:27:57.740549]   [ 5921/10009]  eta: 1:02:51    time: 0.9210  data: 0.0011  max mem: 5384
+[18:28:16.200652]   [ 5941/10009]  eta: 1:02:33    time: 0.9229  data: 0.0020  max mem: 5384
+[18:28:34.640778]   [ 5961/10009]  eta: 1:02:14    time: 0.9219  data: 0.0016  max mem: 5384
+[18:28:53.061312]   [ 5981/10009]  eta: 1:01:56    time: 0.9209  data: 0.0020  max mem: 5384
+[18:29:11.458287]   [ 6001/10009]  eta: 1:01:37    time: 0.9198  data: 0.0026  max mem: 5384
+[18:29:29.961913]   [ 6021/10009]  eta: 1:01:19    time: 0.9251  data: 0.0020  max mem: 5384
+[18:29:48.401092]   [ 6041/10009]  eta: 1:01:00    time: 0.9217  data: 0.0019  max mem: 5384
+[18:30:06.835945]   [ 6061/10009]  eta: 1:00:42    time: 0.9216  data: 0.0022  max mem: 5384
+[18:30:25.263446]   [ 6081/10009]  eta: 1:00:24    time: 0.9213  data: 0.0027  max mem: 5384
+[18:30:43.710939]   [ 6101/10009]  eta: 1:00:05    time: 0.9223  data: 0.0015  max mem: 5384
+[18:31:02.142441]   [ 6121/10009]  eta: 0:59:47    time: 0.9213  data: 0.0009  max mem: 5384
+[18:31:20.579657]   [ 6141/10009]  eta: 0:59:28    time: 0.9218  data: 0.0019  max mem: 5384
+[18:31:39.080992]   [ 6161/10009]  eta: 0:59:10    time: 0.9250  data: 0.0031  max mem: 5384
+[18:31:57.560223]   [ 6181/10009]  eta: 0:58:51    time: 0.9239  data: 0.0015  max mem: 5384
+[18:32:16.055344]   [ 6201/10009]  eta: 0:58:33    time: 0.9247  data: 0.0017  max mem: 5384
+[18:32:34.424806]   [ 6221/10009]  eta: 0:58:14    time: 0.9184  data: 0.0010  max mem: 5384
+[18:32:52.843271]   [ 6241/10009]  eta: 0:57:56    time: 0.9208  data: 0.0017  max mem: 5384
+[18:33:11.222195]   [ 6261/10009]  eta: 0:57:37    time: 0.9188  data: 0.0020  max mem: 5384
+[18:33:29.683102]   [ 6281/10009]  eta: 0:57:19    time: 0.9229  data: 0.0035  max mem: 5384
+[18:33:48.219401]   [ 6301/10009]  eta: 0:57:01    time: 0.9267  data: 0.0019  max mem: 5384
+[18:34:06.643263]   [ 6321/10009]  eta: 0:56:42    time: 0.9211  data: 0.0013  max mem: 5384
+[18:34:25.084253]   [ 6341/10009]  eta: 0:56:24    time: 0.9219  data: 0.0022  max mem: 5384
+[18:34:43.538656]   [ 6361/10009]  eta: 0:56:05    time: 0.9226  data: 0.0017  max mem: 5384
+[18:35:01.968149]   [ 6381/10009]  eta: 0:55:47    time: 0.9213  data: 0.0036  max mem: 5384
+[18:35:20.432920]   [ 6401/10009]  eta: 0:55:28    time: 0.9231  data: 0.0016  max mem: 5384
+[18:35:38.872699]   [ 6421/10009]  eta: 0:55:10    time: 0.9219  data: 0.0014  max mem: 5384
+[18:35:57.341364]   [ 6441/10009]  eta: 0:54:51    time: 0.9233  data: 0.0031  max mem: 5384
+[18:36:15.795107]   [ 6461/10009]  eta: 0:54:33    time: 0.9226  data: 0.0007  max mem: 5384
+[18:36:34.289972]   [ 6481/10009]  eta: 0:54:15    time: 0.9246  data: 0.0020  max mem: 5384
+[18:36:52.723732]   [ 6501/10009]  eta: 0:53:56    time: 0.9216  data: 0.0029  max mem: 5384
+[18:37:11.156566]   [ 6521/10009]  eta: 0:53:38    time: 0.9216  data: 0.0006  max mem: 5384
+[18:37:29.593924]   [ 6541/10009]  eta: 0:53:19    time: 0.9218  data: 0.0012  max mem: 5384
+[18:37:48.060988]   [ 6561/10009]  eta: 0:53:01    time: 0.9233  data: 0.0030  max mem: 5384
+[18:38:06.525315]   [ 6581/10009]  eta: 0:52:42    time: 0.9231  data: 0.0019  max mem: 5384
+[18:38:24.956088]   [ 6601/10009]  eta: 0:52:24    time: 0.9214  data: 0.0047  max mem: 5384
+[18:38:43.423640]   [ 6621/10009]  eta: 0:52:05    time: 0.9233  data: 0.0013  max mem: 5384
+[18:39:01.881015]   [ 6641/10009]  eta: 0:51:47    time: 0.9228  data: 0.0027  max mem: 5384
+[18:39:20.335594]   [ 6661/10009]  eta: 0:51:29    time: 0.9226  data: 0.0005  max mem: 5384
+[18:39:38.798560]   [ 6681/10009]  eta: 0:51:10    time: 0.9231  data: 0.0024  max mem: 5384
+[18:39:57.248495]   [ 6701/10009]  eta: 0:50:52    time: 0.9224  data: 0.0024  max mem: 5384
+[18:40:15.662591]   [ 6721/10009]  eta: 0:50:33    time: 0.9206  data: 0.0032  max mem: 5384
+[18:40:34.068786]   [ 6741/10009]  eta: 0:50:15    time: 0.9202  data: 0.0014  max mem: 5384
+[18:40:52.520324]   [ 6761/10009]  eta: 0:49:56    time: 0.9225  data: 0.0020  max mem: 5384
+[18:41:10.953981]   [ 6781/10009]  eta: 0:49:38    time: 0.9216  data: 0.0020  max mem: 5384
+[18:41:29.358318]   [ 6801/10009]  eta: 0:49:19    time: 0.9201  data: 0.0033  max mem: 5384
+[18:41:47.751246]   [ 6821/10009]  eta: 0:49:01    time: 0.9195  data: 0.0020  max mem: 5384
+[18:42:06.305377]   [ 6841/10009]  eta: 0:48:43    time: 0.9276  data: 0.0029  max mem: 5384
+[18:42:24.759557]   [ 6861/10009]  eta: 0:48:24    time: 0.9226  data: 0.0012  max mem: 5384
+[18:42:43.178121]   [ 6881/10009]  eta: 0:48:06    time: 0.9208  data: 0.0006  max mem: 5384
+[18:43:01.638845]   [ 6901/10009]  eta: 0:47:47    time: 0.9229  data: 0.0037  max mem: 5384
+[18:43:20.077370]   [ 6921/10009]  eta: 0:47:29    time: 0.9218  data: 0.0023  max mem: 5384
+[18:43:38.538604]   [ 6941/10009]  eta: 0:47:10    time: 0.9229  data: 0.0041  max mem: 5384
+[18:43:57.079687]   [ 6961/10009]  eta: 0:46:52    time: 0.9269  data: 0.0013  max mem: 5384
+[18:44:15.488216]   [ 6981/10009]  eta: 0:46:33    time: 0.9203  data: 0.0008  max mem: 5384
+[18:44:33.929598]   [ 7001/10009]  eta: 0:46:15    time: 0.9220  data: 0.0011  max mem: 5384
+[18:44:52.312383]   [ 7021/10009]  eta: 0:45:56    time: 0.9190  data: 0.0019  max mem: 5384
+[18:45:10.754303]   [ 7041/10009]  eta: 0:45:38    time: 0.9220  data: 0.0030  max mem: 5384
+[18:45:29.203182]   [ 7061/10009]  eta: 0:45:20    time: 0.9223  data: 0.0024  max mem: 5384
+[18:45:47.633654]   [ 7081/10009]  eta: 0:45:01    time: 0.9214  data: 0.0019  max mem: 5384
+[18:46:06.097198]   [ 7101/10009]  eta: 0:44:43    time: 0.9231  data: 0.0014  max mem: 5384
+[18:46:24.576182]   [ 7121/10009]  eta: 0:44:24    time: 0.9238  data: 0.0034  max mem: 5384
+[18:46:43.021139]   [ 7141/10009]  eta: 0:44:06    time: 0.9221  data: 0.0042  max mem: 5384
+[18:47:01.447817]   [ 7161/10009]  eta: 0:43:47    time: 0.9212  data: 0.0014  max mem: 5384
+[18:47:19.899337]   [ 7181/10009]  eta: 0:43:29    time: 0.9225  data: 0.0028  max mem: 5384
+[18:47:38.341466]   [ 7201/10009]  eta: 0:43:10    time: 0.9220  data: 0.0025  max mem: 5384
+[18:47:56.782382]   [ 7221/10009]  eta: 0:42:52    time: 0.9219  data: 0.0013  max mem: 5384
+[18:48:15.301847]   [ 7241/10009]  eta: 0:42:34    time: 0.9259  data: 0.0009  max mem: 5384
+[18:48:33.748887]   [ 7261/10009]  eta: 0:42:15    time: 0.9223  data: 0.0019  max mem: 5384
+[18:48:52.209915]   [ 7281/10009]  eta: 0:41:57    time: 0.9229  data: 0.0011  max mem: 5384
+[18:49:10.672745]   [ 7301/10009]  eta: 0:41:38    time: 0.9230  data: 0.0014  max mem: 5384
+[18:49:29.104088]   [ 7321/10009]  eta: 0:41:20    time: 0.9215  data: 0.0051  max mem: 5384
+[18:49:47.617176]   [ 7341/10009]  eta: 0:41:01    time: 0.9256  data: 0.0025  max mem: 5384
+[18:50:06.055660]   [ 7361/10009]  eta: 0:40:43    time: 0.9218  data: 0.0025  max mem: 5384
+[18:50:24.497071]   [ 7381/10009]  eta: 0:40:24    time: 0.9219  data: 0.0028  max mem: 5384
+[18:50:42.882804]   [ 7401/10009]  eta: 0:40:06    time: 0.9192  data: 0.0019  max mem: 5384
+[18:51:01.377194]   [ 7421/10009]  eta: 0:39:48    time: 0.9246  data: 0.0035  max mem: 5384
+[18:51:19.814103]   [ 7441/10009]  eta: 0:39:29    time: 0.9217  data: 0.0024  max mem: 5384
+[18:51:38.265041]   [ 7461/10009]  eta: 0:39:11    time: 0.9224  data: 0.0019  max mem: 5384
+[18:51:56.740795]   [ 7481/10009]  eta: 0:38:52    time: 0.9237  data: 0.0021  max mem: 5384
+[18:52:15.198601]   [ 7501/10009]  eta: 0:38:34    time: 0.9228  data: 0.0026  max mem: 5384
+[18:52:33.631002]   [ 7521/10009]  eta: 0:38:15    time: 0.9215  data: 0.0029  max mem: 5384
+[18:52:52.100434]   [ 7541/10009]  eta: 0:37:57    time: 0.9234  data: 0.0026  max mem: 5384
+[18:53:10.548101]   [ 7561/10009]  eta: 0:37:38    time: 0.9222  data: 0.0025  max mem: 5384
+[18:53:29.018709]   [ 7581/10009]  eta: 0:37:20    time: 0.9234  data: 0.0016  max mem: 5384
+[18:53:47.450288]   [ 7601/10009]  eta: 0:37:02    time: 0.9215  data: 0.0016  max mem: 5384
+[18:54:05.870788]   [ 7621/10009]  eta: 0:36:43    time: 0.9209  data: 0.0010  max mem: 5384
+[18:54:24.327612]   [ 7641/10009]  eta: 0:36:25    time: 0.9227  data: 0.0040  max mem: 5384
+[18:54:42.743394]   [ 7661/10009]  eta: 0:36:06    time: 0.9207  data: 0.0009  max mem: 5384
+[18:55:01.174717]   [ 7681/10009]  eta: 0:35:48    time: 0.9215  data: 0.0019  max mem: 5384
+[18:55:19.611777]   [ 7701/10009]  eta: 0:35:29    time: 0.9217  data: 0.0009  max mem: 5384
+[18:55:38.180248]   [ 7721/10009]  eta: 0:35:11    time: 0.9283  data: 0.0027  max mem: 5384
+[18:55:56.618807]   [ 7741/10009]  eta: 0:34:52    time: 0.9218  data: 0.0011  max mem: 5384
+[18:56:15.010317]   [ 7761/10009]  eta: 0:34:34    time: 0.9195  data: 0.0025  max mem: 5384
+[18:56:33.441914]   [ 7781/10009]  eta: 0:34:15    time: 0.9215  data: 0.0019  max mem: 5384
+[18:56:51.912526]   [ 7801/10009]  eta: 0:33:57    time: 0.9235  data: 0.0008  max mem: 5384
+[18:57:10.355852]   [ 7821/10009]  eta: 0:33:39    time: 0.9221  data: 0.0022  max mem: 5384
+[18:57:28.873010]   [ 7841/10009]  eta: 0:33:20    time: 0.9258  data: 0.0015  max mem: 5384
+[18:57:47.302879]   [ 7861/10009]  eta: 0:33:02    time: 0.9214  data: 0.0019  max mem: 5384
+[18:58:05.767550]   [ 7881/10009]  eta: 0:32:43    time: 0.9231  data: 0.0018  max mem: 5384
+[18:58:24.164147]   [ 7901/10009]  eta: 0:32:25    time: 0.9197  data: 0.0007  max mem: 5384
+[18:58:42.609052]   [ 7921/10009]  eta: 0:32:06    time: 0.9221  data: 0.0014  max mem: 5384
+[18:59:01.063254]   [ 7941/10009]  eta: 0:31:48    time: 0.9226  data: 0.0016  max mem: 5384
+[18:59:19.494565]   [ 7961/10009]  eta: 0:31:29    time: 0.9214  data: 0.0033  max mem: 5384
+[18:59:38.026179]   [ 7981/10009]  eta: 0:31:11    time: 0.9265  data: 0.0035  max mem: 5384
+[18:59:56.462165]   [ 8001/10009]  eta: 0:30:53    time: 0.9217  data: 0.0025  max mem: 5384
+[19:00:14.882718]   [ 8021/10009]  eta: 0:30:34    time: 0.9209  data: 0.0008  max mem: 5384
+[19:00:33.323453]   [ 8041/10009]  eta: 0:30:16    time: 0.9219  data: 0.0024  max mem: 5384
+[19:00:51.760429]   [ 8061/10009]  eta: 0:29:57    time: 0.9217  data: 0.0055  max mem: 5384
+[19:01:10.176220]   [ 8081/10009]  eta: 0:29:39    time: 0.9207  data: 0.0021  max mem: 5384
+[19:01:28.682329]   [ 8101/10009]  eta: 0:29:20    time: 0.9252  data: 0.0027  max mem: 5384
+[19:01:47.082361]   [ 8121/10009]  eta: 0:29:02    time: 0.9199  data: 0.0016  max mem: 5384
+[19:02:05.528875]   [ 8141/10009]  eta: 0:28:43    time: 0.9222  data: 0.0030  max mem: 5384
+[19:02:23.974138]   [ 8161/10009]  eta: 0:28:25    time: 0.9221  data: 0.0037  max mem: 5384
+[19:02:42.398552]   [ 8181/10009]  eta: 0:28:07    time: 0.9211  data: 0.0018  max mem: 5384
+[19:03:00.814967]   [ 8201/10009]  eta: 0:27:48    time: 0.9207  data: 0.0026  max mem: 5384
+[19:03:19.276097]   [ 8221/10009]  eta: 0:27:30    time: 0.9229  data: 0.0021  max mem: 5384
+[19:03:37.810657]   [ 8241/10009]  eta: 0:27:11    time: 0.9266  data: 0.0030  max mem: 5384
+[19:03:56.274192]   [ 8261/10009]  eta: 0:26:53    time: 0.9231  data: 0.0059  max mem: 5384
+[19:04:14.664372]   [ 8281/10009]  eta: 0:26:34    time: 0.9194  data: 0.0017  max mem: 5384
+[19:04:33.090294]   [ 8301/10009]  eta: 0:26:16    time: 0.9212  data: 0.0005  max mem: 5384
+[19:04:51.532717]   [ 8321/10009]  eta: 0:25:57    time: 0.9220  data: 0.0021  max mem: 5384
+[19:05:09.958757]   [ 8341/10009]  eta: 0:25:39    time: 0.9212  data: 0.0026  max mem: 5384
+[19:05:28.390003]   [ 8361/10009]  eta: 0:25:20    time: 0.9215  data: 0.0035  max mem: 5384
+[19:05:46.860643]   [ 8381/10009]  eta: 0:25:02    time: 0.9234  data: 0.0026  max mem: 5384
+[19:06:05.265232]   [ 8401/10009]  eta: 0:24:44    time: 0.9201  data: 0.0014  max mem: 5384
+[19:06:23.680411]   [ 8421/10009]  eta: 0:24:25    time: 0.9206  data: 0.0005  max mem: 5384
+[19:06:42.098410]   [ 8441/10009]  eta: 0:24:07    time: 0.9208  data: 0.0012  max mem: 5384
+[19:07:00.535394]   [ 8461/10009]  eta: 0:23:48    time: 0.9217  data: 0.0028  max mem: 5384
+[19:07:18.982454]   [ 8481/10009]  eta: 0:23:30    time: 0.9222  data: 0.0016  max mem: 5384
+[19:07:37.410091]   [ 8501/10009]  eta: 0:23:11    time: 0.9213  data: 0.0011  max mem: 5384
+[19:07:55.941611]   [ 8521/10009]  eta: 0:22:53    time: 0.9264  data: 0.0005  max mem: 5384
+[19:08:14.350433]   [ 8541/10009]  eta: 0:22:34    time: 0.9203  data: 0.0020  max mem: 5384
+[19:08:32.771863]   [ 8561/10009]  eta: 0:22:16    time: 0.9210  data: 0.0013  max mem: 5384
+[19:08:51.227583]   [ 8581/10009]  eta: 0:21:58    time: 0.9227  data: 0.0016  max mem: 5384
+[19:09:09.654456]   [ 8601/10009]  eta: 0:21:39    time: 0.9209  data: 0.0017  max mem: 5384
+[19:09:28.074574]   [ 8621/10009]  eta: 0:21:21    time: 0.9209  data: 0.0029  max mem: 5384
+[19:09:46.535543]   [ 8641/10009]  eta: 0:21:02    time: 0.9229  data: 0.0024  max mem: 5384
+[19:10:04.993744]   [ 8661/10009]  eta: 0:20:44    time: 0.9228  data: 0.0046  max mem: 5384
+[19:10:23.425138]   [ 8681/10009]  eta: 0:20:25    time: 0.9215  data: 0.0023  max mem: 5384
+[19:10:41.839677]   [ 8701/10009]  eta: 0:20:07    time: 0.9206  data: 0.0012  max mem: 5384
+[19:11:00.299772]   [ 8721/10009]  eta: 0:19:48    time: 0.9229  data: 0.0023  max mem: 5384
+[19:11:18.758939]   [ 8741/10009]  eta: 0:19:30    time: 0.9228  data: 0.0011  max mem: 5384
+[19:11:37.181330]   [ 8761/10009]  eta: 0:19:12    time: 0.9210  data: 0.0026  max mem: 5384
+[19:11:55.700888]   [ 8781/10009]  eta: 0:18:53    time: 0.9259  data: 0.0033  max mem: 5384
+[19:12:14.148790]   [ 8801/10009]  eta: 0:18:35    time: 0.9223  data: 0.0023  max mem: 5384
+[19:12:32.596564]   [ 8821/10009]  eta: 0:18:16    time: 0.9223  data: 0.0029  max mem: 5384
+[19:12:51.028310]   [ 8841/10009]  eta: 0:17:58    time: 0.9208  data: 0.0020  max mem: 5384
+[19:13:09.464496]   [ 8861/10009]  eta: 0:17:39    time: 0.9217  data: 0.0021  max mem: 5384
+[19:13:27.924827]   [ 8881/10009]  eta: 0:17:21    time: 0.9229  data: 0.0012  max mem: 5384
+[19:13:46.414733]   [ 8901/10009]  eta: 0:17:02    time: 0.9244  data: 0.0016  max mem: 5384
+[19:14:04.826186]   [ 8921/10009]  eta: 0:16:44    time: 0.9205  data: 0.0023  max mem: 5384
+[19:14:23.253061]   [ 8941/10009]  eta: 0:16:25    time: 0.9212  data: 0.0049  max mem: 5384
+[19:14:41.678343]   [ 8961/10009]  eta: 0:16:07    time: 0.9212  data: 0.0025  max mem: 5384
+[19:15:00.097495]   [ 8981/10009]  eta: 0:15:49    time: 0.9209  data: 0.0017  max mem: 5384
+[19:15:18.538434]   [ 9001/10009]  eta: 0:15:30    time: 0.9219  data: 0.0015  max mem: 5384
+[19:15:36.954119]   [ 9021/10009]  eta: 0:15:12    time: 0.9207  data: 0.0012  max mem: 5384
+[19:15:55.456543]   [ 9041/10009]  eta: 0:14:53    time: 0.9250  data: 0.0027  max mem: 5384
+[19:16:13.901528]   [ 9061/10009]  eta: 0:14:35    time: 0.9221  data: 0.0021  max mem: 5384
+[19:16:32.358614]   [ 9081/10009]  eta: 0:14:16    time: 0.9227  data: 0.0016  max mem: 5384
+[19:16:50.795686]   [ 9101/10009]  eta: 0:13:58    time: 0.9218  data: 0.0018  max mem: 5384
+[19:17:09.226427]   [ 9121/10009]  eta: 0:13:39    time: 0.9214  data: 0.0030  max mem: 5384
+[19:17:27.659348]   [ 9141/10009]  eta: 0:13:21    time: 0.9215  data: 0.0041  max mem: 5384
+[19:17:46.174605]   [ 9161/10009]  eta: 0:13:03    time: 0.9257  data: 0.0039  max mem: 5384
+[19:18:04.612599]   [ 9181/10009]  eta: 0:12:44    time: 0.9218  data: 0.0036  max mem: 5384
+[19:18:23.036785]   [ 9201/10009]  eta: 0:12:26    time: 0.9211  data: 0.0020  max mem: 5384
+[19:18:41.471043]   [ 9221/10009]  eta: 0:12:07    time: 0.9216  data: 0.0027  max mem: 5384
+[19:18:59.947031]   [ 9241/10009]  eta: 0:11:49    time: 0.9237  data: 0.0030  max mem: 5384
+[19:19:18.420375]   [ 9261/10009]  eta: 0:11:30    time: 0.9236  data: 0.0012  max mem: 5384
+[19:19:36.847811]   [ 9281/10009]  eta: 0:11:12    time: 0.9213  data: 0.0018  max mem: 5384
+[19:19:55.277878]   [ 9301/10009]  eta: 0:10:53    time: 0.9214  data: 0.0027  max mem: 5384
+[19:20:13.710590]   [ 9321/10009]  eta: 0:10:35    time: 0.9215  data: 0.0007  max mem: 5384
+[19:20:32.151220]   [ 9341/10009]  eta: 0:10:17    time: 0.9219  data: 0.0023  max mem: 5384
+[19:20:50.551295]   [ 9361/10009]  eta: 0:09:58    time: 0.9199  data: 0.0038  max mem: 5384
+[19:21:08.972507]   [ 9381/10009]  eta: 0:09:40    time: 0.9210  data: 0.0023  max mem: 5384
+[19:21:27.468120]   [ 9401/10009]  eta: 0:09:21    time: 0.9247  data: 0.0029  max mem: 5384
+[19:21:45.894298]   [ 9421/10009]  eta: 0:09:03    time: 0.9212  data: 0.0021  max mem: 5384
+[19:22:04.289119]   [ 9441/10009]  eta: 0:08:44    time: 0.9196  data: 0.0027  max mem: 5384
+[19:22:22.732757]   [ 9461/10009]  eta: 0:08:26    time: 0.9221  data: 0.0020  max mem: 5384
+[19:22:41.162306]   [ 9481/10009]  eta: 0:08:07    time: 0.9213  data: 0.0020  max mem: 5384
+[19:22:59.574502]   [ 9501/10009]  eta: 0:07:49    time: 0.9205  data: 0.0008  max mem: 5384
+[19:23:18.037879]   [ 9521/10009]  eta: 0:07:31    time: 0.9230  data: 0.0015  max mem: 5384
+[19:23:36.480436]   [ 9541/10009]  eta: 0:07:12    time: 0.9220  data: 0.0026  max mem: 5384
+[19:23:54.893526]   [ 9561/10009]  eta: 0:06:54    time: 0.9206  data: 0.0005  max mem: 5384
+[19:24:13.302968]   [ 9581/10009]  eta: 0:06:35    time: 0.9204  data: 0.0022  max mem: 5384
+[19:24:31.686066]   [ 9601/10009]  eta: 0:06:17    time: 0.9190  data: 0.0018  max mem: 5384
+[19:24:50.134686]   [ 9621/10009]  eta: 0:05:58    time: 0.9223  data: 0.0016  max mem: 5384
+[19:25:08.549625]   [ 9641/10009]  eta: 0:05:40    time: 0.9206  data: 0.0027  max mem: 5384
+[19:25:26.978505]   [ 9661/10009]  eta: 0:05:21    time: 0.9213  data: 0.0016  max mem: 5384
+[19:25:45.459053]   [ 9681/10009]  eta: 0:05:03    time: 0.9239  data: 0.0022  max mem: 5384
+[19:26:03.868378]   [ 9701/10009]  eta: 0:04:44    time: 0.9204  data: 0.0021  max mem: 5384
+[19:26:22.294325]   [ 9721/10009]  eta: 0:04:26    time: 0.9212  data: 0.0010  max mem: 5384
+[19:26:40.736675]   [ 9741/10009]  eta: 0:04:08    time: 0.9220  data: 0.0027  max mem: 5384
+[19:26:59.158600]   [ 9761/10009]  eta: 0:03:49    time: 0.9210  data: 0.0005  max mem: 5384
+[19:27:17.536588]   [ 9781/10009]  eta: 0:03:31    time: 0.9188  data: 0.0041  max mem: 5384
+[19:27:35.912616]   [ 9801/10009]  eta: 0:03:12    time: 0.9187  data: 0.0017  max mem: 5384
+[19:27:54.419572]   [ 9821/10009]  eta: 0:02:54    time: 0.9253  data: 0.0047  max mem: 5384
+[19:28:12.842339]   [ 9841/10009]  eta: 0:02:35    time: 0.9210  data: 0.0038  max mem: 5384
+[19:28:31.223650]   [ 9861/10009]  eta: 0:02:17    time: 0.9190  data: 0.0029  max mem: 5384
+[19:28:49.649179]   [ 9881/10009]  eta: 0:01:58    time: 0.9212  data: 0.0017  max mem: 5384
+[19:29:08.058147]   [ 9901/10009]  eta: 0:01:40    time: 0.9203  data: 0.0019  max mem: 5384
+[19:29:26.480846]   [ 9921/10009]  eta: 0:01:22    time: 0.9210  data: 0.0014  max mem: 5384
+[19:29:44.872340]   [ 9941/10009]  eta: 0:01:03    time: 0.9195  data: 0.0019  max mem: 5384
+[19:30:03.297015]   [ 9961/10009]  eta: 0:00:45    time: 0.9210  data: 0.0012  max mem: 5384
+[19:30:21.779953]   [ 9981/10009]  eta: 0:00:26    time: 0.9240  data: 0.0008  max mem: 5384
+[19:30:40.168527]   [10001/10009]  eta: 0:00:08    time: 0.9193  data: 0.0025  max mem: 5384
+[19:30:47.308190]   [10009/10009]  eta: 0:00:00    time: 0.9089  data: 0.0048  max mem: 5384
+[19:30:47.652210]  Total time: 2:33:52 (0.9224 s / it)
+[19:30:47.652464] Extracting features for val set...
+[19:30:52.276275] Storing features into tensor of shape torch.Size([50000, 768])
+[19:30:52.290710]   [  1/391]  eta: 0:30:13    time: 4.6372  data: 4.1171  max mem: 5384
+[19:31:16.790944]   [ 21/391]  eta: 0:08:34    time: 1.2242  data: 1.1944  max mem: 5529
+[19:31:42.255993]   [ 41/391]  eta: 0:07:47    time: 1.2732  data: 1.2460  max mem: 5529
+[19:32:05.251044]   [ 61/391]  eta: 0:07:00    time: 1.1497  data: 1.1240  max mem: 5529
+[19:32:33.434083]   [ 81/391]  eta: 0:06:46    time: 1.4091  data: 1.3821  max mem: 5529
+[19:33:00.596241]   [101/391]  eta: 0:06:22    time: 1.3580  data: 1.3293  max mem: 5529
+[19:33:28.342527]   [121/391]  eta: 0:05:59    time: 1.3872  data: 1.3594  max mem: 5529
+[19:33:49.108786]   [141/391]  eta: 0:05:22    time: 1.0382  data: 1.0097  max mem: 5529
+[19:34:13.996737]   [161/391]  eta: 0:04:56    time: 1.2443  data: 1.2175  max mem: 5529
+[19:34:30.172336]   [181/391]  eta: 0:04:19    time: 0.8087  data: 0.6664  max mem: 5529
+[19:34:49.313566]   [201/391]  eta: 0:03:49    time: 0.9570  data: 0.7980  max mem: 5529
+[19:35:06.482590]   [221/391]  eta: 0:03:20    time: 0.8584  data: 0.1192  max mem: 5529
+[19:35:24.866981]   [241/391]  eta: 0:02:53    time: 0.9191  data: 0.0037  max mem: 5529
+[19:35:43.346100]   [261/391]  eta: 0:02:28    time: 0.9238  data: 0.0012  max mem: 5529
+[19:36:01.758625]   [281/391]  eta: 0:02:04    time: 0.9205  data: 0.0030  max mem: 5529
+[19:36:23.498603]   [301/391]  eta: 0:01:41    time: 1.0869  data: 0.2127  max mem: 5529
+[19:36:44.510644]   [321/391]  eta: 0:01:18    time: 1.0505  data: 1.0218  max mem: 5529
+[19:37:12.765009]   [341/391]  eta: 0:00:57    time: 1.4125  data: 1.3762  max mem: 5529
+[19:37:40.228302]   [361/391]  eta: 0:00:35    time: 1.3731  data: 1.3483  max mem: 5529
+[19:38:03.057922]   [381/391]  eta: 0:00:12    time: 1.1411  data: 1.1163  max mem: 5529
+[19:38:17.688149]   [391/391]  eta: 0:00:01    time: 1.3913  data: 1.2710  max mem: 5529
+[19:38:18.008327]  Total time: 0:07:30 (1.1518 s / it)
+[19:38:18.262497] Features are ready!
+Start the k-NN classification.
+[19:38:18.262756] Pre-trained checkpoint from: /raid/home_yedek/utku/ViTFreeze/ViT/pretrain/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_save5/checkpoint-99.pth
+[19:38:47.496906] 10-NN classifier result: Top1: 0.102, Top5: 0.508
+[19:39:16.448455] 20-NN classifier result: Top1: 0.102, Top5: 0.498
+[19:39:45.722208] 100-NN classifier result: Top1: 0.104, Top5: 0.484
+[19:40:11.816113] 200-NN classifier result: Top1: 0.112, Top5: 0.46

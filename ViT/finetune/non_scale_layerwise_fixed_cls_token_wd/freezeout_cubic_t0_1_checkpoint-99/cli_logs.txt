@@ -1,0 +1,776 @@
+/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py:180: FutureWarning: The module torch.distributed.launch is deprecated
+and will be removed in future. Use torchrun.
+Note that --use_env is set by default in torchrun.
+If your script expects `--local_rank` argument to be set, please
+change it to read from `os.environ['LOCAL_RANK']` instead. See 
+https://pytorch.org/docs/stable/distributed.html#launch-utility for 
+further instructions
+
+  warnings.warn(
+| distributed init (rank 3): env://, gpu 3
+| distributed init (rank 2): env://, gpu 2
+| distributed init (rank 0): env://, gpu 0
+| distributed init (rank 1): env://, gpu 1
+[05:43:28.498476] Namespace(batch_size=256, epochs=100, accum_iter=1, model='vit_base_patch16', input_size=224, drop_path=0.1, clip_grad=None, weight_decay=0.05, lr=0.004, blr=0.001, layer_decay=0.75, min_lr=1e-06, warmup_epochs=20, color_jitter=None, aa='rand-m9-mstd0.5-inc1', smoothing=0.1, reprob=0.25, remode='pixel', recount=1, resplit=False, mixup=0.8, cutmix=1.0, cutmix_minmax=None, mixup_prob=1.0, mixup_switch_prob=0.5, mixup_mode='batch', finetune='/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99', global_pool=True, data_path='/raid/utku/datasets/imagenet/classification/', nb_classes=1000, output_dir='finetune/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99', log_dir='finetune/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99', device='cuda', seed=0, resume='', auto_resume=True, start_epoch=0, eval=False, dist_eval=True, num_workers=10, pin_mem=True, world_size=4, local_rank=0, dist_on_itp=False, dist_url='env://', rank=0, gpu=0, distributed=True, dist_backend='nccl')
+[05:43:28.500689] Train data path is:  /raid/utku/datasets/imagenet/classification/train/image_folders
+[05:43:36.088848] Dataset ImageFolder
+    Number of datapoints: 1281167
+    Root location: /raid/utku/datasets/imagenet/classification/train/image_folders
+    StandardTransform
+Transform: Compose(
+               RandomResizedCropAndInterpolation(size=(224, 224), scale=(0.08, 1.0), ratio=(0.75, 1.3333), interpolation=bicubic)
+               RandomHorizontalFlip(p=0.5)
+               RandAugment(n=2, ops=
+           	AugmentOp(name=AutoContrast, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=Equalize, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=Invert, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=Rotate, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=PosterizeIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=SolarizeIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=SolarizeAdd, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ColorIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ContrastIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=BrightnessIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=SharpnessIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ShearX, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ShearY, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=TranslateXRel, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=TranslateYRel, p=0.5, m=9, mstd=0.5))
+               ToTensor()
+               Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+               RandomErasing(p=0.25, mode=pixel, count=(1, 1))
+           )
+[05:43:36.093534] Val data path is:  /raid/utku/datasets/imagenet/classification/val/image_folders
+[05:43:36.388387] Dataset ImageFolder
+    Number of datapoints: 50000
+    Root location: /raid/utku/datasets/imagenet/classification/val/image_folders
+    StandardTransform
+Transform: Compose(
+               Resize(size=256, interpolation=bicubic, max_size=None, antialias=None)
+               CenterCrop(size=(224, 224))
+               ToTensor()
+               Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+           )
+[05:43:36.388654] Sampler_train = <torch.utils.data.distributed.DistributedSampler object at 0x7f817f9a27d0>
+[05:43:36.391846] Mixup is activated!
+Traceback (most recent call last):
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_finetune.py", line 266, in <module>
+    main(args)
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_finetune.py", line 169, in main
+    checkpoint = torch.load(args.finetune, map_location='cpu')
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 771, in load
+    with _open_file_like(f, 'rb') as opened_file:
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 270, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 251, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+FileNotFoundError: [Errno 2] No such file or directory: '/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99'
+Traceback (most recent call last):
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_finetune.py", line 266, in <module>
+    main(args)
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_finetune.py", line 169, in main
+    checkpoint = torch.load(args.finetune, map_location='cpu')
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 771, in load
+    with _open_file_like(f, 'rb') as opened_file:
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 270, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 251, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+FileNotFoundError: [Errno 2] No such file or directory: '/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99'
+Traceback (most recent call last):
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_finetune.py", line 266, in <module>
+    main(args)
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_finetune.py", line 169, in main
+    checkpoint = torch.load(args.finetune, map_location='cpu')
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 771, in load
+    with _open_file_like(f, 'rb') as opened_file:
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 270, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 251, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+FileNotFoundError: [Errno 2] No such file or directory: '/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99'
+Traceback (most recent call last):
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_finetune.py", line 266, in <module>
+    main(args)
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_finetune.py", line 169, in main
+    checkpoint = torch.load(args.finetune, map_location='cpu')
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 771, in load
+    with _open_file_like(f, 'rb') as opened_file:
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 270, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 251, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+FileNotFoundError: [Errno 2] No such file or directory: '/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99'
+ERROR:torch.distributed.elastic.multiprocessing.api:failed (exitcode: 1) local_rank: 0 (pid: 2247890) of binary: /opt/conda/bin/python3
+Traceback (most recent call last):
+  File "/opt/conda/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/opt/conda/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py", line 195, in <module>
+    main()
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py", line 191, in main
+    launch(args)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py", line 176, in launch
+    run(args)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/run.py", line 753, in run
+    elastic_launch(
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 246, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+run_finetune.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2024-01-26_05:43:40
+  host      : 5a03a66edd0a
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 2247891)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[2]:
+  time      : 2024-01-26_05:43:40
+  host      : 5a03a66edd0a
+  rank      : 2 (local_rank: 2)
+  exitcode  : 1 (pid: 2247892)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[3]:
+  time      : 2024-01-26_05:43:40
+  host      : 5a03a66edd0a
+  rank      : 3 (local_rank: 3)
+  exitcode  : 1 (pid: 2247893)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2024-01-26_05:43:40
+  host      : 5a03a66edd0a
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 2247890)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py:180: FutureWarning: The module torch.distributed.launch is deprecated
+and will be removed in future. Use torchrun.
+Note that --use_env is set by default in torchrun.
+If your script expects `--local_rank` argument to be set, please
+change it to read from `os.environ['LOCAL_RANK']` instead. See 
+https://pytorch.org/docs/stable/distributed.html#launch-utility for 
+further instructions
+
+  warnings.warn(
+| distributed init (rank 0): env://, gpu 0
+| distributed init (rank 1): env://, gpu 1
+| distributed init (rank 3): env://, gpu 3
+| distributed init (rank 2): env://, gpu 2
+[05:44:00.628452] Namespace(batch_size=256, epochs=100, accum_iter=1, model='vit_base_patch16', input_size=224, drop_path=0.1, clip_grad=None, weight_decay=0.05, lr=0.004, blr=0.001, layer_decay=0.75, min_lr=1e-06, warmup_epochs=20, color_jitter=None, aa='rand-m9-mstd0.5-inc1', smoothing=0.1, reprob=0.25, remode='pixel', recount=1, resplit=False, mixup=0.8, cutmix=1.0, cutmix_minmax=None, mixup_prob=1.0, mixup_switch_prob=0.5, mixup_mode='batch', finetune='/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99.pth', global_pool=True, data_path='/raid/utku/datasets/imagenet/classification/', nb_classes=1000, output_dir='finetune/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99', log_dir='finetune/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99', device='cuda', seed=0, resume='', auto_resume=True, start_epoch=0, eval=False, dist_eval=True, num_workers=10, pin_mem=True, world_size=4, local_rank=0, dist_on_itp=False, dist_url='env://', rank=0, gpu=0, distributed=True, dist_backend='nccl')
+[05:44:00.635285] Train data path is:  /raid/utku/datasets/imagenet/classification/train/image_folders
+[05:44:07.600933] Dataset ImageFolder
+    Number of datapoints: 1281167
+    Root location: /raid/utku/datasets/imagenet/classification/train/image_folders
+    StandardTransform
+Transform: Compose(
+               RandomResizedCropAndInterpolation(size=(224, 224), scale=(0.08, 1.0), ratio=(0.75, 1.3333), interpolation=bicubic)
+               RandomHorizontalFlip(p=0.5)
+               RandAugment(n=2, ops=
+           	AugmentOp(name=AutoContrast, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=Equalize, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=Invert, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=Rotate, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=PosterizeIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=SolarizeIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=SolarizeAdd, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ColorIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ContrastIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=BrightnessIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=SharpnessIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ShearX, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ShearY, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=TranslateXRel, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=TranslateYRel, p=0.5, m=9, mstd=0.5))
+               ToTensor()
+               Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+               RandomErasing(p=0.25, mode=pixel, count=(1, 1))
+           )
+[05:44:07.629944] Val data path is:  /raid/utku/datasets/imagenet/classification/val/image_folders
+[05:44:08.058273] Dataset ImageFolder
+    Number of datapoints: 50000
+    Root location: /raid/utku/datasets/imagenet/classification/val/image_folders
+    StandardTransform
+Transform: Compose(
+               Resize(size=256, interpolation=bicubic, max_size=None, antialias=None)
+               CenterCrop(size=(224, 224))
+               ToTensor()
+               Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+           )
+[05:44:08.058809] Sampler_train = <torch.utils.data.distributed.DistributedSampler object at 0x7fb0815be7d0>
+[05:44:08.067410] Mixup is activated!
+Traceback (most recent call last):
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_finetune.py", line 266, in <module>
+    main(args)
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_finetune.py", line 169, in main
+    checkpoint = torch.load(args.finetune, map_location='cpu')
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 771, in load
+    with _open_file_like(f, 'rb') as opened_file:
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 270, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 251, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+FileNotFoundError: [Errno 2] No such file or directory: '/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99.pth'
+Traceback (most recent call last):
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_finetune.py", line 266, in <module>
+    main(args)
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_finetune.py", line 169, in main
+    checkpoint = torch.load(args.finetune, map_location='cpu')
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 771, in load
+    with _open_file_like(f, 'rb') as opened_file:
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 270, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 251, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+FileNotFoundError: [Errno 2] No such file or directory: '/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99.pth'
+Traceback (most recent call last):
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_finetune.py", line 266, in <module>
+    main(args)
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_finetune.py", line 169, in main
+    checkpoint = torch.load(args.finetune, map_location='cpu')
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 771, in load
+    with _open_file_like(f, 'rb') as opened_file:
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 270, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 251, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+FileNotFoundError: [Errno 2] No such file or directory: '/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99.pth'
+Traceback (most recent call last):
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_finetune.py", line 266, in <module>
+    main(args)
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_finetune.py", line 169, in main
+    checkpoint = torch.load(args.finetune, map_location='cpu')
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 771, in load
+    with _open_file_like(f, 'rb') as opened_file:
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 270, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/opt/conda/lib/python3.10/site-packages/torch/serialization.py", line 251, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+FileNotFoundError: [Errno 2] No such file or directory: '/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99.pth'
+WARNING:torch.distributed.elastic.multiprocessing.api:Sending process 2248466 closing signal SIGTERM
+ERROR:torch.distributed.elastic.multiprocessing.api:failed (exitcode: 1) local_rank: 1 (pid: 2248467) of binary: /opt/conda/bin/python3
+Traceback (most recent call last):
+  File "/opt/conda/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/opt/conda/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py", line 195, in <module>
+    main()
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py", line 191, in main
+    launch(args)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py", line 176, in launch
+    run(args)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/run.py", line 753, in run
+    elastic_launch(
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 246, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+run_finetune.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2024-01-26_05:44:12
+  host      : 5a03a66edd0a
+  rank      : 2 (local_rank: 2)
+  exitcode  : 1 (pid: 2248468)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[2]:
+  time      : 2024-01-26_05:44:12
+  host      : 5a03a66edd0a
+  rank      : 3 (local_rank: 3)
+  exitcode  : 1 (pid: 2248469)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2024-01-26_05:44:12
+  host      : 5a03a66edd0a
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 2248467)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py:180: FutureWarning: The module torch.distributed.launch is deprecated
+and will be removed in future. Use torchrun.
+Note that --use_env is set by default in torchrun.
+If your script expects `--local_rank` argument to be set, please
+change it to read from `os.environ['LOCAL_RANK']` instead. See 
+https://pytorch.org/docs/stable/distributed.html#launch-utility for 
+further instructions
+
+  warnings.warn(
+| distributed init (rank 2): env://, gpu 2
+| distributed init (rank 0): env://, gpu 0
+| distributed init (rank 3): env://, gpu 3
+| distributed init (rank 1): env://, gpu 1
+[05:44:56.617959] Namespace(batch_size=256, epochs=100, accum_iter=1, model='vit_base_patch16', input_size=224, drop_path=0.1, clip_grad=None, weight_decay=0.05, lr=0.004, blr=0.001, layer_decay=0.75, min_lr=1e-06, warmup_epochs=20, color_jitter=None, aa='rand-m9-mstd0.5-inc1', smoothing=0.1, reprob=0.25, remode='pixel', recount=1, resplit=False, mixup=0.8, cutmix=1.0, cutmix_minmax=None, mixup_prob=1.0, mixup_switch_prob=0.5, mixup_mode='batch', finetune='/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1/checkpoint-99.pth', global_pool=True, data_path='/raid/utku/datasets/imagenet/classification/', nb_classes=1000, output_dir='finetune/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99', log_dir='finetune/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99', device='cuda', seed=0, resume='', auto_resume=True, start_epoch=0, eval=False, dist_eval=True, num_workers=10, pin_mem=True, world_size=4, local_rank=0, dist_on_itp=False, dist_url='env://', rank=0, gpu=0, distributed=True, dist_backend='nccl')
+[05:44:56.620722] Train data path is:  /raid/utku/datasets/imagenet/classification/train/image_folders
+[05:45:03.262585] Dataset ImageFolder
+    Number of datapoints: 1281167
+    Root location: /raid/utku/datasets/imagenet/classification/train/image_folders
+    StandardTransform
+Transform: Compose(
+               RandomResizedCropAndInterpolation(size=(224, 224), scale=(0.08, 1.0), ratio=(0.75, 1.3333), interpolation=bicubic)
+               RandomHorizontalFlip(p=0.5)
+               RandAugment(n=2, ops=
+           	AugmentOp(name=AutoContrast, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=Equalize, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=Invert, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=Rotate, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=PosterizeIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=SolarizeIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=SolarizeAdd, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ColorIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ContrastIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=BrightnessIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=SharpnessIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ShearX, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ShearY, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=TranslateXRel, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=TranslateYRel, p=0.5, m=9, mstd=0.5))
+               ToTensor()
+               Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+               RandomErasing(p=0.25, mode=pixel, count=(1, 1))
+           )
+[05:45:03.285894] Val data path is:  /raid/utku/datasets/imagenet/classification/val/image_folders
+[05:45:03.572095] Dataset ImageFolder
+    Number of datapoints: 50000
+    Root location: /raid/utku/datasets/imagenet/classification/val/image_folders
+    StandardTransform
+Transform: Compose(
+               Resize(size=256, interpolation=bicubic, max_size=None, antialias=None)
+               CenterCrop(size=(224, 224))
+               ToTensor()
+               Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+           )
+[05:45:03.572415] Sampler_train = <torch.utils.data.distributed.DistributedSampler object at 0x7fb1f61f67d0>
+[05:45:03.576004] Mixup is activated!
+[05:45:06.147640] Load pre-trained checkpoint from: /raid/home_yedek/utku/ViTFreeze/ViT/pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1/checkpoint-99.pth
+[05:45:06.296753] _IncompatibleKeys(missing_keys=['fc_norm.weight', 'fc_norm.bias', 'head.weight', 'head.bias'], unexpected_keys=['norm.0.weight', 'norm.0.bias', 'norm.1.weight', 'norm.1.bias', 'norm.2.weight', 'norm.2.bias', 'norm.3.weight', 'norm.3.bias', 'decoder.0.mask_token', 'decoder.0.pos_embed', 'decoder.0.embed.weight', 'decoder.0.embed.bias', 'decoder.0.blocks.0.norm1.weight', 'decoder.0.blocks.0.norm1.bias', 'decoder.0.blocks.0.attn.qkv.weight', 'decoder.0.blocks.0.attn.qkv.bias', 'decoder.0.blocks.0.attn.proj.weight', 'decoder.0.blocks.0.attn.proj.bias', 'decoder.0.blocks.0.norm2.weight', 'decoder.0.blocks.0.norm2.bias', 'decoder.0.blocks.0.mlp.fc1.weight', 'decoder.0.blocks.0.mlp.fc1.bias', 'decoder.0.blocks.0.mlp.fc2.weight', 'decoder.0.blocks.0.mlp.fc2.bias', 'decoder.0.norm.weight', 'decoder.0.norm.bias', 'decoder.0.pred.0.weight', 'decoder.0.pred.0.bias', 'decoder.0.pred.1.weight', 'decoder.0.pred.1.bias', 'decoder.0.pred.3.weight', 'decoder.0.pred.3.bias', 'decoder.0.pred.4.weight', 'decoder.0.pred.4.bias', 'decoder.1.mask_token', 'decoder.1.pos_embed', 'decoder.1.embed.weight', 'decoder.1.embed.bias', 'decoder.1.blocks.0.norm1.weight', 'decoder.1.blocks.0.norm1.bias', 'decoder.1.blocks.0.attn.qkv.weight', 'decoder.1.blocks.0.attn.qkv.bias', 'decoder.1.blocks.0.attn.proj.weight', 'decoder.1.blocks.0.attn.proj.bias', 'decoder.1.blocks.0.norm2.weight', 'decoder.1.blocks.0.norm2.bias', 'decoder.1.blocks.0.mlp.fc1.weight', 'decoder.1.blocks.0.mlp.fc1.bias', 'decoder.1.blocks.0.mlp.fc2.weight', 'decoder.1.blocks.0.mlp.fc2.bias', 'decoder.1.norm.weight', 'decoder.1.norm.bias', 'decoder.1.pred.0.weight', 'decoder.1.pred.0.bias', 'decoder.1.pred.1.weight', 'decoder.1.pred.1.bias', 'decoder.2.mask_token', 'decoder.2.pos_embed', 'decoder.2.embed.weight', 'decoder.2.embed.bias', 'decoder.2.blocks.0.norm1.weight', 'decoder.2.blocks.0.norm1.bias', 'decoder.2.blocks.0.attn.qkv.weight', 'decoder.2.blocks.0.attn.qkv.bias', 'decoder.2.blocks.0.attn.proj.weight', 'decoder.2.blocks.0.attn.proj.bias', 'decoder.2.blocks.0.norm2.weight', 'decoder.2.blocks.0.norm2.bias', 'decoder.2.blocks.0.mlp.fc1.weight', 'decoder.2.blocks.0.mlp.fc1.bias', 'decoder.2.blocks.0.mlp.fc2.weight', 'decoder.2.blocks.0.mlp.fc2.bias', 'decoder.2.norm.weight', 'decoder.2.norm.bias', 'decoder.2.pred.0.weight', 'decoder.2.pred.0.bias', 'decoder.3.mask_token', 'decoder.3.pos_embed', 'decoder.3.embed.weight', 'decoder.3.embed.bias', 'decoder.3.blocks.0.norm1.weight', 'decoder.3.blocks.0.norm1.bias', 'decoder.3.blocks.0.attn.qkv.weight', 'decoder.3.blocks.0.attn.qkv.bias', 'decoder.3.blocks.0.attn.proj.weight', 'decoder.3.blocks.0.attn.proj.bias', 'decoder.3.blocks.0.norm2.weight', 'decoder.3.blocks.0.norm2.bias', 'decoder.3.blocks.0.mlp.fc1.weight', 'decoder.3.blocks.0.mlp.fc1.bias', 'decoder.3.blocks.0.mlp.fc2.weight', 'decoder.3.blocks.0.mlp.fc2.bias', 'decoder.3.norm.weight', 'decoder.3.norm.bias', 'decoder.3.pred.1.weight', 'decoder.3.pred.1.bias', 'hog_enc.0.conv.weight', 'hog_enc.1.conv.weight', 'hog_enc.2.conv.weight', 'hog_enc.3.conv.weight'])
+[05:45:06.407678] number of params (M): 86.57
+[05:45:06.407754] base lr: 1.00e-03
+[05:45:06.407774] actual lr: 4.00e-03
+[05:45:06.407790] accumulate grad iterations: 1
+[05:45:06.407805] effective batch size: 1024
+[05:45:07.750117] parameter groups: 
+{
+  "layer_0_no_decay": {
+    "lr_scale": 0.023757264018058777,
+    "weight_decay": 0.0,
+    "params": [
+      "cls_token",
+      "pos_embed",
+      "patch_embed.proj.bias"
+    ]
+  },
+  "layer_0_decay": {
+    "lr_scale": 0.023757264018058777,
+    "weight_decay": 0.05,
+    "params": [
+      "patch_embed.proj.weight"
+    ]
+  },
+  "layer_1_no_decay": {
+    "lr_scale": 0.03167635202407837,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.0.norm1.weight",
+      "blocks.0.norm1.bias",
+      "blocks.0.attn.qkv.bias",
+      "blocks.0.attn.proj.bias",
+      "blocks.0.norm2.weight",
+      "blocks.0.norm2.bias",
+      "blocks.0.mlp.fc1.bias",
+      "blocks.0.mlp.fc2.bias"
+    ]
+  },
+  "layer_1_decay": {
+    "lr_scale": 0.03167635202407837,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.0.attn.qkv.weight",
+      "blocks.0.attn.proj.weight",
+      "blocks.0.mlp.fc1.weight",
+      "blocks.0.mlp.fc2.weight"
+    ]
+  },
+  "layer_2_no_decay": {
+    "lr_scale": 0.04223513603210449,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.1.norm1.weight",
+      "blocks.1.norm1.bias",
+      "blocks.1.attn.qkv.bias",
+      "blocks.1.attn.proj.bias",
+      "blocks.1.norm2.weight",
+      "blocks.1.norm2.bias",
+      "blocks.1.mlp.fc1.bias",
+      "blocks.1.mlp.fc2.bias"
+    ]
+  },
+  "layer_2_decay": {
+    "lr_scale": 0.04223513603210449,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.1.attn.qkv.weight",
+      "blocks.1.attn.proj.weight",
+      "blocks.1.mlp.fc1.weight",
+      "blocks.1.mlp.fc2.weight"
+    ]
+  },
+  "layer_3_no_decay": {
+    "lr_scale": 0.056313514709472656,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.2.norm1.weight",
+      "blocks.2.norm1.bias",
+      "blocks.2.attn.qkv.bias",
+      "blocks.2.attn.proj.bias",
+      "blocks.2.norm2.weight",
+      "blocks.2.norm2.bias",
+      "blocks.2.mlp.fc1.bias",
+      "blocks.2.mlp.fc2.bias"
+    ]
+  },
+  "layer_3_decay": {
+    "lr_scale": 0.056313514709472656,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.2.attn.qkv.weight",
+      "blocks.2.attn.proj.weight",
+      "blocks.2.mlp.fc1.weight",
+      "blocks.2.mlp.fc2.weight"
+    ]
+  },
+  "layer_4_no_decay": {
+    "lr_scale": 0.07508468627929688,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.3.norm1.weight",
+      "blocks.3.norm1.bias",
+      "blocks.3.attn.qkv.bias",
+      "blocks.3.attn.proj.bias",
+      "blocks.3.norm2.weight",
+      "blocks.3.norm2.bias",
+      "blocks.3.mlp.fc1.bias",
+      "blocks.3.mlp.fc2.bias"
+    ]
+  },
+  "layer_4_decay": {
+    "lr_scale": 0.07508468627929688,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.3.attn.qkv.weight",
+      "blocks.3.attn.proj.weight",
+      "blocks.3.mlp.fc1.weight",
+      "blocks.3.mlp.fc2.weight"
+    ]
+  },
+  "layer_5_no_decay": {
+    "lr_scale": 0.1001129150390625,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.4.norm1.weight",
+      "blocks.4.norm1.bias",
+      "blocks.4.attn.qkv.bias",
+      "blocks.4.attn.proj.bias",
+      "blocks.4.norm2.weight",
+      "blocks.4.norm2.bias",
+      "blocks.4.mlp.fc1.bias",
+      "blocks.4.mlp.fc2.bias"
+    ]
+  },
+  "layer_5_decay": {
+    "lr_scale": 0.1001129150390625,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.4.attn.qkv.weight",
+      "blocks.4.attn.proj.weight",
+      "blocks.4.mlp.fc1.weight",
+      "blocks.4.mlp.fc2.weight"
+    ]
+  },
+  "layer_6_no_decay": {
+    "lr_scale": 0.13348388671875,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.5.norm1.weight",
+      "blocks.5.norm1.bias",
+      "blocks.5.attn.qkv.bias",
+      "blocks.5.attn.proj.bias",
+      "blocks.5.norm2.weight",
+      "blocks.5.norm2.bias",
+      "blocks.5.mlp.fc1.bias",
+      "blocks.5.mlp.fc2.bias"
+    ]
+  },
+  "layer_6_decay": {
+    "lr_scale": 0.13348388671875,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.5.attn.qkv.weight",
+      "blocks.5.attn.proj.weight",
+      "blocks.5.mlp.fc1.weight",
+      "blocks.5.mlp.fc2.weight"
+    ]
+  },
+  "layer_7_no_decay": {
+    "lr_scale": 0.177978515625,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.6.norm1.weight",
+      "blocks.6.norm1.bias",
+      "blocks.6.attn.qkv.bias",
+      "blocks.6.attn.proj.bias",
+      "blocks.6.norm2.weight",
+      "blocks.6.norm2.bias",
+      "blocks.6.mlp.fc1.bias",
+      "blocks.6.mlp.fc2.bias"
+    ]
+  },
+  "layer_7_decay": {
+    "lr_scale": 0.177978515625,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.6.attn.qkv.weight",
+      "blocks.6.attn.proj.weight",
+      "blocks.6.mlp.fc1.weight",
+      "blocks.6.mlp.fc2.weight"
+    ]
+  },
+  "layer_8_no_decay": {
+    "lr_scale": 0.2373046875,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.7.norm1.weight",
+      "blocks.7.norm1.bias",
+      "blocks.7.attn.qkv.bias",
+      "blocks.7.attn.proj.bias",
+      "blocks.7.norm2.weight",
+      "blocks.7.norm2.bias",
+      "blocks.7.mlp.fc1.bias",
+      "blocks.7.mlp.fc2.bias"
+    ]
+  },
+  "layer_8_decay": {
+    "lr_scale": 0.2373046875,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.7.attn.qkv.weight",
+      "blocks.7.attn.proj.weight",
+      "blocks.7.mlp.fc1.weight",
+      "blocks.7.mlp.fc2.weight"
+    ]
+  },
+  "layer_9_no_decay": {
+    "lr_scale": 0.31640625,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.8.norm1.weight",
+      "blocks.8.norm1.bias",
+      "blocks.8.attn.qkv.bias",
+      "blocks.8.attn.proj.bias",
+      "blocks.8.norm2.weight",
+      "blocks.8.norm2.bias",
+      "blocks.8.mlp.fc1.bias",
+      "blocks.8.mlp.fc2.bias"
+    ]
+  },
+  "layer_9_decay": {
+    "lr_scale": 0.31640625,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.8.attn.qkv.weight",
+      "blocks.8.attn.proj.weight",
+      "blocks.8.mlp.fc1.weight",
+      "blocks.8.mlp.fc2.weight"
+    ]
+  },
+  "layer_10_no_decay": {
+    "lr_scale": 0.421875,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.9.norm1.weight",
+      "blocks.9.norm1.bias",
+      "blocks.9.attn.qkv.bias",
+      "blocks.9.attn.proj.bias",
+      "blocks.9.norm2.weight",
+      "blocks.9.norm2.bias",
+      "blocks.9.mlp.fc1.bias",
+      "blocks.9.mlp.fc2.bias"
+    ]
+  },
+  "layer_10_decay": {
+    "lr_scale": 0.421875,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.9.attn.qkv.weight",
+      "blocks.9.attn.proj.weight",
+      "blocks.9.mlp.fc1.weight",
+      "blocks.9.mlp.fc2.weight"
+    ]
+  },
+  "layer_11_no_decay": {
+    "lr_scale": 0.5625,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.10.norm1.weight",
+      "blocks.10.norm1.bias",
+      "blocks.10.attn.qkv.bias",
+      "blocks.10.attn.proj.bias",
+      "blocks.10.norm2.weight",
+      "blocks.10.norm2.bias",
+      "blocks.10.mlp.fc1.bias",
+      "blocks.10.mlp.fc2.bias"
+    ]
+  },
+  "layer_11_decay": {
+    "lr_scale": 0.5625,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.10.attn.qkv.weight",
+      "blocks.10.attn.proj.weight",
+      "blocks.10.mlp.fc1.weight",
+      "blocks.10.mlp.fc2.weight"
+    ]
+  },
+  "layer_12_no_decay": {
+    "lr_scale": 0.75,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.11.norm1.weight",
+      "blocks.11.norm1.bias",
+      "blocks.11.attn.qkv.bias",
+      "blocks.11.attn.proj.bias",
+      "blocks.11.norm2.weight",
+      "blocks.11.norm2.bias",
+      "blocks.11.mlp.fc1.bias",
+      "blocks.11.mlp.fc2.bias"
+    ]
+  },
+  "layer_12_decay": {
+    "lr_scale": 0.75,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.11.attn.qkv.weight",
+      "blocks.11.attn.proj.weight",
+      "blocks.11.mlp.fc1.weight",
+      "blocks.11.mlp.fc2.weight"
+    ]
+  },
+  "layer_13_no_decay": {
+    "lr_scale": 1.0,
+    "weight_decay": 0.0,
+    "params": [
+      "fc_norm.weight",
+      "fc_norm.bias",
+      "head.bias"
+    ]
+  },
+  "layer_13_decay": {
+    "lr_scale": 1.0,
+    "weight_decay": 0.05,
+    "params": [
+      "head.weight"
+    ]
+  }
+}
+[05:45:07.751699] criterion = SoftTargetCrossEntropy()
+[05:45:07.752627] Auto resume checkpoint: 
+[05:45:07.752664] Start training for 100 epochs
+[05:45:07.754948] log_dir: finetune/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99
+[05:45:28.809879] Epoch: [0]  [   1/1251]  eta: 7:18:57  lr: 0.000000  loss: 6.9077 (6.9077)  time: 21.0528  data: 6.4728  max mem: 25840
+[05:46:09.125613] Epoch: [0]  [  51/1251]  eta: 0:24:05  lr: 0.000008  loss: 6.9076 (6.9077)  time: 0.8093  data: 0.0070  max mem: 26829
+[05:46:49.357620] Epoch: [0]  [ 101/1251]  eta: 0:19:17  lr: 0.000016  loss: 6.9065 (6.9073)  time: 0.8058  data: 0.0086  max mem: 26829
+[05:47:29.650345] Epoch: [0]  [ 151/1251]  eta: 0:17:14  lr: 0.000024  loss: 6.9043 (6.9067)  time: 0.8163  data: 0.0044  max mem: 26829
+[05:48:10.058404] Epoch: [0]  [ 201/1251]  eta: 0:15:53  lr: 0.000032  loss: 6.8756 (6.9019)  time: 0.8082  data: 0.0052  max mem: 26829
+[05:48:50.564666] Epoch: [0]  [ 251/1251]  eta: 0:14:48  lr: 0.000040  loss: 6.7610 (6.8806)  time: 0.8098  data: 0.0061  max mem: 26829
+[05:49:31.424167] Epoch: [0]  [ 301/1251]  eta: 0:13:52  lr: 0.000048  loss: 6.6509 (6.8507)  time: 0.8121  data: 0.0040  max mem: 26829
+[05:50:12.155783] Epoch: [0]  [ 351/1251]  eta: 0:13:01  lr: 0.000056  loss: 6.6460 (6.8234)  time: 0.8200  data: 0.0070  max mem: 26829
+[05:50:52.707884] Epoch: [0]  [ 401/1251]  eta: 0:12:11  lr: 0.000064  loss: 6.5737 (6.7921)  time: 0.8121  data: 0.0073  max mem: 26829
+[05:51:33.632930] Epoch: [0]  [ 451/1251]  eta: 0:11:25  lr: 0.000072  loss: 6.5193 (6.7642)  time: 0.8152  data: 0.0032  max mem: 26829
+[05:52:14.523426] Epoch: [0]  [ 501/1251]  eta: 0:10:39  lr: 0.000080  loss: 6.4355 (6.7293)  time: 0.8211  data: 0.0041  max mem: 26829
+[05:52:55.096487] Epoch: [0]  [ 551/1251]  eta: 0:09:54  lr: 0.000088  loss: 6.4166 (6.6984)  time: 0.8077  data: 0.0063  max mem: 26829
+[05:53:35.707893] Epoch: [0]  [ 601/1251]  eta: 0:09:10  lr: 0.000096  loss: 6.3305 (6.6704)  time: 0.8111  data: 0.0028  max mem: 26829
+[05:54:16.205582] Epoch: [0]  [ 651/1251]  eta: 0:08:26  lr: 0.000104  loss: 6.2505 (6.6405)  time: 0.8139  data: 0.0052  max mem: 26829
+[05:54:57.277643] Epoch: [0]  [ 701/1251]  eta: 0:07:43  lr: 0.000112  loss: 6.1336 (6.6093)  time: 0.8302  data: 0.0059  max mem: 26829
+[05:55:38.008423] Epoch: [0]  [ 751/1251]  eta: 0:07:00  lr: 0.000120  loss: 6.3128 (6.5830)  time: 0.8151  data: 0.0052  max mem: 26829
+[05:56:19.000597] Epoch: [0]  [ 801/1251]  eta: 0:06:17  lr: 0.000128  loss: 6.1358 (6.5569)  time: 0.8255  data: 0.0043  max mem: 26829
+[05:56:59.696520] Epoch: [0]  [ 851/1251]  eta: 0:05:35  lr: 0.000136  loss: 6.0727 (6.5244)  time: 0.8113  data: 0.0067  max mem: 26829
+[05:57:40.386825] Epoch: [0]  [ 901/1251]  eta: 0:04:53  lr: 0.000144  loss: 6.0848 (6.4959)  time: 0.8150  data: 0.0034  max mem: 26829
+[05:58:20.103719] Epoch: [0]  [ 951/1251]  eta: 0:04:10  lr: 0.000152  loss: 5.8036 (6.4700)  time: 0.7732  data: 0.0012  max mem: 26829
+[05:59:01.235979] Epoch: [0]  [1001/1251]  eta: 0:03:28  lr: 0.000160  loss: 6.0109 (6.4468)  time: 0.8233  data: 0.0055  max mem: 26829
+[05:59:42.154852] Epoch: [0]  [1051/1251]  eta: 0:02:47  lr: 0.000168  loss: 6.0443 (6.4220)  time: 0.8163  data: 0.0058  max mem: 26829
+[06:00:22.772210] Epoch: [0]  [1101/1251]  eta: 0:02:05  lr: 0.000176  loss: 5.8988 (6.3971)  time: 0.8210  data: 0.0065  max mem: 26829
+[06:01:02.131287] Epoch: [0]  [1151/1251]  eta: 0:01:23  lr: 0.000184  loss: 5.8442 (6.3739)  time: 0.7752  data: 0.0011  max mem: 26829
+[06:01:43.051049] Epoch: [0]  [1201/1251]  eta: 0:00:42  lr: 0.000192  loss: 5.9665 (6.3548)  time: 0.8271  data: 0.0052  max mem: 26829
+[06:02:23.565785] Epoch: [0]  [1251/1251]  eta: 0:00:00  lr: 0.000200  loss: 5.7213 (6.3297)  time: 0.7888  data: 0.0021  max mem: 26829
+[06:02:24.470842] Epoch: [0] Total time: 0:17:16 (0.8287 s / it)
+[06:02:24.475194] Averaged stats: lr: 0.000200  loss: 5.7213 (6.3300)
+[06:02:33.684038] Test:  [ 1/49]  eta: 0:06:51  loss: 3.9351 (3.9351)  acc1: 22.6562 (22.6562)  acc5: 46.4844 (46.4844)  time: 8.4010  data: 8.1506  max mem: 26829
+[06:02:51.243178] Test:  [31/49]  eta: 0:00:15  loss: 4.0026 (4.0113)  acc1: 21.0938 (21.0433)  acc5: 46.8750 (46.9758)  time: 0.5326  data: 0.2780  max mem: 26829
+[06:03:03.261519] Test:  [49/49]  eta: 0:00:00  loss: 4.0059 (4.0096)  acc1: 21.4844 (21.2400)  acc5: 46.4844 (46.9120)  time: 0.6260  data: 0.3099  max mem: 26829
+[06:03:03.514484] Test: Total time: 0:00:38 (0.7803 s / it)
+[06:03:03.697495] * Acc@1 20.998 Acc@5 46.550 loss 4.004
+[06:03:03.697733] Accuracy of the network on the 50000 test images: 21.0%
+[06:03:03.697791] Max accuracy: 21.00%
+[06:03:03.704405] log_dir: finetune/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99
+[06:03:13.624240] Epoch: [1]  [   1/1251]  eta: 3:26:46  lr: 0.000200  loss: 5.7622 (5.7622)  time: 9.9171  data: 7.9353  max mem: 26829
+[06:03:54.584695] Epoch: [1]  [  51/1251]  eta: 0:19:58  lr: 0.000208  loss: 5.8422 (5.8561)  time: 0.8022  data: 0.0036  max mem: 26829
+[06:04:35.371215] Epoch: [1]  [ 101/1251]  eta: 0:17:24  lr: 0.000216  loss: 5.8552 (5.7668)  time: 0.8171  data: 0.0033  max mem: 26829
+[06:05:15.775740] Epoch: [1]  [ 151/1251]  eta: 0:16:02  lr: 0.000224  loss: 5.8351 (5.7809)  time: 0.8037  data: 0.0061  max mem: 26829
+[06:05:56.562580] Epoch: [1]  [ 201/1251]  eta: 0:15:03  lr: 0.000232  loss: 5.8466 (5.7617)  time: 0.8168  data: 0.0045  max mem: 26829
+[06:06:37.200090] Epoch: [1]  [ 251/1251]  eta: 0:14:11  lr: 0.000240  loss: 5.4706 (5.7199)  time: 0.8130  data: 0.0044  max mem: 26829
+[06:07:17.950088] Epoch: [1]  [ 301/1251]  eta: 0:13:23  lr: 0.000248  loss: 5.4971 (5.7051)  time: 0.8112  data: 0.0042  max mem: 26829
+[06:07:58.751330] Epoch: [1]  [ 351/1251]  eta: 0:12:37  lr: 0.000256  loss: 5.7667 (5.6887)  time: 0.8146  data: 0.0022  max mem: 26829
+[06:08:39.233728] Epoch: [1]  [ 401/1251]  eta: 0:11:51  lr: 0.000264  loss: 5.3537 (5.6669)  time: 0.8102  data: 0.0027  max mem: 26829
+[06:09:20.156963] Epoch: [1]  [ 451/1251]  eta: 0:11:08  lr: 0.000272  loss: 5.8120 (5.6559)  time: 0.8256  data: 0.0025  max mem: 26829
+[06:10:01.231487] Epoch: [1]  [ 501/1251]  eta: 0:10:25  lr: 0.000280  loss: 5.3498 (5.6382)  time: 0.8248  data: 0.0040  max mem: 26829
+[06:10:42.173877] Epoch: [1]  [ 551/1251]  eta: 0:09:43  lr: 0.000288  loss: 5.5748 (5.6310)  time: 0.8101  data: 0.0035  max mem: 26829
+[06:11:23.339937] Epoch: [1]  [ 601/1251]  eta: 0:09:01  lr: 0.000296  loss: 5.3517 (5.6152)  time: 0.8202  data: 0.0029  max mem: 26829
+[06:12:04.213150] Epoch: [1]  [ 651/1251]  eta: 0:08:18  lr: 0.000304  loss: 5.3040 (5.6014)  time: 0.8211  data: 0.0065  max mem: 26829
+[06:12:45.026879] Epoch: [1]  [ 701/1251]  eta: 0:07:36  lr: 0.000312  loss: 5.3897 (5.5821)  time: 0.8209  data: 0.0052  max mem: 26829
+[06:13:26.358184] Epoch: [1]  [ 751/1251]  eta: 0:06:55  lr: 0.000320  loss: 5.3835 (5.5639)  time: 0.8314  data: 0.0041  max mem: 26829
+[06:14:07.191557] Epoch: [1]  [ 801/1251]  eta: 0:06:13  lr: 0.000328  loss: 5.4149 (5.5599)  time: 0.8092  data: 0.0029  max mem: 26829
+[06:14:47.440674] Epoch: [1]  [ 851/1251]  eta: 0:05:31  lr: 0.000336  loss: 5.5231 (5.5495)  time: 0.8330  data: 0.0033  max mem: 26829
+[06:15:28.541679] Epoch: [1]  [ 901/1251]  eta: 0:04:50  lr: 0.000344  loss: 5.6353 (5.5439)  time: 0.8247  data: 0.0036  max mem: 26829
+[06:16:09.667581] Epoch: [1]  [ 951/1251]  eta: 0:04:08  lr: 0.000352  loss: 5.4706 (5.5360)  time: 0.8128  data: 0.0035  max mem: 26829
+[06:16:50.662025] Epoch: [1]  [1001/1251]  eta: 0:03:27  lr: 0.000360  loss: 5.1761 (5.5209)  time: 0.8196  data: 0.0049  max mem: 26829
+[06:17:30.383606] Epoch: [1]  [1051/1251]  eta: 0:02:45  lr: 0.000368  loss: 5.1709 (5.5109)  time: 0.7882  data: 0.0011  max mem: 26829
+[06:18:11.667089] Epoch: [1]  [1101/1251]  eta: 0:02:04  lr: 0.000376  loss: 5.2845 (5.5056)  time: 0.8318  data: 0.0046  max mem: 26829
+[06:18:53.014749] Epoch: [1]  [1151/1251]  eta: 0:01:23  lr: 0.000384  loss: 5.0019 (5.4944)  time: 0.8199  data: 0.0036  max mem: 26829
+[06:19:34.132968] Epoch: [1]  [1201/1251]  eta: 0:00:42  lr: 0.000392  loss: 5.4722 (5.4875)  time: 0.8189  data: 0.0034  max mem: 26829
+[06:20:14.583214] Epoch: [1]  [1251/1251]  eta: 0:00:00  lr: 0.000400  loss: 5.3065 (5.4771)  time: 0.7862  data: 0.0028  max mem: 26829
+[06:20:15.542268] Epoch: [1] Total time: 0:17:11 (0.8248 s / it)
+[06:20:15.560480] Averaged stats: lr: 0.000400  loss: 5.3065 (5.4882)
+[06:20:23.324893] Test:  [ 1/49]  eta: 0:06:20  loss: 2.7056 (2.7056)  acc1: 42.1875 (42.1875)  acc5: 71.8750 (71.8750)  time: 7.7588  data: 7.5038  max mem: 26829
+[06:20:38.145227] Test:  [31/49]  eta: 0:00:13  loss: 2.7938 (2.7976)  acc1: 40.2344 (40.5998)  acc5: 68.3594 (68.8004)  time: 0.5141  data: 0.2584  max mem: 26829
+[06:20:47.590608] Test:  [49/49]  eta: 0:00:00  loss: 2.7958 (2.7922)  acc1: 40.6250 (40.7840)  acc5: 69.1406 (68.9440)  time: 0.6055  data: 0.3529  max mem: 26829
+[06:20:47.900390] Test: Total time: 0:00:32 (0.6599 s / it)
+[06:20:54.907918] * Acc@1 40.494 Acc@5 68.800 loss 2.789
+[06:20:54.908334] Accuracy of the network on the 50000 test images: 40.5%
+[06:20:54.908370] Max accuracy: 40.49%
+[06:20:54.914136] log_dir: finetune/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_checkpoint-99
+[06:21:04.205674] Epoch: [2]  [   1/1251]  eta: 3:13:41  lr: 0.000400  loss: 5.1412 (5.1412)  time: 9.2897  data: 8.4739  max mem: 26829
+[06:21:45.028353] Epoch: [2]  [  51/1251]  eta: 0:19:39  lr: 0.000408  loss: 5.4231 (5.3175)  time: 0.8060  data: 0.0039  max mem: 26829
+[06:22:25.925320] Epoch: [2]  [ 101/1251]  eta: 0:17:16  lr: 0.000416  loss: 5.2964 (5.3468)  time: 0.8202  data: 0.0029  max mem: 26829
+[06:23:06.206196] Epoch: [2]  [ 151/1251]  eta: 0:15:57  lr: 0.000424  loss: 5.6639 (5.3098)  time: 0.8095  data: 0.0027  max mem: 26829
+[06:23:46.510200] Epoch: [2]  [ 201/1251]  eta: 0:14:57  lr: 0.000432  loss: 5.5018 (5.3291)  time: 0.8020  data: 0.0018  max mem: 26829
+[06:24:26.791935] Epoch: [2]  [ 251/1251]  eta: 0:14:04  lr: 0.000440  loss: 5.0415 (5.3060)  time: 0.8107  data: 0.0021  max mem: 26829
+[06:25:07.195853] Epoch: [2]  [ 301/1251]  eta: 0:13:16  lr: 0.000448  loss: 4.8236 (5.2808)  time: 0.8078  data: 0.0035  max mem: 26829

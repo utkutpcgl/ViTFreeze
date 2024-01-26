@@ -1,0 +1,24 @@
+File Path,Epoch 10,Epoch 20,Epoch 30,Epoch 40,Epoch 50,Epoch 60,Epoch 70,Epoch 80,Epoch 90,Epoch 100
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr/cli_logs.txt,64.352,69.354,72.704,75.182,76.83,78.538,80.216,81.444,82.46,82.852
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_save5_checkpoint-69/cli_logs.txt,62.58,68.78
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_save5_checkpoint-79/cli_logs.txt,62.714,68.518,72.078,74.506,76.274,78.18,79.766,81.218,82.068,82.466
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_save5_checkpoint-84/cli_logs.txt,62.618,68.642,72.048,74.634,76.2,78.116,79.796,81.148,82.056,82.368
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_save5_checkpoint-74/cli_logs.txt,62.644,68.646,72.236,74.628,76.43,78.012,79.902,81.128,82.172,82.486
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_save5_checkpoint-89/cli_logs.txt,62.686,68.496,71.954,74.482,76.32,77.908,79.828,80.94,82.04,82.458
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_save5_checkpoint-94/cli_logs.txt,62.74,68.424,72.016,74.506,76.288,78.09,79.68,81.106,82.194,82.542
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/bench_2/full_pretrain_out_freezeout_cubic_t0_9_1gpu/cli_logs.txt,64.306,69.59,73.088,75.194,76.858,78.624,80.202,81.508,82.438,82.786
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/bench_2/full_pretrain_out_freezeout_cubic_t0_75_1gpu/cli_logs.txt,58.596,65.168,69.318,72.692,74.528,76.692,78.616,79.984,81.282,81.51
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/bench_2/full_pretrain_out_freezeout_cubic_t0_70_1gpu/cli_logs.txt,55.588,62.176,67.628,71.162,73.33,75.53,77.478,79.284,80.326,80.716
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/bench_2/full_pretrain_out_freezeout_cubic_t0_65_1gpu/cli_logs.txt,41.82,53.052,59.192,65.124,68.556,71.528,73.992,76.716,78.058,79.066
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/full_pretrain_out_slow/checkpoint-80/cli_logs.txt,68.464,71.16,73.774,76.114
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/full_pretrain_out_slow/checkpoint-70/cli_logs.txt,68.042,70.816,73.892,75.976
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/full_pretrain_out_slow/checkpoint-50/cli_logs.txt,66.91,70.582,73.354,75.648
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/full_pretrain_out_slow/checkpoint-90/cli_logs.txt,68.518,71.208,74.048,76.072
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/full_pretrain_out_slow/checkpoint-60/cli_logs.txt,67.812,70.726,73.696,76.04
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/bench_1/full_finetune_out_freezeout_cubic_t0_85/cli_logs.txt,63.592,69.382,72.558,74.872,76.356,78.436,80.052,81.428,82.232,82.652
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/bench_1/failed/full_finetune_out_freezeout_cubic_t0_85/cli_logs.txt,63.592,69.382,72.558,74.872
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/bench_1/failed/full_finetune_out_freezeout_linear_t0_5/cli_logs.txt,62.878,69.052,71.96,74.586
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/bench_1/full_finetune_out_freezeout_cubic_t0_8_fast/cli_logs.txt,17.846,57.166,64.716,68.116,69.652,71.234,72.868,73.864,75.096,75.94,76.612,77.438,78.504,79.342,80.02,80.868,81.568,82.012,82.292,82.498
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/bench_1/full_finetune_out_freezeout_linear_t0_5/cli_logs.txt,63.098,68.72,72.244,74.374,76.108,77.916,79.78,81.154,82.14,82.49
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/CL/full_pretrain_out_freezeout_cubic_t0_8_1gpu_linear_loss_scaler_4321/cli_logs.txt,60.356,67.224,70.87,73.96,75.512,77.326,79.154,80.488,81.584
+/raid/home_yedek/utku/ViTFreeze/ViT/finetune/CL/full_pretrain_out_linear_loss_scaler_4321/cli_logs.txt,62.78,68.732,72.4,74.872,76.678,78.294,80.156,81.318,82.244

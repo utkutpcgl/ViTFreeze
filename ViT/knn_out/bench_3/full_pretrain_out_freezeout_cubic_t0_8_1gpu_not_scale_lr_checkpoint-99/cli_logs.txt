@@ -1,0 +1,1869 @@
+/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py:180: FutureWarning: The module torch.distributed.launch is deprecated
+and will be removed in future. Use torchrun.
+Note that --use_env is set by default in torchrun.
+If your script expects `--local_rank` argument to be set, please
+change it to read from `os.environ['LOCAL_RANK']` instead. See 
+https://pytorch.org/docs/stable/distributed.html#launch-utility for 
+further instructions
+
+  warnings.warn(
+| distributed init (rank 0): env://, gpu 0
+[13:15:56.766094] job dir: /raid/home_yedek/utku/ViTFreeze/ViT
+[13:15:56.766470] Namespace(batch_size=128,
+accum_iter=1,
+model='vit_base_patch16',
+finetune='/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr/checkpoint-99.pth',
+global_pool=False,
+data_path='/raid/utku/datasets/imagenet/classification/',
+nb_classes=1000,
+output_dir='knn_out/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr_checkpoint-99',
+log_dir='knn_out/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr_checkpoint-99',
+device='cuda',
+seed=0,
+eval=False,
+dist_eval=True,
+num_workers=4,
+pin_mem=True,
+world_size=1,
+local_rank=0,
+dist_on_itp=False,
+dist_url='env://',
+dump_features=None,
+load_features=None,
+rank=0,
+gpu=0,
+distributed=True,
+dist_backend='nccl')
+/opt/conda/lib/python3.10/site-packages/torchvision/transforms/transforms.py:329: UserWarning: Argument 'interpolation' of type int is deprecated since 0.13 and will be removed in 0.15. Please use InterpolationMode enum.
+  warnings.warn(
+Traceback (most recent call last):
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_knn.py", line 349, in <module>
+    main(args)
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_knn.py", line 207, in main
+    dataset_train = build_dataset(is_train=True, args=args)
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/util/datasets.py", line 21, in build_dataset
+    transform = build_transform(is_train, args)
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/util/datasets.py", line 36, in build_transform
+    input_size=args.input_size,
+AttributeError: 'Namespace' object has no attribute 'input_size'
+ERROR:torch.distributed.elastic.multiprocessing.api:failed (exitcode: 1) local_rank: 0 (pid: 3195088) of binary: /opt/conda/bin/python3
+Traceback (most recent call last):
+  File "/opt/conda/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/opt/conda/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py", line 195, in <module>
+    main()
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py", line 191, in main
+    launch(args)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py", line 176, in launch
+    run(args)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/run.py", line 753, in run
+    elastic_launch(
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 246, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+run_knn.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2024-01-17_13:15:58
+  host      : 5a03a66edd0a
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 3195088)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py:180: FutureWarning: The module torch.distributed.launch is deprecated
+and will be removed in future. Use torchrun.
+Note that --use_env is set by default in torchrun.
+If your script expects `--local_rank` argument to be set, please
+change it to read from `os.environ['LOCAL_RANK']` instead. See 
+https://pytorch.org/docs/stable/distributed.html#launch-utility for 
+further instructions
+
+  warnings.warn(
+| distributed init (rank 0): env://, gpu 0
+[13:18:39.503792] job dir: /raid/home_yedek/utku/ViTFreeze/ViT
+[13:18:39.504374] Namespace(batch_size=128,
+accum_iter=1,
+model='vit_base_patch16',
+input_size=224,
+finetune='/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr/checkpoint-99.pth',
+global_pool=False,
+data_path='/raid/utku/datasets/imagenet/classification/',
+nb_classes=1000,
+output_dir='knn_out/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr_checkpoint-99',
+log_dir='knn_out/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr_checkpoint-99',
+device='cuda',
+seed=0,
+eval=False,
+dist_eval=True,
+num_workers=4,
+pin_mem=True,
+world_size=1,
+local_rank=0,
+dist_on_itp=False,
+dist_url='env://',
+dump_features=None,
+load_features=None,
+rank=0,
+gpu=0,
+distributed=True,
+dist_backend='nccl')
+/opt/conda/lib/python3.10/site-packages/torchvision/transforms/transforms.py:329: UserWarning: Argument 'interpolation' of type int is deprecated since 0.13 and will be removed in 0.15. Please use InterpolationMode enum.
+  warnings.warn(
+Traceback (most recent call last):
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_knn.py", line 350, in <module>
+    main(args)
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_knn.py", line 208, in main
+    dataset_train = build_dataset(is_train=True, args=args)
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/util/datasets.py", line 21, in build_dataset
+    transform = build_transform(is_train, args)
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/util/datasets.py", line 38, in build_transform
+    color_jitter=args.color_jitter,
+AttributeError: 'Namespace' object has no attribute 'color_jitter'
+ERROR:torch.distributed.elastic.multiprocessing.api:failed (exitcode: 1) local_rank: 0 (pid: 3197387) of binary: /opt/conda/bin/python3
+Traceback (most recent call last):
+  File "/opt/conda/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/opt/conda/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py", line 195, in <module>
+    main()
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py", line 191, in main
+    launch(args)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py", line 176, in launch
+    run(args)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/run.py", line 753, in run
+    elastic_launch(
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 246, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+run_knn.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2024-01-17_13:18:40
+  host      : 5a03a66edd0a
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 3197387)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py:180: FutureWarning: The module torch.distributed.launch is deprecated
+and will be removed in future. Use torchrun.
+Note that --use_env is set by default in torchrun.
+If your script expects `--local_rank` argument to be set, please
+change it to read from `os.environ['LOCAL_RANK']` instead. See 
+https://pytorch.org/docs/stable/distributed.html#launch-utility for 
+further instructions
+
+  warnings.warn(
+| distributed init (rank 0): env://, gpu 0
+[13:28:25.928681] job dir: /raid/home_yedek/utku/ViTFreeze/ViT
+[13:28:25.928902] Namespace(batch_size=128,
+accum_iter=1,
+model='vit_base_patch16',
+input_size=224,
+finetune='/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr/checkpoint-99.pth',
+global_pool=False,
+data_path='/raid/utku/datasets/imagenet/classification/',
+nb_classes=1000,
+output_dir='knn_out/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr_checkpoint-99',
+log_dir='knn_out/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr_checkpoint-99',
+device='cuda',
+seed=0,
+eval=False,
+dist_eval=True,
+num_workers=4,
+pin_mem=True,
+world_size=1,
+local_rank=0,
+dist_on_itp=False,
+dist_url='env://',
+dump_features=None,
+load_features=None,
+rank=0,
+gpu=0,
+distributed=True,
+dist_backend='nccl')
+/opt/conda/lib/python3.10/site-packages/torchvision/transforms/transforms.py:329: UserWarning: Argument 'interpolation' of type int is deprecated since 0.13 and will be removed in 0.15. Please use InterpolationMode enum.
+  warnings.warn(
+[13:28:25.930960] Val data path is:  /raid/utku/datasets/imagenet/classification/val/image_folders
+[13:28:26.331916] Dataset ImageFolder
+    Number of datapoints: 50000
+    Root location: /raid/utku/datasets/imagenet/classification/val/image_folders
+    StandardTransform
+Transform: Compose(
+               Resize(size=256, interpolation=bicubic, max_size=None, antialias=None)
+               CenterCrop(size=(224, 224))
+               ToTensor()
+               Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+           )
+[13:28:26.332494] Val data path is:  /raid/utku/datasets/imagenet/classification/val/image_folders
+[13:28:26.608107] Dataset ImageFolder
+    Number of datapoints: 50000
+    Root location: /raid/utku/datasets/imagenet/classification/val/image_folders
+    StandardTransform
+Transform: Compose(
+               Resize(size=256, interpolation=bicubic, max_size=None, antialias=None)
+               CenterCrop(size=(224, 224))
+               ToTensor()
+               Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+           )
+[13:28:26.608263] Sampler_train = <torch.utils.data.distributed.DistributedSampler object at 0x7fbceaeda410>
+[13:28:29.057747] Load pre-trained checkpoint from: /raid/home_yedek/utku/ViTFreeze/ViT/pretrain/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr/checkpoint-99.pth
+[13:28:29.061705] missing keys: ['cls_token', 'pos_embed', 'patch_embed.proj.weight', 'patch_embed.proj.bias', 'blocks.0.norm1.weight', 'blocks.0.norm1.bias', 'blocks.0.attn.qkv.weight', 'blocks.0.attn.qkv.bias', 'blocks.0.attn.proj.weight', 'blocks.0.attn.proj.bias', 'blocks.0.norm2.weight', 'blocks.0.norm2.bias', 'blocks.0.mlp.fc1.weight', 'blocks.0.mlp.fc1.bias', 'blocks.0.mlp.fc2.weight', 'blocks.0.mlp.fc2.bias', 'blocks.1.norm1.weight', 'blocks.1.norm1.bias', 'blocks.1.attn.qkv.weight', 'blocks.1.attn.qkv.bias', 'blocks.1.attn.proj.weight', 'blocks.1.attn.proj.bias', 'blocks.1.norm2.weight', 'blocks.1.norm2.bias', 'blocks.1.mlp.fc1.weight', 'blocks.1.mlp.fc1.bias', 'blocks.1.mlp.fc2.weight', 'blocks.1.mlp.fc2.bias', 'blocks.2.norm1.weight', 'blocks.2.norm1.bias', 'blocks.2.attn.qkv.weight', 'blocks.2.attn.qkv.bias', 'blocks.2.attn.proj.weight', 'blocks.2.attn.proj.bias', 'blocks.2.norm2.weight', 'blocks.2.norm2.bias', 'blocks.2.mlp.fc1.weight', 'blocks.2.mlp.fc1.bias', 'blocks.2.mlp.fc2.weight', 'blocks.2.mlp.fc2.bias', 'blocks.3.norm1.weight', 'blocks.3.norm1.bias', 'blocks.3.attn.qkv.weight', 'blocks.3.attn.qkv.bias', 'blocks.3.attn.proj.weight', 'blocks.3.attn.proj.bias', 'blocks.3.norm2.weight', 'blocks.3.norm2.bias', 'blocks.3.mlp.fc1.weight', 'blocks.3.mlp.fc1.bias', 'blocks.3.mlp.fc2.weight', 'blocks.3.mlp.fc2.bias', 'blocks.4.norm1.weight', 'blocks.4.norm1.bias', 'blocks.4.attn.qkv.weight', 'blocks.4.attn.qkv.bias', 'blocks.4.attn.proj.weight', 'blocks.4.attn.proj.bias', 'blocks.4.norm2.weight', 'blocks.4.norm2.bias', 'blocks.4.mlp.fc1.weight', 'blocks.4.mlp.fc1.bias', 'blocks.4.mlp.fc2.weight', 'blocks.4.mlp.fc2.bias', 'blocks.5.norm1.weight', 'blocks.5.norm1.bias', 'blocks.5.attn.qkv.weight', 'blocks.5.attn.qkv.bias', 'blocks.5.attn.proj.weight', 'blocks.5.attn.proj.bias', 'blocks.5.norm2.weight', 'blocks.5.norm2.bias', 'blocks.5.mlp.fc1.weight', 'blocks.5.mlp.fc1.bias', 'blocks.5.mlp.fc2.weight', 'blocks.5.mlp.fc2.bias', 'blocks.6.norm1.weight', 'blocks.6.norm1.bias', 'blocks.6.attn.qkv.weight', 'blocks.6.attn.qkv.bias', 'blocks.6.attn.proj.weight', 'blocks.6.attn.proj.bias', 'blocks.6.norm2.weight', 'blocks.6.norm2.bias', 'blocks.6.mlp.fc1.weight', 'blocks.6.mlp.fc1.bias', 'blocks.6.mlp.fc2.weight', 'blocks.6.mlp.fc2.bias', 'blocks.7.norm1.weight', 'blocks.7.norm1.bias', 'blocks.7.attn.qkv.weight', 'blocks.7.attn.qkv.bias', 'blocks.7.attn.proj.weight', 'blocks.7.attn.proj.bias', 'blocks.7.norm2.weight', 'blocks.7.norm2.bias', 'blocks.7.mlp.fc1.weight', 'blocks.7.mlp.fc1.bias', 'blocks.7.mlp.fc2.weight', 'blocks.7.mlp.fc2.bias', 'blocks.8.norm1.weight', 'blocks.8.norm1.bias', 'blocks.8.attn.qkv.weight', 'blocks.8.attn.qkv.bias', 'blocks.8.attn.proj.weight', 'blocks.8.attn.proj.bias', 'blocks.8.norm2.weight', 'blocks.8.norm2.bias', 'blocks.8.mlp.fc1.weight', 'blocks.8.mlp.fc1.bias', 'blocks.8.mlp.fc2.weight', 'blocks.8.mlp.fc2.bias', 'blocks.9.norm1.weight', 'blocks.9.norm1.bias', 'blocks.9.attn.qkv.weight', 'blocks.9.attn.qkv.bias', 'blocks.9.attn.proj.weight', 'blocks.9.attn.proj.bias', 'blocks.9.norm2.weight', 'blocks.9.norm2.bias', 'blocks.9.mlp.fc1.weight', 'blocks.9.mlp.fc1.bias', 'blocks.9.mlp.fc2.weight', 'blocks.9.mlp.fc2.bias', 'blocks.10.norm1.weight', 'blocks.10.norm1.bias', 'blocks.10.attn.qkv.weight', 'blocks.10.attn.qkv.bias', 'blocks.10.attn.proj.weight', 'blocks.10.attn.proj.bias', 'blocks.10.norm2.weight', 'blocks.10.norm2.bias', 'blocks.10.mlp.fc1.weight', 'blocks.10.mlp.fc1.bias', 'blocks.10.mlp.fc2.weight', 'blocks.10.mlp.fc2.bias', 'blocks.11.norm1.weight', 'blocks.11.norm1.bias', 'blocks.11.attn.qkv.weight', 'blocks.11.attn.qkv.bias', 'blocks.11.attn.proj.weight', 'blocks.11.attn.proj.bias', 'blocks.11.norm2.weight', 'blocks.11.norm2.bias', 'blocks.11.mlp.fc1.weight', 'blocks.11.mlp.fc1.bias', 'blocks.11.mlp.fc2.weight', 'blocks.11.mlp.fc2.bias', 'norm.weight', 'norm.bias']
+[13:28:29.061789] unexpected keys: ['model', 'optimizer', 'epoch', 'scaler', 'args']
+[13:28:29.349457] Model = VisionTransformer(
+  (patch_embed): PatchEmbed(
+    (proj): Conv2d(3, 768, kernel_size=(16, 16), stride=(16, 16))
+    (norm): Identity()
+  )
+  (pos_drop): Dropout(p=0.0, inplace=False)
+  (patch_drop): Identity()
+  (norm_pre): Identity()
+  (blocks): Sequential(
+    (0): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (1): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (2): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (3): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (4): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (5): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (6): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (7): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (8): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (9): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (10): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (11): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+  )
+  (norm): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+  (fc_norm): Identity()
+  (head_drop): Dropout(p=0.0, inplace=False)
+  (head): Identity()
+)
+[13:28:29.349542] number of params (M): 85.80
+Traceback (most recent call last):
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_knn.py", line 350, in <module>
+    main(args)
+  File "/raid/home_yedek/utku/ViTFreeze/ViT/run_knn.py", line 306, in main
+    train_labels = torch.tensor([s for s in dataset_train.target]).long()
+AttributeError: 'ImageFolder' object has no attribute 'target'. Did you mean: 'targets'?
+ERROR:torch.distributed.elastic.multiprocessing.api:failed (exitcode: 1) local_rank: 0 (pid: 3204963) of binary: /opt/conda/bin/python3
+Traceback (most recent call last):
+  File "/opt/conda/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/opt/conda/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py", line 195, in <module>
+    main()
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py", line 191, in main
+    launch(args)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py", line 176, in launch
+    run(args)
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/run.py", line 753, in run
+    elastic_launch(
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 132, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/opt/conda/lib/python3.10/site-packages/torch/distributed/launcher/api.py", line 246, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+run_knn.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2024-01-17_13:28:32
+  host      : 5a03a66edd0a
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 3204963)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py:180: FutureWarning: The module torch.distributed.launch is deprecated
+and will be removed in future. Use torchrun.
+Note that --use_env is set by default in torchrun.
+If your script expects `--local_rank` argument to be set, please
+change it to read from `os.environ['LOCAL_RANK']` instead. See 
+https://pytorch.org/docs/stable/distributed.html#launch-utility for 
+further instructions
+
+  warnings.warn(
+| distributed init (rank 0): env://, gpu 0
+[14:06:41.687896] job dir: /raid/home_yedek/utku/ViTFreeze/ViT
+[14:06:41.688087] Namespace(batch_size=128,
+accum_iter=1,
+model='vit_base_patch16',
+input_size=224,
+finetune='/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr/checkpoint-99.pth',
+global_pool=False,
+data_path='/raid/utku/datasets/imagenet/classification/',
+nb_classes=1000,
+output_dir='knn_out/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr_checkpoint-99',
+log_dir='knn_out/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr_checkpoint-99',
+device='cuda',
+seed=0,
+eval=False,
+dist_eval=True,
+num_workers=4,
+pin_mem=True,
+world_size=1,
+local_rank=0,
+dist_on_itp=False,
+dist_url='env://',
+dump_features=None,
+load_features=None,
+rank=0,
+gpu=0,
+distributed=True,
+dist_backend='nccl')
+/opt/conda/lib/python3.10/site-packages/torchvision/transforms/transforms.py:329: UserWarning: Argument 'interpolation' of type int is deprecated since 0.13 and will be removed in 0.15. Please use InterpolationMode enum.
+  warnings.warn(
+[14:06:41.690065] Val data path is:  /raid/utku/datasets/imagenet/classification/val/image_folders
+[14:06:42.122736] Dataset ImageFolder
+    Number of datapoints: 50000
+    Root location: /raid/utku/datasets/imagenet/classification/val/image_folders
+    StandardTransform
+Transform: Compose(
+               Resize(size=256, interpolation=bicubic, max_size=None, antialias=None)
+               CenterCrop(size=(224, 224))
+               ToTensor()
+               Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+           )
+[14:06:42.123341] Val data path is:  /raid/utku/datasets/imagenet/classification/val/image_folders
+[14:06:42.393525] Dataset ImageFolder
+    Number of datapoints: 50000
+    Root location: /raid/utku/datasets/imagenet/classification/val/image_folders
+    StandardTransform
+Transform: Compose(
+               Resize(size=256, interpolation=bicubic, max_size=None, antialias=None)
+               CenterCrop(size=(224, 224))
+               ToTensor()
+               Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+           )
+[14:06:42.393706] Sampler_train = <torch.utils.data.distributed.DistributedSampler object at 0x7f101f88df00>
+[14:06:44.610049] Load pre-trained checkpoint from: /raid/home_yedek/utku/ViTFreeze/ViT/pretrain/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr/checkpoint-99.pth
+[14:06:44.736882] missing keys: ['norm.weight', 'norm.bias']
+[14:06:44.736959] unexpected keys: ['decoder.0.mask_token', 'decoder.0.pos_embed', 'decoder.0.embed.weight', 'decoder.0.embed.bias', 'decoder.0.blocks.0.norm1.weight', 'decoder.0.blocks.0.norm1.bias', 'decoder.0.blocks.0.attn.qkv.weight', 'decoder.0.blocks.0.attn.qkv.bias', 'decoder.0.blocks.0.attn.proj.weight', 'decoder.0.blocks.0.attn.proj.bias', 'decoder.0.blocks.0.norm2.weight', 'decoder.0.blocks.0.norm2.bias', 'decoder.0.blocks.0.mlp.fc1.weight', 'decoder.0.blocks.0.mlp.fc1.bias', 'decoder.0.blocks.0.mlp.fc2.weight', 'decoder.0.blocks.0.mlp.fc2.bias', 'decoder.0.norm.weight', 'decoder.0.norm.bias', 'decoder.0.pred.1.weight', 'decoder.0.pred.1.bias', 'hog_enc.0.conv.weight', 'norm.0.weight', 'norm.0.bias']
+[14:06:45.086120] Model = VisionTransformer(
+  (patch_embed): PatchEmbed(
+    (proj): Conv2d(3, 768, kernel_size=(16, 16), stride=(16, 16))
+    (norm): Identity()
+  )
+  (pos_drop): Dropout(p=0.0, inplace=False)
+  (patch_drop): Identity()
+  (norm_pre): Identity()
+  (blocks): Sequential(
+    (0): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (1): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (2): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (3): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (4): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (5): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (6): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (7): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (8): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (9): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (10): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (11): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+  )
+  (norm): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+  (fc_norm): Identity()
+  (head_drop): Dropout(p=0.0, inplace=False)
+  (head): Identity()
+)
+[14:06:45.086249] number of params (M): 85.80
+[14:06:45.129239] Extracting features for train set...
+[14:06:55.485300] Storing features into tensor of shape torch.Size([50000, 768])
+[14:06:55.486797]   [  1/390]  eta: 1:07:18    time: 10.3563  data: 2.1906  max mem: 1629
+[14:07:09.005652]   [ 21/390]  eta: 0:07:00    time: 0.6759  data: 0.0002  max mem: 1775
+[14:07:26.885604]   [ 41/390]  eta: 0:05:56    time: 0.8939  data: 0.0003  max mem: 1775
+[14:07:44.756157]   [ 61/390]  eta: 0:05:22    time: 0.8935  data: 0.0002  max mem: 1775
+[14:08:02.653059]   [ 81/390]  eta: 0:04:56    time: 0.8948  data: 0.0002  max mem: 1775
+[14:08:20.550323]   [101/390]  eta: 0:04:33    time: 0.8948  data: 0.0002  max mem: 1775
+[14:08:38.468887]   [121/390]  eta: 0:04:12    time: 0.8959  data: 0.0002  max mem: 1775
+[14:08:56.378238]   [141/390]  eta: 0:03:52    time: 0.8954  data: 0.0002  max mem: 1775
+[14:09:14.275593]   [161/390]  eta: 0:03:33    time: 0.8948  data: 0.0002  max mem: 1775
+[14:09:32.198364]   [181/390]  eta: 0:03:13    time: 0.8961  data: 0.0002  max mem: 1775
+[14:09:50.093854]   [201/390]  eta: 0:02:54    time: 0.8947  data: 0.0003  max mem: 1775
+[14:10:07.992538]   [221/390]  eta: 0:02:36    time: 0.8949  data: 0.0003  max mem: 1775
+[14:10:25.875769]   [241/390]  eta: 0:02:17    time: 0.8941  data: 0.0002  max mem: 1775
+[14:10:43.778505]   [261/390]  eta: 0:01:58    time: 0.8951  data: 0.0003  max mem: 1775
+[14:11:01.679890]   [281/390]  eta: 0:01:40    time: 0.8950  data: 0.0003  max mem: 1775
+[14:11:19.604341]   [301/390]  eta: 0:01:22    time: 0.8962  data: 0.0002  max mem: 1775
+[14:11:37.532085]   [321/390]  eta: 0:01:03    time: 0.8963  data: 0.0003  max mem: 1775
+[14:11:55.442155]   [341/390]  eta: 0:00:45    time: 0.8954  data: 0.0003  max mem: 1775
+[14:12:13.354842]   [361/390]  eta: 0:00:27    time: 0.8956  data: 0.0003  max mem: 1775
+/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py:180: FutureWarning: The module torch.distributed.launch is deprecated
+and will be removed in future. Use torchrun.
+Note that --use_env is set by default in torchrun.
+If your script expects `--local_rank` argument to be set, please
+change it to read from `os.environ['LOCAL_RANK']` instead. See 
+https://pytorch.org/docs/stable/distributed.html#launch-utility for 
+further instructions
+
+  warnings.warn(
+| distributed init (rank 0): env://, gpu 0
+[14:12:53.702154] job dir: /raid/home_yedek/utku/ViTFreeze/ViT
+[14:12:53.702371] Namespace(batch_size=128,
+accum_iter=1,
+model='vit_base_patch16',
+input_size=224,
+finetune='/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr/checkpoint-99.pth',
+global_pool=False,
+data_path='/raid/utku/datasets/imagenet/classification/',
+nb_classes=1000,
+output_dir='knn_out/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr_checkpoint-99',
+log_dir='knn_out/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr_checkpoint-99',
+device='cuda',
+seed=0,
+eval=False,
+dist_eval=True,
+num_workers=4,
+pin_mem=True,
+world_size=1,
+local_rank=0,
+dist_on_itp=False,
+dist_url='env://',
+dump_features=None,
+load_features=None,
+rank=0,
+gpu=0,
+distributed=True,
+dist_backend='nccl')
+/opt/conda/lib/python3.10/site-packages/torchvision/transforms/transforms.py:329: UserWarning: Argument 'interpolation' of type int is deprecated since 0.13 and will be removed in 0.15. Please use InterpolationMode enum.
+  warnings.warn(
+[14:12:53.704432] Train data path is:  /raid/utku/datasets/imagenet/classification/train/image_folders
+[14:13:00.293217] Dataset ImageFolder
+    Number of datapoints: 1281167
+    Root location: /raid/utku/datasets/imagenet/classification/train/image_folders
+    StandardTransform
+Transform: Compose(
+               Resize(size=256, interpolation=bicubic, max_size=None, antialias=None)
+               CenterCrop(size=(224, 224))
+               ToTensor()
+               Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+           )
+[14:13:00.293621] Val data path is:  /raid/utku/datasets/imagenet/classification/val/image_folders
+[14:13:00.575561] Dataset ImageFolder
+    Number of datapoints: 50000
+    Root location: /raid/utku/datasets/imagenet/classification/val/image_folders
+    StandardTransform
+Transform: Compose(
+               Resize(size=256, interpolation=bicubic, max_size=None, antialias=None)
+               CenterCrop(size=(224, 224))
+               ToTensor()
+               Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+           )
+[14:13:00.575717] Sampler_train = <torch.utils.data.distributed.DistributedSampler object at 0x7f822f6a01f0>
+[14:13:02.778746] Load pre-trained checkpoint from: /raid/home_yedek/utku/ViTFreeze/ViT/pretrain/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr/checkpoint-99.pth
+[14:13:02.864945] missing keys: ['norm.weight', 'norm.bias']
+[14:13:02.865010] unexpected keys: ['decoder.0.mask_token', 'decoder.0.pos_embed', 'decoder.0.embed.weight', 'decoder.0.embed.bias', 'decoder.0.blocks.0.norm1.weight', 'decoder.0.blocks.0.norm1.bias', 'decoder.0.blocks.0.attn.qkv.weight', 'decoder.0.blocks.0.attn.qkv.bias', 'decoder.0.blocks.0.attn.proj.weight', 'decoder.0.blocks.0.attn.proj.bias', 'decoder.0.blocks.0.norm2.weight', 'decoder.0.blocks.0.norm2.bias', 'decoder.0.blocks.0.mlp.fc1.weight', 'decoder.0.blocks.0.mlp.fc1.bias', 'decoder.0.blocks.0.mlp.fc2.weight', 'decoder.0.blocks.0.mlp.fc2.bias', 'decoder.0.norm.weight', 'decoder.0.norm.bias', 'decoder.0.pred.1.weight', 'decoder.0.pred.1.bias', 'hog_enc.0.conv.weight', 'norm.0.weight', 'norm.0.bias']
+[14:13:03.296107] Model = VisionTransformer(
+  (patch_embed): PatchEmbed(
+    (proj): Conv2d(3, 768, kernel_size=(16, 16), stride=(16, 16))
+    (norm): Identity()
+  )
+  (pos_drop): Dropout(p=0.0, inplace=False)
+  (patch_drop): Identity()
+  (norm_pre): Identity()
+  (blocks): Sequential(
+    (0): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (1): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (2): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (3): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (4): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (5): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (6): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (7): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (8): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (9): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (10): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+    (11): Block(
+      (norm1): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (attn): Attention(
+        (qkv): Linear(in_features=768, out_features=2304, bias=True)
+        (q_norm): Identity()
+        (k_norm): Identity()
+        (attn_drop): Dropout(p=0.0, inplace=False)
+        (proj): Linear(in_features=768, out_features=768, bias=True)
+        (proj_drop): Dropout(p=0.0, inplace=False)
+      )
+      (ls1): Identity()
+      (drop_path1): Identity()
+      (norm2): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+      (mlp): Mlp(
+        (fc1): Linear(in_features=768, out_features=3072, bias=True)
+        (act): GELU(approximate='none')
+        (drop1): Dropout(p=0.0, inplace=False)
+        (norm): Identity()
+        (fc2): Linear(in_features=3072, out_features=768, bias=True)
+        (drop2): Dropout(p=0.0, inplace=False)
+      )
+      (ls2): Identity()
+      (drop_path2): Identity()
+    )
+  )
+  (norm): LayerNorm((768,), eps=1e-06, elementwise_affine=True)
+  (fc_norm): Identity()
+  (head_drop): Dropout(p=0.0, inplace=False)
+  (head): Identity()
+)
+[14:13:03.296196] number of params (M): 85.80
+[14:13:03.554356] Extracting features for train set...
+[14:13:15.263517] Storing features into tensor of shape torch.Size([1281167, 768])
+[14:13:15.264539]   [    1/10009]  eta: 1 day, 8:33:18    time: 11.7093  data: 2.1331  max mem: 4483
+[14:13:28.804918]   [   21/10009]  eta: 3:20:09    time: 0.6769  data: 0.0003  max mem: 5384
+[14:13:46.640329]   [   41/10009]  eta: 2:54:35    time: 0.8917  data: 0.0003  max mem: 5384
+[14:14:04.521187]   [   61/10009]  eta: 2:45:38    time: 0.8927  data: 0.0002  max mem: 5384
+[14:14:22.332112]   [   81/10009]  eta: 2:40:52    time: 0.8905  data: 0.0003  max mem: 5384
+[14:14:40.155549]   [  101/10009]  eta: 2:37:54    time: 0.8911  data: 0.0003  max mem: 5384
+[14:14:57.984217]   [  121/10009]  eta: 2:35:49    time: 0.8914  data: 0.0002  max mem: 5384
+[14:15:15.781466]   [  141/10009]  eta: 2:34:12    time: 0.8898  data: 0.0002  max mem: 5384
+[14:15:33.585904]   [  161/10009]  eta: 2:32:55    time: 0.8902  data: 0.0002  max mem: 5384
+[14:15:51.402509]   [  181/10009]  eta: 2:31:52    time: 0.8908  data: 0.0003  max mem: 5384
+[14:16:09.206508]   [  201/10009]  eta: 2:30:58    time: 0.8901  data: 0.0002  max mem: 5384
+[14:16:27.016083]   [  221/10009]  eta: 2:30:10    time: 0.8904  data: 0.0003  max mem: 5384
+[14:16:44.816505]   [  241/10009]  eta: 2:29:27    time: 0.8900  data: 0.0003  max mem: 5384
+[14:17:02.614272]   [  261/10009]  eta: 2:28:47    time: 0.8898  data: 0.0002  max mem: 5384
+[14:17:20.434668]   [  281/10009]  eta: 2:28:12    time: 0.8910  data: 0.0003  max mem: 5384
+[14:17:38.260426]   [  301/10009]  eta: 2:27:39    time: 0.8912  data: 0.0002  max mem: 5384
+[14:17:56.119088]   [  321/10009]  eta: 2:27:09    time: 0.8929  data: 0.0002  max mem: 5384
+[14:18:13.987260]   [  341/10009]  eta: 2:26:40    time: 0.8934  data: 0.0002  max mem: 5384
+[14:18:31.813058]   [  361/10009]  eta: 2:26:12    time: 0.8912  data: 0.0002  max mem: 5384
+[14:18:49.640839]   [  381/10009]  eta: 2:25:45    time: 0.8913  data: 0.0003  max mem: 5384
+[14:19:07.447756]   [  401/10009]  eta: 2:25:18    time: 0.8903  data: 0.0003  max mem: 5384
+[14:19:25.277205]   [  421/10009]  eta: 2:24:53    time: 0.8914  data: 0.0003  max mem: 5384
+[14:19:43.079249]   [  441/10009]  eta: 2:24:27    time: 0.8900  data: 0.0003  max mem: 5384
+[14:20:00.899779]   [  461/10009]  eta: 2:24:03    time: 0.8910  data: 0.0002  max mem: 5384
+[14:20:18.734301]   [  481/10009]  eta: 2:23:40    time: 0.8917  data: 0.0002  max mem: 5384
+[14:20:36.559482]   [  501/10009]  eta: 2:23:17    time: 0.8912  data: 0.0002  max mem: 5384
+[14:20:54.378459]   [  521/10009]  eta: 2:22:54    time: 0.8909  data: 0.0002  max mem: 5384
+[14:21:12.216108]   [  541/10009]  eta: 2:22:31    time: 0.8918  data: 0.0002  max mem: 5384
+[14:21:30.037196]   [  561/10009]  eta: 2:22:09    time: 0.8910  data: 0.0002  max mem: 5384
+[14:21:47.906117]   [  581/10009]  eta: 2:21:48    time: 0.8934  data: 0.0002  max mem: 5384
+[14:22:05.750610]   [  601/10009]  eta: 2:21:27    time: 0.8922  data: 0.0002  max mem: 5384
+[14:22:23.600933]   [  621/10009]  eta: 2:21:06    time: 0.8925  data: 0.0003  max mem: 5384
+[14:22:41.420307]   [  641/10009]  eta: 2:20:45    time: 0.8909  data: 0.0002  max mem: 5384
+[14:22:59.270737]   [  661/10009]  eta: 2:20:24    time: 0.8925  data: 0.0003  max mem: 5384
+[14:23:17.137926]   [  681/10009]  eta: 2:20:04    time: 0.8933  data: 0.0003  max mem: 5384
+[14:23:35.015960]   [  701/10009]  eta: 2:19:44    time: 0.8938  data: 0.0002  max mem: 5384
+[14:23:52.869642]   [  721/10009]  eta: 2:19:24    time: 0.8926  data: 0.0003  max mem: 5384
+[14:24:10.681316]   [  741/10009]  eta: 2:19:04    time: 0.8905  data: 0.0003  max mem: 5384
+[14:24:28.518637]   [  761/10009]  eta: 2:18:44    time: 0.8918  data: 0.0002  max mem: 5384
+[14:24:46.318254]   [  781/10009]  eta: 2:18:23    time: 0.8899  data: 0.0003  max mem: 5384
+[14:25:04.122546]   [  801/10009]  eta: 2:18:03    time: 0.8902  data: 0.0002  max mem: 5384
+[14:25:21.929161]   [  821/10009]  eta: 2:17:43    time: 0.8903  data: 0.0002  max mem: 5384
+[14:25:39.706648]   [  841/10009]  eta: 2:17:23    time: 0.8888  data: 0.0002  max mem: 5384
+[14:25:57.526860]   [  861/10009]  eta: 2:17:03    time: 0.8910  data: 0.0002  max mem: 5384
+[14:26:15.338359]   [  881/10009]  eta: 2:16:43    time: 0.8905  data: 0.0002  max mem: 5384
+[14:26:33.191477]   [  901/10009]  eta: 2:16:24    time: 0.8926  data: 0.0002  max mem: 5384
+[14:26:51.043541]   [  921/10009]  eta: 2:16:05    time: 0.8925  data: 0.0003  max mem: 5384
+[14:27:08.889241]   [  941/10009]  eta: 2:15:46    time: 0.8922  data: 0.0003  max mem: 5384
+[14:27:26.757850]   [  961/10009]  eta: 2:15:27    time: 0.8934  data: 0.0002  max mem: 5384
+[14:27:44.582997]   [  981/10009]  eta: 2:15:08    time: 0.8912  data: 0.0003  max mem: 5384
+[14:28:02.380649]   [ 1001/10009]  eta: 2:14:48    time: 0.8898  data: 0.0002  max mem: 5384
+[14:28:20.232653]   [ 1021/10009]  eta: 2:14:29    time: 0.8925  data: 0.0002  max mem: 5384
+[14:28:38.007782]   [ 1041/10009]  eta: 2:14:10    time: 0.8887  data: 0.0002  max mem: 5384
+[14:28:55.812532]   [ 1061/10009]  eta: 2:13:51    time: 0.8902  data: 0.0002  max mem: 5384
+[14:29:13.646404]   [ 1081/10009]  eta: 2:13:32    time: 0.8916  data: 0.0002  max mem: 5384
+[14:29:31.438544]   [ 1101/10009]  eta: 2:13:12    time: 0.8896  data: 0.0002  max mem: 5384
+[14:29:49.263332]   [ 1121/10009]  eta: 2:12:54    time: 0.8912  data: 0.0002  max mem: 5384
+[14:30:07.107232]   [ 1141/10009]  eta: 2:12:35    time: 0.8921  data: 0.0002  max mem: 5384
+[14:30:24.971805]   [ 1161/10009]  eta: 2:12:16    time: 0.8932  data: 0.0002  max mem: 5384
+[14:30:42.812001]   [ 1181/10009]  eta: 2:11:58    time: 0.8920  data: 0.0002  max mem: 5384
+[14:31:00.621007]   [ 1201/10009]  eta: 2:11:39    time: 0.8904  data: 0.0002  max mem: 5384
+[14:31:18.458501]   [ 1221/10009]  eta: 2:11:20    time: 0.8918  data: 0.0003  max mem: 5384
+[14:31:36.283601]   [ 1241/10009]  eta: 2:11:01    time: 0.8912  data: 0.0002  max mem: 5384
+[14:31:54.103217]   [ 1261/10009]  eta: 2:10:43    time: 0.8909  data: 0.0002  max mem: 5384
+[14:32:11.917213]   [ 1281/10009]  eta: 2:10:24    time: 0.8906  data: 0.0003  max mem: 5384
+[14:32:29.716424]   [ 1301/10009]  eta: 2:10:05    time: 0.8899  data: 0.0003  max mem: 5384
+[14:32:47.560876]   [ 1321/10009]  eta: 2:09:47    time: 0.8922  data: 0.0003  max mem: 5384
+[14:33:05.425826]   [ 1341/10009]  eta: 2:09:28    time: 0.8932  data: 0.0003  max mem: 5384
+[14:33:23.238935]   [ 1361/10009]  eta: 2:09:10    time: 0.8906  data: 0.0003  max mem: 5384
+[14:33:41.072269]   [ 1381/10009]  eta: 2:08:51    time: 0.8916  data: 0.0003  max mem: 5384
+[14:33:58.906807]   [ 1401/10009]  eta: 2:08:33    time: 0.8917  data: 0.0002  max mem: 5384
+[14:34:16.714433]   [ 1421/10009]  eta: 2:08:14    time: 0.8903  data: 0.0002  max mem: 5384
+[14:34:34.564179]   [ 1441/10009]  eta: 2:07:56    time: 0.8924  data: 0.0002  max mem: 5384
+[14:34:52.371290]   [ 1461/10009]  eta: 2:07:37    time: 0.8903  data: 0.0002  max mem: 5384
+[14:35:10.183969]   [ 1481/10009]  eta: 2:07:19    time: 0.8906  data: 0.0003  max mem: 5384
+[14:35:28.007448]   [ 1501/10009]  eta: 2:07:00    time: 0.8911  data: 0.0002  max mem: 5384
+[14:35:45.833258]   [ 1521/10009]  eta: 2:06:42    time: 0.8912  data: 0.0002  max mem: 5384
+[14:36:03.666809]   [ 1541/10009]  eta: 2:06:24    time: 0.8916  data: 0.0002  max mem: 5384
+[14:36:21.543092]   [ 1561/10009]  eta: 2:06:06    time: 0.8938  data: 0.0002  max mem: 5384
+[14:36:39.378882]   [ 1581/10009]  eta: 2:05:47    time: 0.8917  data: 0.0002  max mem: 5384
+[14:36:57.234222]   [ 1601/10009]  eta: 2:05:29    time: 0.8927  data: 0.0002  max mem: 5384
+[14:37:15.077814]   [ 1621/10009]  eta: 2:05:11    time: 0.8921  data: 0.0002  max mem: 5384
+[14:37:32.883765]   [ 1641/10009]  eta: 2:04:52    time: 0.8902  data: 0.0002  max mem: 5384
+[14:37:50.689849]   [ 1661/10009]  eta: 2:04:34    time: 0.8903  data: 0.0002  max mem: 5384
+[14:38:08.505696]   [ 1681/10009]  eta: 2:04:16    time: 0.8907  data: 0.0002  max mem: 5384
+[14:38:26.315046]   [ 1701/10009]  eta: 2:03:57    time: 0.8904  data: 0.0002  max mem: 5384
+[14:38:44.126228]   [ 1721/10009]  eta: 2:03:39    time: 0.8905  data: 0.0002  max mem: 5384
+[14:39:01.963157]   [ 1741/10009]  eta: 2:03:21    time: 0.8918  data: 0.0002  max mem: 5384
+[14:39:19.815311]   [ 1761/10009]  eta: 2:03:03    time: 0.8926  data: 0.0002  max mem: 5384
+[14:39:37.663192]   [ 1781/10009]  eta: 2:02:44    time: 0.8923  data: 0.0002  max mem: 5384
+[14:39:55.547585]   [ 1801/10009]  eta: 2:02:26    time: 0.8942  data: 0.0002  max mem: 5384
+[14:40:13.407301]   [ 1821/10009]  eta: 2:02:08    time: 0.8929  data: 0.0002  max mem: 5384
+[14:40:31.237696]   [ 1841/10009]  eta: 2:01:50    time: 0.8915  data: 0.0003  max mem: 5384
+[14:40:49.062118]   [ 1861/10009]  eta: 2:01:32    time: 0.8912  data: 0.0003  max mem: 5384
+[14:41:06.865005]   [ 1881/10009]  eta: 2:01:14    time: 0.8901  data: 0.0003  max mem: 5384
+[14:41:24.734323]   [ 1901/10009]  eta: 2:00:56    time: 0.8934  data: 0.0002  max mem: 5384
+[14:41:42.597048]   [ 1921/10009]  eta: 2:00:38    time: 0.8931  data: 0.0002  max mem: 5384
+[14:42:00.468763]   [ 1941/10009]  eta: 2:00:20    time: 0.8935  data: 0.0002  max mem: 5384
+[14:42:18.333863]   [ 1961/10009]  eta: 2:00:01    time: 0.8932  data: 0.0002  max mem: 5384
+[14:42:36.161206]   [ 1981/10009]  eta: 1:59:43    time: 0.8913  data: 0.0003  max mem: 5384
+[14:42:54.004968]   [ 2001/10009]  eta: 1:59:25    time: 0.8921  data: 0.0002  max mem: 5384
+[14:43:11.861016]   [ 2021/10009]  eta: 1:59:07    time: 0.8927  data: 0.0002  max mem: 5384
+[14:43:29.684361]   [ 2041/10009]  eta: 1:58:49    time: 0.8911  data: 0.0002  max mem: 5384
+[14:43:47.486827]   [ 2061/10009]  eta: 1:58:31    time: 0.8901  data: 0.0003  max mem: 5384
+[14:44:05.320708]   [ 2081/10009]  eta: 1:58:13    time: 0.8916  data: 0.0003  max mem: 5384
+[14:44:23.116222]   [ 2101/10009]  eta: 1:57:54    time: 0.8897  data: 0.0003  max mem: 5384
+[14:44:40.923316]   [ 2121/10009]  eta: 1:57:36    time: 0.8903  data: 0.0003  max mem: 5384
+[14:44:58.759823]   [ 2141/10009]  eta: 1:57:18    time: 0.8918  data: 0.0003  max mem: 5384
+[14:45:16.612113]   [ 2161/10009]  eta: 1:57:00    time: 0.8925  data: 0.0003  max mem: 5384
+[14:45:34.419693]   [ 2181/10009]  eta: 1:56:42    time: 0.8903  data: 0.0003  max mem: 5384
+[14:45:52.232271]   [ 2201/10009]  eta: 1:56:24    time: 0.8906  data: 0.0002  max mem: 5384
+[14:46:10.074574]   [ 2221/10009]  eta: 1:56:06    time: 0.8921  data: 0.0002  max mem: 5384
+[14:46:27.885581]   [ 2241/10009]  eta: 1:55:47    time: 0.8905  data: 0.0002  max mem: 5384
+[14:46:45.728140]   [ 2261/10009]  eta: 1:55:29    time: 0.8921  data: 0.0003  max mem: 5384
+[14:47:03.556128]   [ 2281/10009]  eta: 1:55:11    time: 0.8913  data: 0.0003  max mem: 5384
+[14:47:21.415857]   [ 2301/10009]  eta: 1:54:53    time: 0.8929  data: 0.0003  max mem: 5384
+[14:47:39.260570]   [ 2321/10009]  eta: 1:54:35    time: 0.8922  data: 0.0002  max mem: 5384
+[14:47:57.110277]   [ 2341/10009]  eta: 1:54:17    time: 0.8924  data: 0.0002  max mem: 5384
+[14:48:14.944084]   [ 2361/10009]  eta: 1:53:59    time: 0.8916  data: 0.0002  max mem: 5384
+[14:48:32.798518]   [ 2381/10009]  eta: 1:53:41    time: 0.8927  data: 0.0002  max mem: 5384
+[14:48:50.631486]   [ 2401/10009]  eta: 1:53:23    time: 0.8916  data: 0.0002  max mem: 5384
+[14:49:08.449371]   [ 2421/10009]  eta: 1:53:05    time: 0.8908  data: 0.0002  max mem: 5384
+[14:49:26.275807]   [ 2441/10009]  eta: 1:52:47    time: 0.8913  data: 0.0003  max mem: 5384
+[14:49:44.123539]   [ 2461/10009]  eta: 1:52:29    time: 0.8923  data: 0.0003  max mem: 5384
+[14:50:01.970613]   [ 2481/10009]  eta: 1:52:11    time: 0.8923  data: 0.0002  max mem: 5384
+[14:50:19.845014]   [ 2501/10009]  eta: 1:51:53    time: 0.8937  data: 0.0002  max mem: 5384
+[14:50:37.699178]   [ 2521/10009]  eta: 1:51:35    time: 0.8927  data: 0.0002  max mem: 5384
+[14:50:55.543808]   [ 2541/10009]  eta: 1:51:17    time: 0.8922  data: 0.0002  max mem: 5384
+[14:51:13.386917]   [ 2561/10009]  eta: 1:50:59    time: 0.8921  data: 0.0003  max mem: 5384
+[14:51:31.221511]   [ 2581/10009]  eta: 1:50:41    time: 0.8917  data: 0.0002  max mem: 5384
+[14:51:49.026764]   [ 2601/10009]  eta: 1:50:23    time: 0.8902  data: 0.0002  max mem: 5384
+[14:52:06.854560]   [ 2621/10009]  eta: 1:50:05    time: 0.8913  data: 0.0002  max mem: 5384
+[14:52:24.673351]   [ 2641/10009]  eta: 1:49:47    time: 0.8909  data: 0.0003  max mem: 5384
+[14:52:42.508560]   [ 2661/10009]  eta: 1:49:29    time: 0.8917  data: 0.0002  max mem: 5384
+[14:53:00.357547]   [ 2681/10009]  eta: 1:49:11    time: 0.8924  data: 0.0002  max mem: 5384
+[14:53:18.237468]   [ 2701/10009]  eta: 1:48:53    time: 0.8939  data: 0.0003  max mem: 5384
+[14:53:36.102426]   [ 2721/10009]  eta: 1:48:35    time: 0.8932  data: 0.0003  max mem: 5384
+[14:53:53.939375]   [ 2741/10009]  eta: 1:48:17    time: 0.8918  data: 0.0002  max mem: 5384
+[14:54:11.793958]   [ 2761/10009]  eta: 1:47:59    time: 0.8927  data: 0.0002  max mem: 5384
+[14:54:29.648109]   [ 2781/10009]  eta: 1:47:41    time: 0.8914  data: 0.0002  max mem: 5384
+[14:54:47.415967]   [ 2801/10009]  eta: 1:47:23    time: 0.8883  data: 0.0003  max mem: 5384
+[14:55:05.251103]   [ 2821/10009]  eta: 1:47:05    time: 0.8917  data: 0.0002  max mem: 5384
+[14:55:23.077615]   [ 2841/10009]  eta: 1:46:47    time: 0.8913  data: 0.0003  max mem: 5384
+[14:55:40.904190]   [ 2861/10009]  eta: 1:46:29    time: 0.8913  data: 0.0002  max mem: 5384
+[14:55:58.764612]   [ 2881/10009]  eta: 1:46:11    time: 0.8929  data: 0.0005  max mem: 5384
+[14:56:16.638084]   [ 2901/10009]  eta: 1:45:53    time: 0.8936  data: 0.0004  max mem: 5384
+[14:56:34.506282]   [ 2921/10009]  eta: 1:45:35    time: 0.8933  data: 0.0006  max mem: 5384
+[14:56:52.314086]   [ 2941/10009]  eta: 1:45:17    time: 0.8903  data: 0.0006  max mem: 5384
+[14:57:10.130341]   [ 2961/10009]  eta: 1:44:59    time: 0.8907  data: 0.0004  max mem: 5384
+[14:57:27.981005]   [ 2981/10009]  eta: 1:44:41    time: 0.8925  data: 0.0004  max mem: 5384
+[14:57:45.807356]   [ 3001/10009]  eta: 1:44:24    time: 0.8912  data: 0.0005  max mem: 5384
+[14:58:03.675714]   [ 3021/10009]  eta: 1:44:06    time: 0.8933  data: 0.0003  max mem: 5384
+[14:58:21.554349]   [ 3041/10009]  eta: 1:43:48    time: 0.8939  data: 0.0003  max mem: 5384
+[14:58:39.413783]   [ 3061/10009]  eta: 1:43:30    time: 0.8929  data: 0.0003  max mem: 5384
+[14:58:57.284448]   [ 3081/10009]  eta: 1:43:12    time: 0.8935  data: 0.0003  max mem: 5384
+[14:59:15.152355]   [ 3101/10009]  eta: 1:42:54    time: 0.8933  data: 0.0003  max mem: 5384
+[14:59:33.013581]   [ 3121/10009]  eta: 1:42:36    time: 0.8930  data: 0.0005  max mem: 5384
+[14:59:50.900940]   [ 3141/10009]  eta: 1:42:18    time: 0.8943  data: 0.0004  max mem: 5384
+[15:00:08.787466]   [ 3161/10009]  eta: 1:42:00    time: 0.8942  data: 0.0005  max mem: 5384
+[15:00:26.633880]   [ 3181/10009]  eta: 1:41:43    time: 0.8922  data: 0.0004  max mem: 5384
+[15:00:44.479043]   [ 3201/10009]  eta: 1:41:25    time: 0.8922  data: 0.0004  max mem: 5384
+[15:01:02.313285]   [ 3221/10009]  eta: 1:41:07    time: 0.8916  data: 0.0004  max mem: 5384
+[15:01:20.170655]   [ 3241/10009]  eta: 1:40:49    time: 0.8928  data: 0.0004  max mem: 5384
+[15:01:37.999235]   [ 3261/10009]  eta: 1:40:31    time: 0.8913  data: 0.0006  max mem: 5384
+[15:01:55.834530]   [ 3281/10009]  eta: 1:40:13    time: 0.8917  data: 0.0004  max mem: 5384
+[15:02:13.660812]   [ 3301/10009]  eta: 1:39:55    time: 0.8912  data: 0.0005  max mem: 5384
+[15:02:31.462818]   [ 3321/10009]  eta: 1:39:37    time: 0.8900  data: 0.0005  max mem: 5384
+[15:02:49.232406]   [ 3341/10009]  eta: 1:39:19    time: 0.8884  data: 0.0004  max mem: 5384
+[15:03:07.041751]   [ 3361/10009]  eta: 1:39:01    time: 0.8904  data: 0.0003  max mem: 5384
+[15:03:24.808383]   [ 3381/10009]  eta: 1:38:43    time: 0.8883  data: 0.0003  max mem: 5384
+[15:03:42.599646]   [ 3401/10009]  eta: 1:38:25    time: 0.8895  data: 0.0003  max mem: 5384
+[15:04:00.427268]   [ 3421/10009]  eta: 1:38:07    time: 0.8913  data: 0.0003  max mem: 5384
+[15:04:18.257937]   [ 3441/10009]  eta: 1:37:49    time: 0.8915  data: 0.0003  max mem: 5384
+[15:04:36.074935]   [ 3461/10009]  eta: 1:37:31    time: 0.8908  data: 0.0003  max mem: 5384
+[15:04:53.878613]   [ 3481/10009]  eta: 1:37:13    time: 0.8901  data: 0.0003  max mem: 5384
+[15:05:11.677159]   [ 3501/10009]  eta: 1:36:55    time: 0.8898  data: 0.0003  max mem: 5384
+[15:05:29.514118]   [ 3521/10009]  eta: 1:36:37    time: 0.8917  data: 0.0003  max mem: 5384
+[15:05:47.320760]   [ 3541/10009]  eta: 1:36:19    time: 0.8902  data: 0.0006  max mem: 5384
+[15:06:05.114283]   [ 3561/10009]  eta: 1:36:01    time: 0.8896  data: 0.0006  max mem: 5384
+[15:06:22.937700]   [ 3581/10009]  eta: 1:35:43    time: 0.8911  data: 0.0005  max mem: 5384
+[15:06:40.715971]   [ 3601/10009]  eta: 1:35:25    time: 0.8888  data: 0.0006  max mem: 5384
+[15:06:58.493769]   [ 3621/10009]  eta: 1:35:07    time: 0.8888  data: 0.0005  max mem: 5384
+[15:07:12.042297]   [ 3641/10009]  eta: 1:34:41    time: 0.6773  data: 0.0006  max mem: 5384
+[15:07:29.656071]   [ 3661/10009]  eta: 1:34:23    time: 0.8805  data: 0.0007  max mem: 5384
+[15:07:47.222431]   [ 3681/10009]  eta: 1:34:05    time: 0.8780  data: 0.0019  max mem: 5384
+[15:08:04.796918]   [ 3701/10009]  eta: 1:33:47    time: 0.8785  data: 0.0019  max mem: 5384
+[15:08:22.384034]   [ 3721/10009]  eta: 1:33:28    time: 0.8792  data: 0.0010  max mem: 5384
+[15:08:39.972299]   [ 3741/10009]  eta: 1:33:10    time: 0.8793  data: 0.0007  max mem: 5384
+[15:08:57.571956]   [ 3761/10009]  eta: 1:32:52    time: 0.8798  data: 0.0008  max mem: 5384
+[15:09:10.852199]   [ 3781/10009]  eta: 1:32:26    time: 0.6639  data: 0.0005  max mem: 5384
+[15:09:28.656911]   [ 3801/10009]  eta: 1:32:09    time: 0.8902  data: 0.0003  max mem: 5384
+[15:09:46.446530]   [ 3821/10009]  eta: 1:31:51    time: 0.8894  data: 0.0004  max mem: 5384
+[15:10:04.220523]   [ 3841/10009]  eta: 1:31:33    time: 0.8886  data: 0.0003  max mem: 5384
+[15:10:22.003124]   [ 3861/10009]  eta: 1:31:15    time: 0.8891  data: 0.0004  max mem: 5384
+[15:10:39.733317]   [ 3881/10009]  eta: 1:30:57    time: 0.8864  data: 0.0007  max mem: 5384
+[15:10:57.444392]   [ 3901/10009]  eta: 1:30:39    time: 0.8854  data: 0.0005  max mem: 5384
+[15:11:15.156711]   [ 3921/10009]  eta: 1:30:21    time: 0.8854  data: 0.0006  max mem: 5384
+[15:11:32.845007]   [ 3941/10009]  eta: 1:30:03    time: 0.8843  data: 0.0008  max mem: 5384
+[15:11:50.537015]   [ 3961/10009]  eta: 1:29:45    time: 0.8843  data: 0.0012  max mem: 5384
+[15:12:08.283887]   [ 3981/10009]  eta: 1:29:27    time: 0.8872  data: 0.0009  max mem: 5384
+[15:12:26.000098]   [ 4001/10009]  eta: 1:29:09    time: 0.8857  data: 0.0005  max mem: 5384
+[15:12:43.742345]   [ 4021/10009]  eta: 1:28:51    time: 0.8870  data: 0.0004  max mem: 5384
+[15:13:01.473059]   [ 4041/10009]  eta: 1:28:34    time: 0.8865  data: 0.0004  max mem: 5384
+[15:13:19.174008]   [ 4061/10009]  eta: 1:28:16    time: 0.8849  data: 0.0006  max mem: 5384
+[15:13:36.917346]   [ 4081/10009]  eta: 1:27:58    time: 0.8871  data: 0.0007  max mem: 5384
+[15:13:54.625511]   [ 4101/10009]  eta: 1:27:40    time: 0.8854  data: 0.0003  max mem: 5384
+[15:14:12.323793]   [ 4121/10009]  eta: 1:27:22    time: 0.8847  data: 0.0010  max mem: 5384
+[15:14:30.005378]   [ 4141/10009]  eta: 1:27:04    time: 0.8839  data: 0.0007  max mem: 5384
+[15:14:47.676134]   [ 4161/10009]  eta: 1:26:46    time: 0.8834  data: 0.0006  max mem: 5384
+[15:15:05.358128]   [ 4181/10009]  eta: 1:26:28    time: 0.8840  data: 0.0006  max mem: 5384
+[15:15:23.077351]   [ 4201/10009]  eta: 1:26:10    time: 0.8856  data: 0.0003  max mem: 5384
+[15:15:40.767376]   [ 4221/10009]  eta: 1:25:52    time: 0.8844  data: 0.0006  max mem: 5384
+[15:15:58.487811]   [ 4241/10009]  eta: 1:25:34    time: 0.8860  data: 0.0004  max mem: 5384
+[15:16:16.162939]   [ 4261/10009]  eta: 1:25:16    time: 0.8837  data: 0.0002  max mem: 5384
+[15:16:33.889171]   [ 4281/10009]  eta: 1:24:58    time: 0.8862  data: 0.0006  max mem: 5384
+[15:16:51.596207]   [ 4301/10009]  eta: 1:24:40    time: 0.8853  data: 0.0006  max mem: 5384
+[15:17:09.272061]   [ 4321/10009]  eta: 1:24:22    time: 0.8837  data: 0.0004  max mem: 5384
+[15:17:26.963473]   [ 4341/10009]  eta: 1:24:04    time: 0.8844  data: 0.0008  max mem: 5384
+[15:17:44.656756]   [ 4361/10009]  eta: 1:23:46    time: 0.8846  data: 0.0007  max mem: 5384
+[15:18:02.341698]   [ 4381/10009]  eta: 1:23:28    time: 0.8841  data: 0.0004  max mem: 5384
+[15:18:20.038079]   [ 4401/10009]  eta: 1:23:10    time: 0.8848  data: 0.0004  max mem: 5384
+[15:18:37.721970]   [ 4421/10009]  eta: 1:22:53    time: 0.8839  data: 0.0010  max mem: 5384
+[15:18:55.435290]   [ 4441/10009]  eta: 1:22:35    time: 0.8854  data: 0.0010  max mem: 5384
+[15:19:13.124368]   [ 4461/10009]  eta: 1:22:17    time: 0.8844  data: 0.0004  max mem: 5384
+[15:19:30.808369]   [ 4481/10009]  eta: 1:21:59    time: 0.8841  data: 0.0003  max mem: 5384
+[15:19:48.488584]   [ 4501/10009]  eta: 1:21:41    time: 0.8838  data: 0.0005  max mem: 5384
+[15:20:06.151162]   [ 4521/10009]  eta: 1:21:23    time: 0.8830  data: 0.0011  max mem: 5384
+[15:20:23.811822]   [ 4541/10009]  eta: 1:21:05    time: 0.8830  data: 0.0003  max mem: 5384
+[15:20:41.510677]   [ 4561/10009]  eta: 1:20:47    time: 0.8849  data: 0.0003  max mem: 5384
+[15:20:59.224006]   [ 4581/10009]  eta: 1:20:29    time: 0.8856  data: 0.0002  max mem: 5384
+[15:21:16.915629]   [ 4601/10009]  eta: 1:20:11    time: 0.8845  data: 0.0006  max mem: 5384
+[15:21:34.618936]   [ 4621/10009]  eta: 1:19:53    time: 0.8851  data: 0.0006  max mem: 5384
+[15:21:52.323445]   [ 4641/10009]  eta: 1:19:35    time: 0.8851  data: 0.0006  max mem: 5384
+[15:22:10.039078]   [ 4661/10009]  eta: 1:19:18    time: 0.8857  data: 0.0009  max mem: 5384
+[15:22:27.759497]   [ 4681/10009]  eta: 1:19:00    time: 0.8859  data: 0.0004  max mem: 5384
+[15:22:45.456734]   [ 4701/10009]  eta: 1:18:42    time: 0.8847  data: 0.0013  max mem: 5384
+[15:23:03.144164]   [ 4721/10009]  eta: 1:18:24    time: 0.8843  data: 0.0005  max mem: 5384
+[15:23:20.890576]   [ 4741/10009]  eta: 1:18:06    time: 0.8872  data: 0.0008  max mem: 5384
+[15:23:38.589223]   [ 4761/10009]  eta: 1:17:48    time: 0.8848  data: 0.0008  max mem: 5384
+[15:23:56.274915]   [ 4781/10009]  eta: 1:17:30    time: 0.8842  data: 0.0006  max mem: 5384
+[15:24:13.967023]   [ 4801/10009]  eta: 1:17:12    time: 0.8845  data: 0.0002  max mem: 5384
+[15:24:31.637157]   [ 4821/10009]  eta: 1:16:54    time: 0.8834  data: 0.0003  max mem: 5384
+[15:24:49.307165]   [ 4841/10009]  eta: 1:16:37    time: 0.8833  data: 0.0006  max mem: 5384
+[15:25:06.975798]   [ 4861/10009]  eta: 1:16:19    time: 0.8833  data: 0.0011  max mem: 5384
+[15:25:24.670218]   [ 4881/10009]  eta: 1:16:01    time: 0.8847  data: 0.0004  max mem: 5384
+[15:25:42.360949]   [ 4901/10009]  eta: 1:15:43    time: 0.8845  data: 0.0002  max mem: 5384
+[15:26:00.052836]   [ 4921/10009]  eta: 1:15:25    time: 0.8841  data: 0.0003  max mem: 5384
+[15:26:17.741759]   [ 4941/10009]  eta: 1:15:07    time: 0.8843  data: 0.0012  max mem: 5384
+[15:26:35.460846]   [ 4961/10009]  eta: 1:14:49    time: 0.8859  data: 0.0005  max mem: 5384
+[15:26:53.138570]   [ 4981/10009]  eta: 1:14:31    time: 0.8838  data: 0.0003  max mem: 5384
+[15:27:10.827186]   [ 5001/10009]  eta: 1:14:13    time: 0.8844  data: 0.0004  max mem: 5384
+[15:27:28.517794]   [ 5021/10009]  eta: 1:13:56    time: 0.8844  data: 0.0007  max mem: 5384
+[15:27:46.176318]   [ 5041/10009]  eta: 1:13:38    time: 0.8829  data: 0.0006  max mem: 5384
+[15:28:03.873577]   [ 5061/10009]  eta: 1:13:20    time: 0.8848  data: 0.0003  max mem: 5384
+[15:28:21.577506]   [ 5081/10009]  eta: 1:13:02    time: 0.8851  data: 0.0003  max mem: 5384
+[15:28:39.320728]   [ 5101/10009]  eta: 1:12:44    time: 0.8868  data: 0.0027  max mem: 5384
+[15:28:57.064254]   [ 5121/10009]  eta: 1:12:26    time: 0.8870  data: 0.0014  max mem: 5384
+[15:29:14.808018]   [ 5141/10009]  eta: 1:12:08    time: 0.8869  data: 0.0030  max mem: 5384
+[15:29:32.509903]   [ 5161/10009]  eta: 1:11:51    time: 0.8850  data: 0.0003  max mem: 5384
+[15:29:50.216823]   [ 5181/10009]  eta: 1:11:33    time: 0.8853  data: 0.0003  max mem: 5384
+[15:30:07.942901]   [ 5201/10009]  eta: 1:11:15    time: 0.8860  data: 0.0014  max mem: 5384
+[15:30:25.694895]   [ 5221/10009]  eta: 1:10:57    time: 0.8874  data: 0.0010  max mem: 5384
+[15:30:44.053446]   [ 5241/10009]  eta: 1:10:40    time: 0.9170  data: 0.0003  max mem: 5384
+[15:31:01.139335]   [ 5261/10009]  eta: 1:10:21    time: 0.8541  data: 0.0013  max mem: 5384
+[15:31:18.859470]   [ 5281/10009]  eta: 1:10:04    time: 0.8859  data: 0.0010  max mem: 5384
+[15:31:36.596263]   [ 5301/10009]  eta: 1:09:46    time: 0.8867  data: 0.0056  max mem: 5384
+[15:31:54.307225]   [ 5321/10009]  eta: 1:09:28    time: 0.8854  data: 0.0005  max mem: 5384
+[15:32:12.049897]   [ 5341/10009]  eta: 1:09:10    time: 0.8870  data: 0.0025  max mem: 5384
+[15:32:29.747515]   [ 5361/10009]  eta: 1:08:52    time: 0.8848  data: 0.0010  max mem: 5384
+[15:32:47.474892]   [ 5381/10009]  eta: 1:08:34    time: 0.8863  data: 0.0003  max mem: 5384
+[15:33:05.168443]   [ 5401/10009]  eta: 1:08:17    time: 0.8846  data: 0.0004  max mem: 5384
+[15:33:22.912402]   [ 5421/10009]  eta: 1:07:59    time: 0.8868  data: 0.0007  max mem: 5384
+[15:33:40.576086]   [ 5441/10009]  eta: 1:07:41    time: 0.8829  data: 0.0008  max mem: 5384
+[15:33:58.254208]   [ 5461/10009]  eta: 1:07:23    time: 0.8838  data: 0.0004  max mem: 5384
+[15:34:15.936051]   [ 5481/10009]  eta: 1:07:05    time: 0.8840  data: 0.0004  max mem: 5384
+[15:34:33.617320]   [ 5501/10009]  eta: 1:06:47    time: 0.8840  data: 0.0007  max mem: 5384
+[15:34:51.282446]   [ 5521/10009]  eta: 1:06:29    time: 0.8832  data: 0.0003  max mem: 5384
+[15:35:08.973115]   [ 5541/10009]  eta: 1:06:12    time: 0.8845  data: 0.0003  max mem: 5384
+[15:35:26.639900]   [ 5561/10009]  eta: 1:05:54    time: 0.8833  data: 0.0003  max mem: 5384
+[15:35:44.330626]   [ 5581/10009]  eta: 1:05:36    time: 0.8845  data: 0.0003  max mem: 5384
+[15:36:02.004171]   [ 5601/10009]  eta: 1:05:18    time: 0.8836  data: 0.0003  max mem: 5384
+[15:36:19.673753]   [ 5621/10009]  eta: 1:05:00    time: 0.8834  data: 0.0003  max mem: 5384
+[15:36:37.367628]   [ 5641/10009]  eta: 1:04:42    time: 0.8846  data: 0.0003  max mem: 5384
+[15:36:55.045018]   [ 5661/10009]  eta: 1:04:24    time: 0.8838  data: 0.0003  max mem: 5384
+[15:37:12.705630]   [ 5681/10009]  eta: 1:04:07    time: 0.8830  data: 0.0003  max mem: 5384
+[15:37:30.353286]   [ 5701/10009]  eta: 1:03:49    time: 0.8823  data: 0.0003  max mem: 5384
+[15:37:48.026660]   [ 5721/10009]  eta: 1:03:31    time: 0.8836  data: 0.0003  max mem: 5384
+[15:38:05.700624]   [ 5741/10009]  eta: 1:03:13    time: 0.8836  data: 0.0003  max mem: 5384
+[15:38:23.342527]   [ 5761/10009]  eta: 1:02:55    time: 0.8820  data: 0.0002  max mem: 5384
+[15:38:41.019820]   [ 5781/10009]  eta: 1:02:37    time: 0.8838  data: 0.0003  max mem: 5384
+[15:38:58.682511]   [ 5801/10009]  eta: 1:02:19    time: 0.8831  data: 0.0003  max mem: 5384
+[15:39:16.362996]   [ 5821/10009]  eta: 1:02:02    time: 0.8840  data: 0.0003  max mem: 5384
+[15:39:34.071767]   [ 5841/10009]  eta: 1:01:44    time: 0.8853  data: 0.0003  max mem: 5384
+[15:39:51.769082]   [ 5861/10009]  eta: 1:01:26    time: 0.8848  data: 0.0003  max mem: 5384
+[15:40:09.478256]   [ 5881/10009]  eta: 1:01:08    time: 0.8854  data: 0.0002  max mem: 5384
+[15:40:27.156850]   [ 5901/10009]  eta: 1:00:50    time: 0.8839  data: 0.0087  max mem: 5384
+[15:40:44.840986]   [ 5921/10009]  eta: 1:00:33    time: 0.8841  data: 0.0003  max mem: 5384
+[15:41:02.578443]   [ 5941/10009]  eta: 1:00:15    time: 0.8868  data: 0.0003  max mem: 5384
+[15:41:20.277261]   [ 5961/10009]  eta: 0:59:57    time: 0.8849  data: 0.0002  max mem: 5384
+[15:41:37.993113]   [ 5981/10009]  eta: 0:59:39    time: 0.8857  data: 0.0003  max mem: 5384
+[15:41:55.727411]   [ 6001/10009]  eta: 0:59:21    time: 0.8866  data: 0.0003  max mem: 5384
+[15:42:13.453843]   [ 6021/10009]  eta: 0:59:03    time: 0.8863  data: 0.0003  max mem: 5384
+[15:42:31.194745]   [ 6041/10009]  eta: 0:58:46    time: 0.8870  data: 0.0002  max mem: 5384
+[15:42:48.942673]   [ 6061/10009]  eta: 0:58:28    time: 0.8873  data: 0.0002  max mem: 5384
+[15:43:06.676089]   [ 6081/10009]  eta: 0:58:10    time: 0.8866  data: 0.0002  max mem: 5384
+[15:43:24.417576]   [ 6101/10009]  eta: 0:57:52    time: 0.8870  data: 0.0003  max mem: 5384
+[15:43:42.142216]   [ 6121/10009]  eta: 0:57:35    time: 0.8862  data: 0.0003  max mem: 5384
+[15:43:59.856226]   [ 6141/10009]  eta: 0:57:17    time: 0.8856  data: 0.0003  max mem: 5384
+[15:44:17.605059]   [ 6161/10009]  eta: 0:56:59    time: 0.8874  data: 0.0003  max mem: 5384
+[15:44:35.389475]   [ 6181/10009]  eta: 0:56:41    time: 0.8892  data: 0.0003  max mem: 5384
+[15:44:53.142246]   [ 6201/10009]  eta: 0:56:23    time: 0.8876  data: 0.0002  max mem: 5384
+[15:45:10.936597]   [ 6221/10009]  eta: 0:56:06    time: 0.8897  data: 0.0003  max mem: 5384
+[15:45:28.701051]   [ 6241/10009]  eta: 0:55:48    time: 0.8881  data: 0.0005  max mem: 5384
+[15:45:46.491851]   [ 6261/10009]  eta: 0:55:30    time: 0.8895  data: 0.0004  max mem: 5384
+[15:46:04.308070]   [ 6281/10009]  eta: 0:55:12    time: 0.8907  data: 0.0016  max mem: 5384
+[15:46:22.122289]   [ 6301/10009]  eta: 0:54:55    time: 0.8906  data: 0.0004  max mem: 5384
+[15:46:39.962023]   [ 6321/10009]  eta: 0:54:37    time: 0.8919  data: 0.0273  max mem: 5384
+[15:46:57.816250]   [ 6341/10009]  eta: 0:54:19    time: 0.8926  data: 0.0003  max mem: 5384
+[15:47:15.684971]   [ 6361/10009]  eta: 0:54:02    time: 0.8934  data: 0.0062  max mem: 5384
+[15:47:33.531806]   [ 6381/10009]  eta: 0:53:44    time: 0.8923  data: 0.0004  max mem: 5384
+[15:47:51.392009]   [ 6401/10009]  eta: 0:53:26    time: 0.8930  data: 0.0048  max mem: 5384
+[15:48:09.233199]   [ 6421/10009]  eta: 0:53:08    time: 0.8920  data: 0.0003  max mem: 5384
+[15:48:27.094614]   [ 6441/10009]  eta: 0:52:51    time: 0.8930  data: 0.0003  max mem: 5384
+[15:48:44.965895]   [ 6461/10009]  eta: 0:52:33    time: 0.8935  data: 0.0003  max mem: 5384
+[15:49:02.760735]   [ 6481/10009]  eta: 0:52:15    time: 0.8897  data: 0.0005  max mem: 5384
+[15:49:20.593080]   [ 6501/10009]  eta: 0:51:57    time: 0.8916  data: 0.0003  max mem: 5384
+[15:49:38.382870]   [ 6521/10009]  eta: 0:51:40    time: 0.8894  data: 0.0003  max mem: 5384
+[15:49:56.225122]   [ 6541/10009]  eta: 0:51:22    time: 0.8920  data: 0.0002  max mem: 5384
+[15:50:14.076685]   [ 6561/10009]  eta: 0:51:04    time: 0.8925  data: 0.0003  max mem: 5384
+[15:50:31.929363]   [ 6581/10009]  eta: 0:50:46    time: 0.8925  data: 0.0003  max mem: 5384
+[15:50:49.815910]   [ 6601/10009]  eta: 0:50:29    time: 0.8943  data: 0.0003  max mem: 5384
+[15:51:07.673414]   [ 6621/10009]  eta: 0:50:11    time: 0.8928  data: 0.0002  max mem: 5384
+[15:51:25.526864]   [ 6641/10009]  eta: 0:49:53    time: 0.8926  data: 0.0003  max mem: 5384
+[15:51:43.393957]   [ 6661/10009]  eta: 0:49:36    time: 0.8933  data: 0.0003  max mem: 5384
+[15:52:01.220372]   [ 6681/10009]  eta: 0:49:18    time: 0.8912  data: 0.0003  max mem: 5384
+[15:52:19.072837]   [ 6701/10009]  eta: 0:49:00    time: 0.8926  data: 0.0003  max mem: 5384
+[15:52:36.950631]   [ 6721/10009]  eta: 0:48:42    time: 0.8938  data: 0.0003  max mem: 5384
+[15:52:54.781228]   [ 6741/10009]  eta: 0:48:25    time: 0.8915  data: 0.0003  max mem: 5384
+[15:53:12.636070]   [ 6761/10009]  eta: 0:48:07    time: 0.8927  data: 0.0003  max mem: 5384
+[15:53:30.483448]   [ 6781/10009]  eta: 0:47:49    time: 0.8923  data: 0.0003  max mem: 5384
+[15:53:47.929604]   [ 6801/10009]  eta: 0:47:31    time: 0.8722  data: 0.0061  max mem: 5384
+[15:54:05.754556]   [ 6821/10009]  eta: 0:47:13    time: 0.8912  data: 0.0003  max mem: 5384
+[15:54:23.540047]   [ 6841/10009]  eta: 0:46:56    time: 0.8892  data: 0.0003  max mem: 5384
+[15:54:41.382967]   [ 6861/10009]  eta: 0:46:38    time: 0.8921  data: 0.0004  max mem: 5384
+[15:54:59.167414]   [ 6881/10009]  eta: 0:46:20    time: 0.8892  data: 0.0003  max mem: 5384
+[15:55:16.963431]   [ 6901/10009]  eta: 0:46:02    time: 0.8897  data: 0.0002  max mem: 5384
+[15:55:34.766962]   [ 6921/10009]  eta: 0:45:45    time: 0.8901  data: 0.0003  max mem: 5384
+[15:55:52.564472]   [ 6941/10009]  eta: 0:45:27    time: 0.8898  data: 0.0003  max mem: 5384
+[15:56:10.356940]   [ 6961/10009]  eta: 0:45:09    time: 0.8896  data: 0.0003  max mem: 5384
+[15:56:28.139773]   [ 6981/10009]  eta: 0:44:51    time: 0.8891  data: 0.0003  max mem: 5384
+[15:56:45.907992]   [ 7001/10009]  eta: 0:44:34    time: 0.8883  data: 0.0003  max mem: 5384
+[15:57:03.704547]   [ 7021/10009]  eta: 0:44:16    time: 0.8898  data: 0.0002  max mem: 5384
+[15:57:21.460393]   [ 7041/10009]  eta: 0:43:58    time: 0.8877  data: 0.0002  max mem: 5384
+[15:57:39.194625]   [ 7061/10009]  eta: 0:43:40    time: 0.8867  data: 0.0002  max mem: 5384
+[15:57:56.943048]   [ 7081/10009]  eta: 0:43:22    time: 0.8874  data: 0.0003  max mem: 5384
+[15:58:14.677792]   [ 7101/10009]  eta: 0:43:05    time: 0.8867  data: 0.0003  max mem: 5384
+[15:58:32.396332]   [ 7121/10009]  eta: 0:42:47    time: 0.8858  data: 0.0005  max mem: 5384
+[15:58:50.143383]   [ 7141/10009]  eta: 0:42:29    time: 0.8873  data: 0.0003  max mem: 5384
+[15:59:07.895665]   [ 7161/10009]  eta: 0:42:11    time: 0.8875  data: 0.0003  max mem: 5384
+[15:59:25.618300]   [ 7181/10009]  eta: 0:41:53    time: 0.8861  data: 0.0003  max mem: 5384
+[15:59:43.347203]   [ 7201/10009]  eta: 0:41:36    time: 0.8864  data: 0.0003  max mem: 5384
+[16:00:01.063278]   [ 7221/10009]  eta: 0:41:18    time: 0.8857  data: 0.0003  max mem: 5384
+[16:00:18.788549]   [ 7241/10009]  eta: 0:41:00    time: 0.8862  data: 0.0002  max mem: 5384
+[16:00:36.514317]   [ 7261/10009]  eta: 0:40:42    time: 0.8862  data: 0.0002  max mem: 5384
+[16:00:54.230420]   [ 7281/10009]  eta: 0:40:25    time: 0.8857  data: 0.0003  max mem: 5384
+[16:01:11.958169]   [ 7301/10009]  eta: 0:40:07    time: 0.8863  data: 0.0002  max mem: 5384
+[16:01:29.662962]   [ 7321/10009]  eta: 0:39:49    time: 0.8851  data: 0.0008  max mem: 5384
+[16:01:47.357320]   [ 7341/10009]  eta: 0:39:31    time: 0.8847  data: 0.0003  max mem: 5384
+[16:02:05.061037]   [ 7361/10009]  eta: 0:39:13    time: 0.8851  data: 0.0003  max mem: 5384
+[16:02:22.770223]   [ 7381/10009]  eta: 0:38:56    time: 0.8854  data: 0.0003  max mem: 5384
+[16:02:40.457776]   [ 7401/10009]  eta: 0:38:38    time: 0.8843  data: 0.0003  max mem: 5384
+[16:02:58.157495]   [ 7421/10009]  eta: 0:38:20    time: 0.8849  data: 0.0003  max mem: 5384
+[16:03:15.768969]   [ 7441/10009]  eta: 0:38:02    time: 0.8805  data: 0.0625  max mem: 5384
+[16:03:33.488786]   [ 7461/10009]  eta: 0:37:44    time: 0.8859  data: 0.0003  max mem: 5384
+[16:03:51.229344]   [ 7481/10009]  eta: 0:37:27    time: 0.8870  data: 0.0003  max mem: 5384
+[16:04:08.959520]   [ 7501/10009]  eta: 0:37:09    time: 0.8864  data: 0.0003  max mem: 5384
+[16:04:26.715406]   [ 7521/10009]  eta: 0:36:51    time: 0.8877  data: 0.0003  max mem: 5384
+[16:04:44.439973]   [ 7541/10009]  eta: 0:36:33    time: 0.8862  data: 0.0003  max mem: 5384
+[16:05:02.148315]   [ 7561/10009]  eta: 0:36:15    time: 0.8853  data: 0.0065  max mem: 5384
+[16:05:19.843213]   [ 7581/10009]  eta: 0:35:58    time: 0.8847  data: 0.0003  max mem: 5384
+[16:05:37.566983]   [ 7601/10009]  eta: 0:35:40    time: 0.8861  data: 0.0004  max mem: 5384
+[16:05:55.269622]   [ 7621/10009]  eta: 0:35:22    time: 0.8850  data: 0.0007  max mem: 5384
+[16:06:13.020897]   [ 7641/10009]  eta: 0:35:04    time: 0.8875  data: 0.0049  max mem: 5384
+[16:06:30.769768]   [ 7661/10009]  eta: 0:34:46    time: 0.8873  data: 0.0008  max mem: 5384
+[16:06:48.547094]   [ 7681/10009]  eta: 0:34:29    time: 0.8888  data: 0.0002  max mem: 5384
+[16:07:06.286381]   [ 7701/10009]  eta: 0:34:11    time: 0.8869  data: 0.0003  max mem: 5384
+[16:07:23.999143]   [ 7721/10009]  eta: 0:33:53    time: 0.8856  data: 0.0003  max mem: 5384
+[16:07:41.693650]   [ 7741/10009]  eta: 0:33:35    time: 0.8847  data: 0.0003  max mem: 5384
+[16:07:59.401227]   [ 7761/10009]  eta: 0:33:18    time: 0.8853  data: 0.0003  max mem: 5384
+[16:08:17.096724]   [ 7781/10009]  eta: 0:33:00    time: 0.8847  data: 0.0003  max mem: 5384
+[16:08:34.788677]   [ 7801/10009]  eta: 0:32:42    time: 0.8845  data: 0.0003  max mem: 5384
+[16:08:52.489444]   [ 7821/10009]  eta: 0:32:24    time: 0.8850  data: 0.0003  max mem: 5384
+[16:09:10.218217]   [ 7841/10009]  eta: 0:32:06    time: 0.8864  data: 0.0052  max mem: 5384
+[16:09:27.926696]   [ 7861/10009]  eta: 0:31:49    time: 0.8854  data: 0.0003  max mem: 5384
+[16:09:45.676258]   [ 7881/10009]  eta: 0:31:31    time: 0.8874  data: 0.0003  max mem: 5384
+[16:10:03.425685]   [ 7901/10009]  eta: 0:31:13    time: 0.8874  data: 0.0003  max mem: 5384
+[16:10:21.203830]   [ 7921/10009]  eta: 0:30:55    time: 0.8888  data: 0.0042  max mem: 5384
+[16:10:38.943867]   [ 7941/10009]  eta: 0:30:38    time: 0.8869  data: 0.0003  max mem: 5384
+[16:10:56.677165]   [ 7961/10009]  eta: 0:30:20    time: 0.8866  data: 0.0003  max mem: 5384
+[16:11:14.460806]   [ 7981/10009]  eta: 0:30:02    time: 0.8891  data: 0.0003  max mem: 5384
+[16:11:32.200617]   [ 8001/10009]  eta: 0:29:44    time: 0.8869  data: 0.0065  max mem: 5384
+[16:11:49.910758]   [ 8021/10009]  eta: 0:29:26    time: 0.8855  data: 0.0003  max mem: 5384
+[16:12:07.631584]   [ 8041/10009]  eta: 0:29:09    time: 0.8860  data: 0.0003  max mem: 5384
+[16:12:25.346675]   [ 8061/10009]  eta: 0:28:51    time: 0.8857  data: 0.0003  max mem: 5384
+[16:12:43.067848]   [ 8081/10009]  eta: 0:28:33    time: 0.8860  data: 0.0003  max mem: 5384
+[16:13:00.776201]   [ 8101/10009]  eta: 0:28:15    time: 0.8854  data: 0.0002  max mem: 5384
+[16:13:18.463776]   [ 8121/10009]  eta: 0:27:58    time: 0.8843  data: 0.0003  max mem: 5384
+[16:13:36.171975]   [ 8141/10009]  eta: 0:27:40    time: 0.8853  data: 0.0003  max mem: 5384
+[16:13:53.875139]   [ 8161/10009]  eta: 0:27:22    time: 0.8851  data: 0.0003  max mem: 5384
+[16:14:11.575901]   [ 8181/10009]  eta: 0:27:04    time: 0.8850  data: 0.0003  max mem: 5384
+[16:14:29.273812]   [ 8201/10009]  eta: 0:26:46    time: 0.8848  data: 0.0003  max mem: 5384
+[16:14:47.012644]   [ 8221/10009]  eta: 0:26:29    time: 0.8869  data: 0.0003  max mem: 5384
+[16:15:04.750914]   [ 8241/10009]  eta: 0:26:11    time: 0.8869  data: 0.0035  max mem: 5384
+[16:15:22.487427]   [ 8261/10009]  eta: 0:25:53    time: 0.8868  data: 0.0002  max mem: 5384
+[16:15:40.220764]   [ 8281/10009]  eta: 0:25:35    time: 0.8866  data: 0.0224  max mem: 5384
+[16:15:57.952651]   [ 8301/10009]  eta: 0:25:18    time: 0.8865  data: 0.0003  max mem: 5384
+[16:16:15.700646]   [ 8321/10009]  eta: 0:25:00    time: 0.8873  data: 0.0010  max mem: 5384
+[16:16:33.430708]   [ 8341/10009]  eta: 0:24:42    time: 0.8864  data: 0.0003  max mem: 5384
+[16:16:51.192615]   [ 8361/10009]  eta: 0:24:24    time: 0.8880  data: 0.0003  max mem: 5384
+[16:17:08.934681]   [ 8381/10009]  eta: 0:24:06    time: 0.8871  data: 0.0003  max mem: 5384
+[16:17:26.678744]   [ 8401/10009]  eta: 0:23:49    time: 0.8872  data: 0.0003  max mem: 5384
+[16:17:44.410771]   [ 8421/10009]  eta: 0:23:31    time: 0.8865  data: 0.0003  max mem: 5384
+[16:18:02.117784]   [ 8441/10009]  eta: 0:23:13    time: 0.8853  data: 0.0003  max mem: 5384
+[16:18:19.786339]   [ 8461/10009]  eta: 0:22:55    time: 0.8834  data: 0.0003  max mem: 5384
+[16:18:37.466473]   [ 8481/10009]  eta: 0:22:38    time: 0.8839  data: 0.0003  max mem: 5384
+[16:18:55.144772]   [ 8501/10009]  eta: 0:22:20    time: 0.8839  data: 0.0003  max mem: 5384
+[16:19:12.843607]   [ 8521/10009]  eta: 0:22:02    time: 0.8849  data: 0.0003  max mem: 5384
+[16:19:30.545456]   [ 8541/10009]  eta: 0:21:44    time: 0.8850  data: 0.0003  max mem: 5384
+[16:19:48.234812]   [ 8561/10009]  eta: 0:21:27    time: 0.8844  data: 0.0002  max mem: 5384
+[16:20:05.934129]   [ 8581/10009]  eta: 0:21:09    time: 0.8849  data: 0.0003  max mem: 5384
+[16:20:23.599347]   [ 8601/10009]  eta: 0:20:51    time: 0.8832  data: 0.0003  max mem: 5384
+[16:20:41.300578]   [ 8621/10009]  eta: 0:20:33    time: 0.8850  data: 0.0003  max mem: 5384
+[16:20:58.991928]   [ 8641/10009]  eta: 0:20:15    time: 0.8845  data: 0.0003  max mem: 5384
+[16:21:16.681748]   [ 8661/10009]  eta: 0:19:58    time: 0.8844  data: 0.0003  max mem: 5384
+[16:21:34.387245]   [ 8681/10009]  eta: 0:19:40    time: 0.8852  data: 0.0003  max mem: 5384
+[16:21:52.053495]   [ 8701/10009]  eta: 0:19:22    time: 0.8833  data: 0.0003  max mem: 5384
+[16:22:09.767545]   [ 8721/10009]  eta: 0:19:04    time: 0.8856  data: 0.0003  max mem: 5384
+[16:22:27.458100]   [ 8741/10009]  eta: 0:18:47    time: 0.8845  data: 0.0003  max mem: 5384
+[16:22:45.139601]   [ 8761/10009]  eta: 0:18:29    time: 0.8840  data: 0.0367  max mem: 5384
+[16:23:02.816334]   [ 8781/10009]  eta: 0:18:11    time: 0.8838  data: 0.0003  max mem: 5384
+[16:23:20.485623]   [ 8801/10009]  eta: 0:17:53    time: 0.8834  data: 0.0003  max mem: 5384
+[16:23:38.165094]   [ 8821/10009]  eta: 0:17:35    time: 0.8839  data: 0.0002  max mem: 5384
+[16:23:55.838594]   [ 8841/10009]  eta: 0:17:18    time: 0.8836  data: 0.0003  max mem: 5384
+[16:24:13.514674]   [ 8861/10009]  eta: 0:17:00    time: 0.8837  data: 0.0003  max mem: 5384
+[16:24:31.210641]   [ 8881/10009]  eta: 0:16:42    time: 0.8847  data: 0.0003  max mem: 5384
+[16:24:48.890638]   [ 8901/10009]  eta: 0:16:24    time: 0.8839  data: 0.0002  max mem: 5384
+[16:25:06.588777]   [ 8921/10009]  eta: 0:16:07    time: 0.8848  data: 0.0003  max mem: 5384
+[16:25:24.288788]   [ 8941/10009]  eta: 0:15:49    time: 0.8849  data: 0.0003  max mem: 5384
+[16:25:41.975335]   [ 8961/10009]  eta: 0:15:31    time: 0.8842  data: 0.0003  max mem: 5384
+[16:25:59.650656]   [ 8981/10009]  eta: 0:15:13    time: 0.8837  data: 0.0003  max mem: 5384
+[16:26:17.347583]   [ 9001/10009]  eta: 0:14:56    time: 0.8848  data: 0.0002  max mem: 5384
+[16:26:35.015867]   [ 9021/10009]  eta: 0:14:38    time: 0.8834  data: 0.0003  max mem: 5384
+[16:26:52.700561]   [ 9041/10009]  eta: 0:14:20    time: 0.8842  data: 0.0003  max mem: 5384
+[16:27:10.383346]   [ 9061/10009]  eta: 0:14:02    time: 0.8841  data: 0.0003  max mem: 5384
+[16:27:28.015353]   [ 9081/10009]  eta: 0:13:44    time: 0.8815  data: 0.0048  max mem: 5384
+[16:27:45.698228]   [ 9101/10009]  eta: 0:13:27    time: 0.8841  data: 0.0003  max mem: 5384
+[16:28:03.408354]   [ 9121/10009]  eta: 0:13:09    time: 0.8855  data: 0.0066  max mem: 5384
+[16:28:21.115158]   [ 9141/10009]  eta: 0:12:51    time: 0.8853  data: 0.0003  max mem: 5384
+[16:28:38.828345]   [ 9161/10009]  eta: 0:12:33    time: 0.8856  data: 0.0002  max mem: 5384
+[16:28:56.528817]   [ 9181/10009]  eta: 0:12:16    time: 0.8850  data: 0.0003  max mem: 5384
+[16:29:14.241824]   [ 9201/10009]  eta: 0:11:58    time: 0.8856  data: 0.0003  max mem: 5384
+[16:29:31.931610]   [ 9221/10009]  eta: 0:11:40    time: 0.8844  data: 0.0003  max mem: 5384
+[16:29:49.626463]   [ 9241/10009]  eta: 0:11:22    time: 0.8847  data: 0.0003  max mem: 5384
+[16:30:07.314734]   [ 9261/10009]  eta: 0:11:05    time: 0.8844  data: 0.0002  max mem: 5384
+[16:30:25.020603]   [ 9281/10009]  eta: 0:10:47    time: 0.8852  data: 0.0003  max mem: 5384
+[16:30:42.713732]   [ 9301/10009]  eta: 0:10:29    time: 0.8846  data: 0.0003  max mem: 5384
+[16:31:00.454105]   [ 9321/10009]  eta: 0:10:11    time: 0.8870  data: 0.0003  max mem: 5384
+[16:31:18.164283]   [ 9341/10009]  eta: 0:09:53    time: 0.8855  data: 0.0003  max mem: 5384
+[16:31:35.885907]   [ 9361/10009]  eta: 0:09:36    time: 0.8860  data: 0.0003  max mem: 5384
+[16:31:53.604943]   [ 9381/10009]  eta: 0:09:18    time: 0.8859  data: 0.0003  max mem: 5384
+[16:32:11.366968]   [ 9401/10009]  eta: 0:09:00    time: 0.8880  data: 0.0003  max mem: 5384
+[16:32:29.106363]   [ 9421/10009]  eta: 0:08:42    time: 0.8869  data: 0.0002  max mem: 5384
+[16:32:46.846893]   [ 9441/10009]  eta: 0:08:25    time: 0.8869  data: 0.0003  max mem: 5384
+[16:33:04.565355]   [ 9461/10009]  eta: 0:08:07    time: 0.8858  data: 0.0003  max mem: 5384
+[16:33:22.305596]   [ 9481/10009]  eta: 0:07:49    time: 0.8870  data: 0.0003  max mem: 5384
+[16:33:39.991938]   [ 9501/10009]  eta: 0:07:31    time: 0.8842  data: 0.0003  max mem: 5384
+[16:33:57.689134]   [ 9521/10009]  eta: 0:07:14    time: 0.8848  data: 0.0003  max mem: 5384
+[16:34:15.394211]   [ 9541/10009]  eta: 0:06:56    time: 0.8852  data: 0.0003  max mem: 5384
+[16:34:33.091780]   [ 9561/10009]  eta: 0:06:38    time: 0.8848  data: 0.0003  max mem: 5384
+[16:34:50.805872]   [ 9581/10009]  eta: 0:06:20    time: 0.8856  data: 0.0003  max mem: 5384
+[16:35:08.535850]   [ 9601/10009]  eta: 0:06:03    time: 0.8864  data: 0.0003  max mem: 5384
+[16:35:26.239447]   [ 9621/10009]  eta: 0:05:45    time: 0.8851  data: 0.0003  max mem: 5384
+[16:35:43.960417]   [ 9641/10009]  eta: 0:05:27    time: 0.8860  data: 0.0003  max mem: 5384
+[16:36:01.692955]   [ 9661/10009]  eta: 0:05:09    time: 0.8866  data: 0.0002  max mem: 5384
+[16:36:19.426721]   [ 9681/10009]  eta: 0:04:52    time: 0.8866  data: 0.0003  max mem: 5384
+[16:36:37.124991]   [ 9701/10009]  eta: 0:04:34    time: 0.8848  data: 0.0004  max mem: 5384
+[16:36:54.806476]   [ 9721/10009]  eta: 0:04:16    time: 0.8840  data: 0.0003  max mem: 5384
+[16:37:12.527646]   [ 9741/10009]  eta: 0:03:58    time: 0.8860  data: 0.0003  max mem: 5384
+[16:37:30.223148]   [ 9761/10009]  eta: 0:03:41    time: 0.8847  data: 0.0003  max mem: 5384
+[16:37:47.919189]   [ 9781/10009]  eta: 0:03:23    time: 0.8847  data: 0.0003  max mem: 5384
+[16:38:05.657407]   [ 9801/10009]  eta: 0:03:05    time: 0.8869  data: 0.0002  max mem: 5384
+[16:38:23.397440]   [ 9821/10009]  eta: 0:02:47    time: 0.8869  data: 0.0002  max mem: 5384
+[16:38:41.166414]   [ 9841/10009]  eta: 0:02:30    time: 0.8884  data: 0.0003  max mem: 5384
+[16:38:58.928338]   [ 9861/10009]  eta: 0:02:12    time: 0.8880  data: 0.0002  max mem: 5384
+[16:39:16.667696]   [ 9881/10009]  eta: 0:01:54    time: 0.8869  data: 0.0002  max mem: 5384
+[16:39:34.443303]   [ 9901/10009]  eta: 0:01:36    time: 0.8887  data: 0.0003  max mem: 5384
+[16:39:52.221360]   [ 9921/10009]  eta: 0:01:19    time: 0.8888  data: 0.0002  max mem: 5384
+[16:40:09.951725]   [ 9941/10009]  eta: 0:01:01    time: 0.8865  data: 0.0003  max mem: 5384
+[16:40:27.695384]   [ 9961/10009]  eta: 0:00:43    time: 0.8871  data: 0.0002  max mem: 5384
+[16:40:45.403412]   [ 9981/10009]  eta: 0:00:25    time: 0.8853  data: 0.0016  max mem: 5384
+[16:41:03.149014]   [10001/10009]  eta: 0:00:07    time: 0.8872  data: 0.0002  max mem: 5384
+[16:41:10.243418]   [10009/10009]  eta: 0:00:00    time: 0.8860  data: 0.0016  max mem: 5384
+[16:41:10.366452]  Total time: 2:28:06 (0.8879 s / it)
+[16:41:10.366594] Extracting features for val set...
+[16:41:15.435659] Storing features into tensor of shape torch.Size([50000, 768])
+[16:41:15.436545]   [  1/391]  eta: 0:33:02    time: 5.0692  data: 2.1798  max mem: 5384
+[16:41:28.929521]   [ 21/391]  eta: 0:05:27    time: 0.6746  data: 0.2502  max mem: 5529
+[16:41:46.681383]   [ 41/391]  eta: 0:05:10    time: 0.8875  data: 0.0002  max mem: 5529
+[16:42:04.451203]   [ 61/391]  eta: 0:04:53    time: 0.8884  data: 0.0002  max mem: 5529
+[16:42:22.237210]   [ 81/391]  eta: 0:04:35    time: 0.8892  data: 0.0002  max mem: 5529
+[16:42:40.018356]   [101/391]  eta: 0:04:18    time: 0.8890  data: 0.0002  max mem: 5529
+[16:42:57.782881]   [121/391]  eta: 0:04:00    time: 0.8882  data: 0.0003  max mem: 5529
+[16:43:15.551672]   [141/391]  eta: 0:03:42    time: 0.8884  data: 0.0003  max mem: 5529
+[16:43:33.336142]   [161/391]  eta: 0:03:25    time: 0.8892  data: 0.0005  max mem: 5529
+[16:43:51.105162]   [181/391]  eta: 0:03:07    time: 0.8884  data: 0.0032  max mem: 5529
+[16:44:08.864694]   [201/391]  eta: 0:02:49    time: 0.8879  data: 0.0004  max mem: 5529
+[16:44:26.608857]   [221/391]  eta: 0:02:31    time: 0.8871  data: 0.0004  max mem: 5529
+[16:44:44.401253]   [241/391]  eta: 0:02:14    time: 0.8895  data: 0.0005  max mem: 5529
+[16:45:02.228708]   [261/391]  eta: 0:01:56    time: 0.8913  data: 0.0110  max mem: 5529
+[16:45:20.047349]   [281/391]  eta: 0:01:38    time: 0.8908  data: 0.0002  max mem: 5529
+[16:45:37.916335]   [301/391]  eta: 0:01:20    time: 0.8934  data: 0.0005  max mem: 5529
+[16:45:55.750497]   [321/391]  eta: 0:01:03    time: 0.8917  data: 0.0002  max mem: 5529
+[16:46:13.580218]   [341/391]  eta: 0:00:45    time: 0.8914  data: 0.0003  max mem: 5529
+[16:46:31.433569]   [361/391]  eta: 0:00:27    time: 0.8926  data: 0.0002  max mem: 5529
+[16:46:49.271799]   [381/391]  eta: 0:00:09    time: 0.8919  data: 0.0003  max mem: 5529
+[16:47:01.698040]   [391/391]  eta: 0:00:00    time: 1.0669  data: 0.0003  max mem: 5529
+[16:47:01.812140]  Total time: 0:05:51 (0.8988 s / it)
+[16:47:02.282968] Features are ready!
+Start the k-NN classification.
+[16:47:02.283033] Pre-trained checkpoint from: /raid/home_yedek/utku/ViTFreeze/ViT/pretrain/bench_3/full_pretrain_out_freezeout_cubic_t0_8_1gpu_not_scale_lr/checkpoint-99.pth
+[16:47:33.792931] 10-NN classifier result: Top1: 0.128, Top5: 0.526
+[16:48:05.446640] 20-NN classifier result: Top1: 0.136, Top5: 0.536
+[16:48:37.552247] 100-NN classifier result: Top1: 0.138, Top5: 0.504
+[16:49:09.755502] 200-NN classifier result: Top1: 0.116, Top5: 0.512

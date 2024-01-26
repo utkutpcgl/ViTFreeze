@@ -1,0 +1,502 @@
+/opt/conda/lib/python3.10/site-packages/torch/distributed/launch.py:180: FutureWarning: The module torch.distributed.launch is deprecated
+and will be removed in future. Use torchrun.
+Note that --use_env is set by default in torchrun.
+If your script expects `--local_rank` argument to be set, please
+change it to read from `os.environ['LOCAL_RANK']` instead. See 
+https://pytorch.org/docs/stable/distributed.html#launch-utility for 
+further instructions
+
+  warnings.warn(
+| distributed init (rank 3): env://, gpu 3
+| distributed init (rank 1): env://, gpu 1
+| distributed init (rank 0): env://, gpu 0
+| distributed init (rank 2): env://, gpu 2
+[09:23:16.187882] Namespace(batch_size=256, epochs=100, accum_iter=1, model='vit_base_patch16', input_size=224, drop_path=0.1, clip_grad=None, weight_decay=0.05, lr=0.004, blr=0.001, layer_decay=0.75, min_lr=1e-06, warmup_epochs=20, color_jitter=None, aa='rand-m9-mstd0.5-inc1', smoothing=0.1, reprob=0.25, remode='pixel', recount=1, resplit=False, mixup=0.8, cutmix=1.0, cutmix_minmax=None, mixup_prob=1.0, mixup_switch_prob=0.5, mixup_mode='batch', finetune='/raid/home_yedek/utku/ViTFreeze/ViT/pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_without_remove_freezeout_layers_default_optimizer_debug/checkpoint-99.pth', global_pool=True, data_path='/raid/utku/datasets/imagenet/classification/', nb_classes=1000, output_dir='finetune/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_without_remove_freezeout_layers_default_optimizer_debug_checkpoint-99', log_dir='finetune/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_without_remove_freezeout_layers_default_optimizer_debug_checkpoint-99', device='cuda', seed=0, resume='', auto_resume=True, start_epoch=0, eval=False, dist_eval=True, num_workers=10, pin_mem=True, world_size=4, local_rank=0, dist_on_itp=False, dist_url='env://', rank=0, gpu=0, distributed=True, dist_backend='nccl')
+[09:23:16.190157] Train data path is:  /raid/utku/datasets/imagenet/classification/train/image_folders
+[09:23:22.915050] Dataset ImageFolder
+    Number of datapoints: 1281167
+    Root location: /raid/utku/datasets/imagenet/classification/train/image_folders
+    StandardTransform
+Transform: Compose(
+               RandomResizedCropAndInterpolation(size=(224, 224), scale=(0.08, 1.0), ratio=(0.75, 1.3333), interpolation=bicubic)
+               RandomHorizontalFlip(p=0.5)
+               RandAugment(n=2, ops=
+           	AugmentOp(name=AutoContrast, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=Equalize, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=Invert, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=Rotate, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=PosterizeIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=SolarizeIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=SolarizeAdd, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ColorIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ContrastIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=BrightnessIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=SharpnessIncreasing, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ShearX, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=ShearY, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=TranslateXRel, p=0.5, m=9, mstd=0.5)
+           	AugmentOp(name=TranslateYRel, p=0.5, m=9, mstd=0.5))
+               ToTensor()
+               Normalize(mean=tensor([0.4850, 0.4560, 0.4060]), std=tensor([0.2290, 0.2240, 0.2250]))
+               RandomErasing(p=0.25, mode=pixel, count=(1, 1))
+           )
+[09:23:22.938238] Val data path is:  /raid/utku/datasets/imagenet/classification/val/image_folders
+[09:23:23.230690] Dataset ImageFolder
+    Number of datapoints: 50000
+    Root location: /raid/utku/datasets/imagenet/classification/val/image_folders
+    StandardTransform
+Transform: Compose(
+               Resize(size=256, interpolation=bicubic, max_size=None, antialias=None)
+               CenterCrop(size=(224, 224))
+               ToTensor()
+               Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+           )
+[09:23:23.230998] Sampler_train = <torch.utils.data.distributed.DistributedSampler object at 0x7f44820227d0>
+[09:23:23.233972] Mixup is activated!
+[09:23:25.557951] Load pre-trained checkpoint from: /raid/home_yedek/utku/ViTFreeze/ViT/pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_without_remove_freezeout_layers_default_optimizer_debug/checkpoint-99.pth
+[09:23:25.681934] _IncompatibleKeys(missing_keys=['fc_norm.weight', 'fc_norm.bias', 'head.weight', 'head.bias'], unexpected_keys=['norm.0.weight', 'norm.0.bias', 'norm.1.weight', 'norm.1.bias', 'norm.2.weight', 'norm.2.bias', 'norm.3.weight', 'norm.3.bias', 'decoder.0.mask_token', 'decoder.0.pos_embed', 'decoder.0.embed.weight', 'decoder.0.embed.bias', 'decoder.0.blocks.0.norm1.weight', 'decoder.0.blocks.0.norm1.bias', 'decoder.0.blocks.0.attn.qkv.weight', 'decoder.0.blocks.0.attn.qkv.bias', 'decoder.0.blocks.0.attn.proj.weight', 'decoder.0.blocks.0.attn.proj.bias', 'decoder.0.blocks.0.norm2.weight', 'decoder.0.blocks.0.norm2.bias', 'decoder.0.blocks.0.mlp.fc1.weight', 'decoder.0.blocks.0.mlp.fc1.bias', 'decoder.0.blocks.0.mlp.fc2.weight', 'decoder.0.blocks.0.mlp.fc2.bias', 'decoder.0.norm.weight', 'decoder.0.norm.bias', 'decoder.0.pred.0.weight', 'decoder.0.pred.0.bias', 'decoder.0.pred.1.weight', 'decoder.0.pred.1.bias', 'decoder.0.pred.3.weight', 'decoder.0.pred.3.bias', 'decoder.0.pred.4.weight', 'decoder.0.pred.4.bias', 'decoder.1.mask_token', 'decoder.1.pos_embed', 'decoder.1.embed.weight', 'decoder.1.embed.bias', 'decoder.1.blocks.0.norm1.weight', 'decoder.1.blocks.0.norm1.bias', 'decoder.1.blocks.0.attn.qkv.weight', 'decoder.1.blocks.0.attn.qkv.bias', 'decoder.1.blocks.0.attn.proj.weight', 'decoder.1.blocks.0.attn.proj.bias', 'decoder.1.blocks.0.norm2.weight', 'decoder.1.blocks.0.norm2.bias', 'decoder.1.blocks.0.mlp.fc1.weight', 'decoder.1.blocks.0.mlp.fc1.bias', 'decoder.1.blocks.0.mlp.fc2.weight', 'decoder.1.blocks.0.mlp.fc2.bias', 'decoder.1.norm.weight', 'decoder.1.norm.bias', 'decoder.1.pred.0.weight', 'decoder.1.pred.0.bias', 'decoder.1.pred.1.weight', 'decoder.1.pred.1.bias', 'decoder.2.mask_token', 'decoder.2.pos_embed', 'decoder.2.embed.weight', 'decoder.2.embed.bias', 'decoder.2.blocks.0.norm1.weight', 'decoder.2.blocks.0.norm1.bias', 'decoder.2.blocks.0.attn.qkv.weight', 'decoder.2.blocks.0.attn.qkv.bias', 'decoder.2.blocks.0.attn.proj.weight', 'decoder.2.blocks.0.attn.proj.bias', 'decoder.2.blocks.0.norm2.weight', 'decoder.2.blocks.0.norm2.bias', 'decoder.2.blocks.0.mlp.fc1.weight', 'decoder.2.blocks.0.mlp.fc1.bias', 'decoder.2.blocks.0.mlp.fc2.weight', 'decoder.2.blocks.0.mlp.fc2.bias', 'decoder.2.norm.weight', 'decoder.2.norm.bias', 'decoder.2.pred.0.weight', 'decoder.2.pred.0.bias', 'decoder.3.mask_token', 'decoder.3.pos_embed', 'decoder.3.embed.weight', 'decoder.3.embed.bias', 'decoder.3.blocks.0.norm1.weight', 'decoder.3.blocks.0.norm1.bias', 'decoder.3.blocks.0.attn.qkv.weight', 'decoder.3.blocks.0.attn.qkv.bias', 'decoder.3.blocks.0.attn.proj.weight', 'decoder.3.blocks.0.attn.proj.bias', 'decoder.3.blocks.0.norm2.weight', 'decoder.3.blocks.0.norm2.bias', 'decoder.3.blocks.0.mlp.fc1.weight', 'decoder.3.blocks.0.mlp.fc1.bias', 'decoder.3.blocks.0.mlp.fc2.weight', 'decoder.3.blocks.0.mlp.fc2.bias', 'decoder.3.norm.weight', 'decoder.3.norm.bias', 'decoder.3.pred.1.weight', 'decoder.3.pred.1.bias', 'hog_enc.0.conv.weight', 'hog_enc.1.conv.weight', 'hog_enc.2.conv.weight', 'hog_enc.3.conv.weight'])
+[09:23:26.195428] number of params (M): 86.57
+[09:23:26.195500] base lr: 1.00e-03
+[09:23:26.195521] actual lr: 4.00e-03
+[09:23:26.195538] accumulate grad iterations: 1
+[09:23:26.195553] effective batch size: 1024
+[09:23:26.284300] parameter groups: 
+{
+  "layer_0_no_decay": {
+    "lr_scale": 0.023757264018058777,
+    "weight_decay": 0.0,
+    "params": [
+      "cls_token",
+      "pos_embed",
+      "patch_embed.proj.bias"
+    ]
+  },
+  "layer_0_decay": {
+    "lr_scale": 0.023757264018058777,
+    "weight_decay": 0.05,
+    "params": [
+      "patch_embed.proj.weight"
+    ]
+  },
+  "layer_1_no_decay": {
+    "lr_scale": 0.03167635202407837,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.0.norm1.weight",
+      "blocks.0.norm1.bias",
+      "blocks.0.attn.qkv.bias",
+      "blocks.0.attn.proj.bias",
+      "blocks.0.norm2.weight",
+      "blocks.0.norm2.bias",
+      "blocks.0.mlp.fc1.bias",
+      "blocks.0.mlp.fc2.bias"
+    ]
+  },
+  "layer_1_decay": {
+    "lr_scale": 0.03167635202407837,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.0.attn.qkv.weight",
+      "blocks.0.attn.proj.weight",
+      "blocks.0.mlp.fc1.weight",
+      "blocks.0.mlp.fc2.weight"
+    ]
+  },
+  "layer_2_no_decay": {
+    "lr_scale": 0.04223513603210449,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.1.norm1.weight",
+      "blocks.1.norm1.bias",
+      "blocks.1.attn.qkv.bias",
+      "blocks.1.attn.proj.bias",
+      "blocks.1.norm2.weight",
+      "blocks.1.norm2.bias",
+      "blocks.1.mlp.fc1.bias",
+      "blocks.1.mlp.fc2.bias"
+    ]
+  },
+  "layer_2_decay": {
+    "lr_scale": 0.04223513603210449,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.1.attn.qkv.weight",
+      "blocks.1.attn.proj.weight",
+      "blocks.1.mlp.fc1.weight",
+      "blocks.1.mlp.fc2.weight"
+    ]
+  },
+  "layer_3_no_decay": {
+    "lr_scale": 0.056313514709472656,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.2.norm1.weight",
+      "blocks.2.norm1.bias",
+      "blocks.2.attn.qkv.bias",
+      "blocks.2.attn.proj.bias",
+      "blocks.2.norm2.weight",
+      "blocks.2.norm2.bias",
+      "blocks.2.mlp.fc1.bias",
+      "blocks.2.mlp.fc2.bias"
+    ]
+  },
+  "layer_3_decay": {
+    "lr_scale": 0.056313514709472656,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.2.attn.qkv.weight",
+      "blocks.2.attn.proj.weight",
+      "blocks.2.mlp.fc1.weight",
+      "blocks.2.mlp.fc2.weight"
+    ]
+  },
+  "layer_4_no_decay": {
+    "lr_scale": 0.07508468627929688,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.3.norm1.weight",
+      "blocks.3.norm1.bias",
+      "blocks.3.attn.qkv.bias",
+      "blocks.3.attn.proj.bias",
+      "blocks.3.norm2.weight",
+      "blocks.3.norm2.bias",
+      "blocks.3.mlp.fc1.bias",
+      "blocks.3.mlp.fc2.bias"
+    ]
+  },
+  "layer_4_decay": {
+    "lr_scale": 0.07508468627929688,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.3.attn.qkv.weight",
+      "blocks.3.attn.proj.weight",
+      "blocks.3.mlp.fc1.weight",
+      "blocks.3.mlp.fc2.weight"
+    ]
+  },
+  "layer_5_no_decay": {
+    "lr_scale": 0.1001129150390625,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.4.norm1.weight",
+      "blocks.4.norm1.bias",
+      "blocks.4.attn.qkv.bias",
+      "blocks.4.attn.proj.bias",
+      "blocks.4.norm2.weight",
+      "blocks.4.norm2.bias",
+      "blocks.4.mlp.fc1.bias",
+      "blocks.4.mlp.fc2.bias"
+    ]
+  },
+  "layer_5_decay": {
+    "lr_scale": 0.1001129150390625,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.4.attn.qkv.weight",
+      "blocks.4.attn.proj.weight",
+      "blocks.4.mlp.fc1.weight",
+      "blocks.4.mlp.fc2.weight"
+    ]
+  },
+  "layer_6_no_decay": {
+    "lr_scale": 0.13348388671875,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.5.norm1.weight",
+      "blocks.5.norm1.bias",
+      "blocks.5.attn.qkv.bias",
+      "blocks.5.attn.proj.bias",
+      "blocks.5.norm2.weight",
+      "blocks.5.norm2.bias",
+      "blocks.5.mlp.fc1.bias",
+      "blocks.5.mlp.fc2.bias"
+    ]
+  },
+  "layer_6_decay": {
+    "lr_scale": 0.13348388671875,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.5.attn.qkv.weight",
+      "blocks.5.attn.proj.weight",
+      "blocks.5.mlp.fc1.weight",
+      "blocks.5.mlp.fc2.weight"
+    ]
+  },
+  "layer_7_no_decay": {
+    "lr_scale": 0.177978515625,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.6.norm1.weight",
+      "blocks.6.norm1.bias",
+      "blocks.6.attn.qkv.bias",
+      "blocks.6.attn.proj.bias",
+      "blocks.6.norm2.weight",
+      "blocks.6.norm2.bias",
+      "blocks.6.mlp.fc1.bias",
+      "blocks.6.mlp.fc2.bias"
+    ]
+  },
+  "layer_7_decay": {
+    "lr_scale": 0.177978515625,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.6.attn.qkv.weight",
+      "blocks.6.attn.proj.weight",
+      "blocks.6.mlp.fc1.weight",
+      "blocks.6.mlp.fc2.weight"
+    ]
+  },
+  "layer_8_no_decay": {
+    "lr_scale": 0.2373046875,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.7.norm1.weight",
+      "blocks.7.norm1.bias",
+      "blocks.7.attn.qkv.bias",
+      "blocks.7.attn.proj.bias",
+      "blocks.7.norm2.weight",
+      "blocks.7.norm2.bias",
+      "blocks.7.mlp.fc1.bias",
+      "blocks.7.mlp.fc2.bias"
+    ]
+  },
+  "layer_8_decay": {
+    "lr_scale": 0.2373046875,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.7.attn.qkv.weight",
+      "blocks.7.attn.proj.weight",
+      "blocks.7.mlp.fc1.weight",
+      "blocks.7.mlp.fc2.weight"
+    ]
+  },
+  "layer_9_no_decay": {
+    "lr_scale": 0.31640625,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.8.norm1.weight",
+      "blocks.8.norm1.bias",
+      "blocks.8.attn.qkv.bias",
+      "blocks.8.attn.proj.bias",
+      "blocks.8.norm2.weight",
+      "blocks.8.norm2.bias",
+      "blocks.8.mlp.fc1.bias",
+      "blocks.8.mlp.fc2.bias"
+    ]
+  },
+  "layer_9_decay": {
+    "lr_scale": 0.31640625,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.8.attn.qkv.weight",
+      "blocks.8.attn.proj.weight",
+      "blocks.8.mlp.fc1.weight",
+      "blocks.8.mlp.fc2.weight"
+    ]
+  },
+  "layer_10_no_decay": {
+    "lr_scale": 0.421875,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.9.norm1.weight",
+      "blocks.9.norm1.bias",
+      "blocks.9.attn.qkv.bias",
+      "blocks.9.attn.proj.bias",
+      "blocks.9.norm2.weight",
+      "blocks.9.norm2.bias",
+      "blocks.9.mlp.fc1.bias",
+      "blocks.9.mlp.fc2.bias"
+    ]
+  },
+  "layer_10_decay": {
+    "lr_scale": 0.421875,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.9.attn.qkv.weight",
+      "blocks.9.attn.proj.weight",
+      "blocks.9.mlp.fc1.weight",
+      "blocks.9.mlp.fc2.weight"
+    ]
+  },
+  "layer_11_no_decay": {
+    "lr_scale": 0.5625,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.10.norm1.weight",
+      "blocks.10.norm1.bias",
+      "blocks.10.attn.qkv.bias",
+      "blocks.10.attn.proj.bias",
+      "blocks.10.norm2.weight",
+      "blocks.10.norm2.bias",
+      "blocks.10.mlp.fc1.bias",
+      "blocks.10.mlp.fc2.bias"
+    ]
+  },
+  "layer_11_decay": {
+    "lr_scale": 0.5625,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.10.attn.qkv.weight",
+      "blocks.10.attn.proj.weight",
+      "blocks.10.mlp.fc1.weight",
+      "blocks.10.mlp.fc2.weight"
+    ]
+  },
+  "layer_12_no_decay": {
+    "lr_scale": 0.75,
+    "weight_decay": 0.0,
+    "params": [
+      "blocks.11.norm1.weight",
+      "blocks.11.norm1.bias",
+      "blocks.11.attn.qkv.bias",
+      "blocks.11.attn.proj.bias",
+      "blocks.11.norm2.weight",
+      "blocks.11.norm2.bias",
+      "blocks.11.mlp.fc1.bias",
+      "blocks.11.mlp.fc2.bias"
+    ]
+  },
+  "layer_12_decay": {
+    "lr_scale": 0.75,
+    "weight_decay": 0.05,
+    "params": [
+      "blocks.11.attn.qkv.weight",
+      "blocks.11.attn.proj.weight",
+      "blocks.11.mlp.fc1.weight",
+      "blocks.11.mlp.fc2.weight"
+    ]
+  },
+  "layer_13_no_decay": {
+    "lr_scale": 1.0,
+    "weight_decay": 0.0,
+    "params": [
+      "fc_norm.weight",
+      "fc_norm.bias",
+      "head.bias"
+    ]
+  },
+  "layer_13_decay": {
+    "lr_scale": 1.0,
+    "weight_decay": 0.05,
+    "params": [
+      "head.weight"
+    ]
+  }
+}
+[09:23:26.285922] criterion = SoftTargetCrossEntropy()
+[09:23:26.286812] Auto resume checkpoint: 
+[09:23:26.286852] Start training for 100 epochs
+[09:23:26.289130] log_dir: finetune/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_without_remove_freezeout_layers_default_optimizer_debug_checkpoint-99
+[09:23:50.035233] Epoch: [0]  [   1/1251]  eta: 8:15:04  lr: 0.000000  loss: 6.9077 (6.9077)  time: 23.7442  data: 6.7792  max mem: 25840
+[09:24:30.466400] Epoch: [0]  [  51/1251]  eta: 0:25:11  lr: 0.000008  loss: 6.9074 (6.9076)  time: 0.8133  data: 0.0058  max mem: 26829
+[09:25:11.360546] Epoch: [0]  [ 101/1251]  eta: 0:19:57  lr: 0.000016  loss: 6.9045 (6.9067)  time: 0.8141  data: 0.0067  max mem: 26829
+[09:25:52.490881] Epoch: [0]  [ 151/1251]  eta: 0:17:45  lr: 0.000024  loss: 6.8682 (6.8993)  time: 0.8294  data: 0.0051  max mem: 26829
+[09:26:33.544276] Epoch: [0]  [ 201/1251]  eta: 0:16:19  lr: 0.000032  loss: 6.7503 (6.8701)  time: 0.8313  data: 0.0063  max mem: 26829
+[09:27:14.377035] Epoch: [0]  [ 251/1251]  eta: 0:15:09  lr: 0.000040  loss: 6.6335 (6.8296)  time: 0.8168  data: 0.0040  max mem: 26829
+[09:27:55.133330] Epoch: [0]  [ 301/1251]  eta: 0:14:09  lr: 0.000048  loss: 6.4627 (6.7844)  time: 0.8237  data: 0.0066  max mem: 26829
+[09:28:36.331707] Epoch: [0]  [ 351/1251]  eta: 0:13:15  lr: 0.000056  loss: 6.4890 (6.7446)  time: 0.8264  data: 0.0064  max mem: 26829
+[09:29:17.205834] Epoch: [0]  [ 401/1251]  eta: 0:12:24  lr: 0.000064  loss: 6.3939 (6.6997)  time: 0.8202  data: 0.0059  max mem: 26829
+[09:29:58.171597] Epoch: [0]  [ 451/1251]  eta: 0:11:35  lr: 0.000072  loss: 6.2922 (6.6594)  time: 0.8151  data: 0.0059  max mem: 26829
+[09:30:39.758621] Epoch: [0]  [ 501/1251]  eta: 0:10:49  lr: 0.000080  loss: 6.2208 (6.6112)  time: 0.8286  data: 0.0037  max mem: 26829
+[09:31:19.709529] Epoch: [0]  [ 551/1251]  eta: 0:10:02  lr: 0.000088  loss: 6.1874 (6.5695)  time: 0.7712  data: 0.0012  max mem: 26829
+[09:32:00.989267] Epoch: [0]  [ 601/1251]  eta: 0:09:17  lr: 0.000096  loss: 6.0873 (6.5330)  time: 0.8341  data: 0.0052  max mem: 26829
+[09:32:42.395521] Epoch: [0]  [ 651/1251]  eta: 0:08:33  lr: 0.000104  loss: 5.9012 (6.4931)  time: 0.8236  data: 0.0044  max mem: 26829
+[09:33:23.924093] Epoch: [0]  [ 701/1251]  eta: 0:07:49  lr: 0.000112  loss: 5.7783 (6.4506)  time: 0.8281  data: 0.0055  max mem: 26829
+[09:34:05.246394] Epoch: [0]  [ 751/1251]  eta: 0:07:06  lr: 0.000120  loss: 6.0809 (6.4144)  time: 0.8238  data: 0.0045  max mem: 26829
+[09:34:46.365723] Epoch: [0]  [ 801/1251]  eta: 0:06:22  lr: 0.000128  loss: 5.7957 (6.3790)  time: 0.8232  data: 0.0025  max mem: 26829
+[09:35:27.655746] Epoch: [0]  [ 851/1251]  eta: 0:05:39  lr: 0.000136  loss: 5.7145 (6.3359)  time: 0.8307  data: 0.0044  max mem: 26829
+[09:36:08.903449] Epoch: [0]  [ 901/1251]  eta: 0:04:57  lr: 0.000144  loss: 5.7540 (6.2982)  time: 0.8247  data: 0.0041  max mem: 26829
+[09:36:50.150325] Epoch: [0]  [ 951/1251]  eta: 0:04:14  lr: 0.000152  loss: 5.3258 (6.2636)  time: 0.8252  data: 0.0056  max mem: 26829
+[09:37:30.640038] Epoch: [0]  [1001/1251]  eta: 0:03:31  lr: 0.000160  loss: 5.7037 (6.2328)  time: 0.7835  data: 0.0013  max mem: 26829
+[09:38:12.048341] Epoch: [0]  [1051/1251]  eta: 0:02:49  lr: 0.000168  loss: 5.7266 (6.2006)  time: 0.8234  data: 0.0037  max mem: 26829
+[09:38:53.380207] Epoch: [0]  [1101/1251]  eta: 0:02:07  lr: 0.000176  loss: 5.4894 (6.1686)  time: 0.8247  data: 0.0034  max mem: 26829
+[09:39:34.752805] Epoch: [0]  [1151/1251]  eta: 0:01:24  lr: 0.000184  loss: 5.4244 (6.1393)  time: 0.8301  data: 0.0022  max mem: 26829
+[09:40:16.503923] Epoch: [0]  [1201/1251]  eta: 0:00:42  lr: 0.000192  loss: 5.6437 (6.1153)  time: 0.8438  data: 0.0068  max mem: 26829
+[09:40:57.090524] Epoch: [0]  [1251/1251]  eta: 0:00:00  lr: 0.000200  loss: 5.3107 (6.0842)  time: 0.7845  data: 0.0023  max mem: 26829
+[09:40:57.922316] Epoch: [0] Total time: 0:17:31 (0.8406 s / it)
+[09:40:57.928735] Averaged stats: lr: 0.000200  loss: 5.3107 (6.0838)
+[09:41:06.718971] Test:  [ 1/49]  eta: 0:06:29  loss: 3.1839 (3.1839)  acc1: 35.5469 (35.5469)  acc5: 66.7969 (66.7969)  time: 7.9489  data: 7.6853  max mem: 26829
+[09:41:24.695200] Test:  [31/49]  eta: 0:00:15  loss: 3.3328 (3.3089)  acc1: 33.2031 (32.4849)  acc5: 63.6719 (63.0418)  time: 0.5851  data: 0.3298  max mem: 26829
+[09:41:34.141732] Test:  [49/49]  eta: 0:00:00  loss: 3.3116 (3.3071)  acc1: 32.8125 (32.7040)  acc5: 62.1094 (62.8880)  time: 0.6022  data: 0.3166  max mem: 26829
+[09:41:34.346877] Test: Total time: 0:00:35 (0.7261 s / it)
+[09:41:35.125743] * Acc@1 32.730 Acc@5 62.524 loss 3.298
+[09:41:35.126059] Accuracy of the network on the 50000 test images: 32.7%
+[09:41:35.126118] Max accuracy: 32.73%
+[09:41:35.133489] log_dir: finetune/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_without_remove_freezeout_layers_default_optimizer_debug_checkpoint-99
+[09:41:45.607895] Epoch: [1]  [   1/1251]  eta: 3:38:20  lr: 0.000200  loss: 5.3760 (5.3760)  time: 10.4720  data: 8.2755  max mem: 26829
+[09:42:26.649045] Epoch: [1]  [  51/1251]  eta: 0:20:13  lr: 0.000208  loss: 5.4862 (5.4900)  time: 0.8154  data: 0.0030  max mem: 26829
+[09:43:07.069906] Epoch: [1]  [ 101/1251]  eta: 0:17:27  lr: 0.000216  loss: 5.5421 (5.3833)  time: 0.8043  data: 0.0030  max mem: 26829
+[09:43:47.546243] Epoch: [1]  [ 151/1251]  eta: 0:16:05  lr: 0.000224  loss: 5.4704 (5.4000)  time: 0.8136  data: 0.0045  max mem: 26829
+[09:44:28.108030] Epoch: [1]  [ 201/1251]  eta: 0:15:04  lr: 0.000232  loss: 5.4680 (5.3799)  time: 0.8063  data: 0.0050  max mem: 26829
+[09:45:08.646595] Epoch: [1]  [ 251/1251]  eta: 0:14:11  lr: 0.000240  loss: 5.0306 (5.3325)  time: 0.8154  data: 0.0047  max mem: 26829
+[09:45:49.326723] Epoch: [1]  [ 301/1251]  eta: 0:13:23  lr: 0.000248  loss: 5.1255 (5.3162)  time: 0.8168  data: 0.0026  max mem: 26829
+[09:46:29.762430] Epoch: [1]  [ 351/1251]  eta: 0:12:36  lr: 0.000256  loss: 5.4678 (5.2992)  time: 0.8093  data: 0.0035  max mem: 26829
+[09:47:10.505332] Epoch: [1]  [ 401/1251]  eta: 0:11:51  lr: 0.000264  loss: 4.9643 (5.2767)  time: 0.8150  data: 0.0024  max mem: 26829
+[09:47:50.131182] Epoch: [1]  [ 451/1251]  eta: 0:11:05  lr: 0.000272  loss: 5.4423 (5.2660)  time: 0.7856  data: 0.0020  max mem: 26829
+[09:48:31.136641] Epoch: [1]  [ 501/1251]  eta: 0:10:23  lr: 0.000280  loss: 4.8864 (5.2470)  time: 0.8203  data: 0.0071  max mem: 26829
+[09:49:12.216803] Epoch: [1]  [ 551/1251]  eta: 0:09:41  lr: 0.000288  loss: 5.2041 (5.2396)  time: 0.8250  data: 0.0046  max mem: 26829
+[09:49:53.319970] Epoch: [1]  [ 601/1251]  eta: 0:08:59  lr: 0.000296  loss: 4.8901 (5.2230)  time: 0.8213  data: 0.0059  max mem: 26829
+[09:50:34.385434] Epoch: [1]  [ 651/1251]  eta: 0:08:17  lr: 0.000304  loss: 4.9190 (5.2087)  time: 0.8198  data: 0.0044  max mem: 26829
+[09:51:15.194727] Epoch: [1]  [ 701/1251]  eta: 0:07:35  lr: 0.000312  loss: 4.9751 (5.1872)  time: 0.8140  data: 0.0044  max mem: 26829
+[09:51:55.887909] Epoch: [1]  [ 751/1251]  eta: 0:06:54  lr: 0.000320  loss: 4.9791 (5.1675)  time: 0.8149  data: 0.0018  max mem: 26829
+[09:52:36.677594] Epoch: [1]  [ 801/1251]  eta: 0:06:12  lr: 0.000328  loss: 5.0595 (5.1646)  time: 0.8120  data: 0.0036  max mem: 26829
+[09:53:17.323042] Epoch: [1]  [ 851/1251]  eta: 0:05:30  lr: 0.000336  loss: 5.1427 (5.1545)  time: 0.8069  data: 0.0027  max mem: 26829
+[09:53:57.488897] Epoch: [1]  [ 901/1251]  eta: 0:04:49  lr: 0.000344  loss: 5.2521 (5.1495)  time: 0.8154  data: 0.0026  max mem: 26829
+[09:54:38.301120] Epoch: [1]  [ 951/1251]  eta: 0:04:07  lr: 0.000352  loss: 5.0729 (5.1417)  time: 0.8167  data: 0.0023  max mem: 26829
+[09:55:19.240940] Epoch: [1]  [1001/1251]  eta: 0:03:26  lr: 0.000360  loss: 4.7587 (5.1253)  time: 0.8149  data: 0.0046  max mem: 26829
+[09:56:00.155223] Epoch: [1]  [1051/1251]  eta: 0:02:45  lr: 0.000368  loss: 4.7270 (5.1151)  time: 0.8180  data: 0.0043  max mem: 26829
+[09:56:41.359148] Epoch: [1]  [1101/1251]  eta: 0:02:04  lr: 0.000376  loss: 4.9070 (5.1106)  time: 0.8217  data: 0.0038  max mem: 26829
+[09:57:22.298958] Epoch: [1]  [1151/1251]  eta: 0:01:23  lr: 0.000384  loss: 4.5778 (5.0993)  time: 0.8173  data: 0.0032  max mem: 26829
+[09:58:03.449417] Epoch: [1]  [1201/1251]  eta: 0:00:41  lr: 0.000392  loss: 5.1246 (5.0929)  time: 0.8202  data: 0.0030  max mem: 26829
+[09:58:43.764085] Epoch: [1]  [1251/1251]  eta: 0:00:00  lr: 0.000400  loss: 4.8889 (5.0824)  time: 0.7871  data: 0.0069  max mem: 26829
+[09:58:44.665113] Epoch: [1] Total time: 0:17:09 (0.8230 s / it)
+[09:58:44.676389] Averaged stats: lr: 0.000400  loss: 4.8889 (5.0943)
+[09:58:52.644973] Test:  [ 1/49]  eta: 0:06:30  loss: 2.1568 (2.1568)  acc1: 54.6875 (54.6875)  acc5: 78.5156 (78.5156)  time: 7.9623  data: 7.6887  max mem: 26829
+[09:59:09.745872] Test:  [31/49]  eta: 0:00:15  loss: 2.2590 (2.2494)  acc1: 50.7812 (50.6300)  acc5: 78.1250 (78.6542)  time: 0.6192  data: 0.3621  max mem: 26829
+[09:59:21.490077] Test:  [49/49]  eta: 0:00:00  loss: 2.2498 (2.2391)  acc1: 51.5625 (51.0480)  acc5: 77.7344 (78.5600)  time: 0.6128  data: 0.3604  max mem: 26829
+[09:59:21.694825] Test: Total time: 0:00:37 (0.7554 s / it)
+[09:59:24.498588] * Acc@1 51.164 Acc@5 78.304 loss 2.235
+[09:59:24.498912] Accuracy of the network on the 50000 test images: 51.2%
+[09:59:24.498952] Max accuracy: 51.16%
+[09:59:24.505693] log_dir: finetune/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_without_remove_freezeout_layers_default_optimizer_debug_checkpoint-99
+[09:59:34.501525] Epoch: [2]  [   1/1251]  eta: 3:28:21  lr: 0.000400  loss: 4.7388 (4.7388)  time: 9.9931  data: 7.4077  max mem: 26829
+[10:00:15.246320] Epoch: [2]  [  51/1251]  eta: 0:19:54  lr: 0.000408  loss: 5.1159 (4.9330)  time: 0.8008  data: 0.0037  max mem: 26829
+[10:00:55.559363] Epoch: [2]  [ 101/1251]  eta: 0:17:17  lr: 0.000416  loss: 4.9067 (4.9641)  time: 0.8101  data: 0.0037  max mem: 26829
+[10:01:35.981356] Epoch: [2]  [ 151/1251]  eta: 0:15:58  lr: 0.000424  loss: 5.2783 (4.9254)  time: 0.8098  data: 0.0032  max mem: 26829
+[10:02:16.711994] Epoch: [2]  [ 201/1251]  eta: 0:15:00  lr: 0.000432  loss: 5.0994 (4.9477)  time: 0.8130  data: 0.0033  max mem: 26829
+[10:02:57.417926] Epoch: [2]  [ 251/1251]  eta: 0:14:09  lr: 0.000440  loss: 4.6310 (4.9256)  time: 0.8176  data: 0.0024  max mem: 26829
+[10:03:38.059458] Epoch: [2]  [ 301/1251]  eta: 0:13:21  lr: 0.000448  loss: 4.3679 (4.8978)  time: 0.8173  data: 0.0041  max mem: 26829
+[10:04:17.702197] Epoch: [2]  [ 351/1251]  eta: 0:12:32  lr: 0.000456  loss: 4.6566 (4.8747)  time: 0.8058  data: 0.0025  max mem: 26829
+[10:04:58.594151] Epoch: [2]  [ 401/1251]  eta: 0:11:48  lr: 0.000464  loss: 4.8582 (4.8372)  time: 0.8176  data: 0.0018  max mem: 26829
+[10:05:39.358807] Epoch: [2]  [ 451/1251]  eta: 0:11:05  lr: 0.000472  loss: 4.8811 (4.8328)  time: 0.8102  data: 0.0049  max mem: 26829
+[10:06:19.838013] Epoch: [2]  [ 501/1251]  eta: 0:10:22  lr: 0.000480  loss: 5.1567 (4.8298)  time: 0.8199  data: 0.0040  max mem: 26829
+[10:07:00.759243] Epoch: [2]  [ 551/1251]  eta: 0:09:40  lr: 0.000488  loss: 5.0778 (4.8212)  time: 0.8119  data: 0.0034  max mem: 26829
+[10:07:41.756267] Epoch: [2]  [ 601/1251]  eta: 0:08:58  lr: 0.000496  loss: 4.9731 (4.8096)  time: 0.8164  data: 0.0030  max mem: 26829
+[10:08:22.655043] Epoch: [2]  [ 651/1251]  eta: 0:08:16  lr: 0.000504  loss: 4.6608 (4.8034)  time: 0.8165  data: 0.0033  max mem: 26829
+[10:09:03.331176] Epoch: [2]  [ 701/1251]  eta: 0:07:34  lr: 0.000512  loss: 4.9153 (4.7975)  time: 0.8100  data: 0.0021  max mem: 26829
+[10:09:43.371841] Epoch: [2]  [ 751/1251]  eta: 0:06:52  lr: 0.000520  loss: 5.1139 (4.8036)  time: 0.8111  data: 0.0023  max mem: 26829
+[10:10:24.516322] Epoch: [2]  [ 801/1251]  eta: 0:06:11  lr: 0.000528  loss: 4.8138 (4.8008)  time: 0.8298  data: 0.0042  max mem: 26829
+[10:11:05.901670] Epoch: [2]  [ 851/1251]  eta: 0:05:30  lr: 0.000536  loss: 4.8894 (4.7947)  time: 0.8256  data: 0.0055  max mem: 26829
+[10:11:46.642905] Epoch: [2]  [ 901/1251]  eta: 0:04:49  lr: 0.000544  loss: 4.7715 (4.7894)  time: 0.8171  data: 0.0046  max mem: 26829
+[10:12:27.298190] Epoch: [2]  [ 951/1251]  eta: 0:04:07  lr: 0.000552  loss: 4.5733 (4.7842)  time: 0.8116  data: 0.0020  max mem: 26829
+[10:13:07.999230] Epoch: [2]  [1001/1251]  eta: 0:03:26  lr: 0.000560  loss: 4.5899 (4.7760)  time: 0.8156  data: 0.0046  max mem: 26829
+[10:13:49.027026] Epoch: [2]  [1051/1251]  eta: 0:02:45  lr: 0.000568  loss: 4.5686 (4.7688)  time: 0.8154  data: 0.0020  max mem: 26829
+[10:14:29.834438] Epoch: [2]  [1101/1251]  eta: 0:02:04  lr: 0.000576  loss: 4.7123 (4.7679)  time: 0.8198  data: 0.0036  max mem: 26829
+[10:15:10.598647] Epoch: [2]  [1151/1251]  eta: 0:01:23  lr: 0.000584  loss: 4.7975 (4.7710)  time: 0.8136  data: 0.0062  max mem: 26829
+[10:15:51.331903] Epoch: [2]  [1201/1251]  eta: 0:00:41  lr: 0.000592  loss: 4.7218 (4.7665)  time: 0.8155  data: 0.0077  max mem: 26829
+[10:16:31.639042] Epoch: [2]  [1251/1251]  eta: 0:00:00  lr: 0.000600  loss: 4.8810 (4.7646)  time: 0.7843  data: 0.0040  max mem: 26829
+[10:16:32.511184] Epoch: [2] Total time: 0:17:08 (0.8217 s / it)
+[10:16:32.512259] Averaged stats: lr: 0.000600  loss: 4.8810 (4.7567)
+[10:16:40.851132] Test:  [ 1/49]  eta: 0:06:48  loss: 1.8409 (1.8409)  acc1: 61.7188 (61.7188)  acc5: 83.2031 (83.2031)  time: 8.3341  data: 8.0718  max mem: 26829
+[10:17:00.855630] Test:  [31/49]  eta: 0:00:17  loss: 1.9135 (1.9027)  acc1: 57.8125 (58.1401)  acc5: 82.0312 (82.8503)  time: 0.6445  data: 0.3900  max mem: 26829
+[10:17:10.241586] Test:  [49/49]  eta: 0:00:00  loss: 1.8667 (1.8909)  acc1: 59.3750 (58.4800)  acc5: 83.2031 (82.8320)  time: 0.6514  data: 0.4013  max mem: 26829
+[10:17:10.514996] Test: Total time: 0:00:37 (0.7755 s / it)
+[10:17:11.080202] * Acc@1 58.034 Acc@5 82.902 loss 1.884
+[10:17:11.080518] Accuracy of the network on the 50000 test images: 58.0%
+[10:17:11.080558] Max accuracy: 58.03%
+[10:17:11.087017] log_dir: finetune/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_without_remove_freezeout_layers_default_optimizer_debug_checkpoint-99
+[10:17:20.777831] Epoch: [3]  [   1/1251]  eta: 3:22:00  lr: 0.000600  loss: 4.4132 (4.4132)  time: 9.6888  data: 8.8709  max mem: 26829
+[10:18:01.694960] Epoch: [3]  [  51/1251]  eta: 0:19:51  lr: 0.000608  loss: 4.6970 (4.7219)  time: 0.8155  data: 0.0040  max mem: 26829
+[10:18:42.320348] Epoch: [3]  [ 101/1251]  eta: 0:17:19  lr: 0.000616  loss: 4.7918 (4.6652)  time: 0.8042  data: 0.0033  max mem: 26829
+[10:19:22.533086] Epoch: [3]  [ 151/1251]  eta: 0:15:58  lr: 0.000624  loss: 4.6821 (4.6047)  time: 0.8051  data: 0.0013  max mem: 26829
+[10:20:03.087632] Epoch: [3]  [ 201/1251]  eta: 0:14:59  lr: 0.000632  loss: 4.2799 (4.5841)  time: 0.8120  data: 0.0067  max mem: 26829

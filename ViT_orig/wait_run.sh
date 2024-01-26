@@ -39,10 +39,11 @@ EOF
 echo "All processes have finished, start training."
 
 
-bash record.sh CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 OMP_NUM_THREADS=1 \
-python3 -m torch.distributed.launch --nproc_per_node=8 --master_port=29502 run_pretrain.py \
---epochs 100 --batch_size 256 --warmup_epochs 10 \
---blr 2e-4 --world_size 8 --accum_iter 1 --weight_decay 0.05 \
---model MIM_vit_base_patch16 --hog_nbins 9 --mask_ratio 0.75 \
---data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
---output_dir full_pretrain_out_fast --log_dir full_pretrain_out_fast
+bash record.sh CUDA_VISIBLE_DEVICES=3,4,5,6 OMP_NUM_THREADS=1 \
+python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29503 run_finetune.py \
+--world_size 4 --accum_iter 1 \
+--batch_size 256 --model vit_base_patch16 --finetune /raid/home_yedek/utku/ViTFreeze/ViT/pretrain/non_scale_layerwise_fixed_freezeout_code/freezeout_cubic_t0_1_without_remove_freezeout_layers/checkpoint-99.pth \
+--epochs 100 --warmup_epochs 20 --lr 4e-3 --min_lr 1e-6 --layer_decay 0.75 \
+--weight_decay 0.05 --drop_path 0.1 --reprob 0.25 --mixup 0.8 --cutmix 1.0 --dist_eval \
+--data_path /raid/utku/datasets/imagenet/classification/ \
+--output_dir finetune/non_scale_layerwise_fixed_freezeout_code/freezeout_cubic_t0_1_without_remove_freezeout_layers_checkpoint-99 --log_dir finetune/non_scale_layerwise_fixed_freezeout_code/freezeout_cubic_t0_1_without_remove_freezeout_layers_checkpoint-99

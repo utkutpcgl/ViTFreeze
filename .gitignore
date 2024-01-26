@@ -9,6 +9,8 @@ runs/*
 **/*events*
 **pth
 **json
+**events*
+**log.txt
 
 # C extensions
 *.so
