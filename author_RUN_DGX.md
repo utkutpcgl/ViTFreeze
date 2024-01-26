@@ -59,7 +59,7 @@ python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29501  run_
 --data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
 --output_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_1234_loss_scaler --log_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_1234_loss_scaler \
 --how_scale cubic --t_0 0.8 \
---not_scale_lr --non_layerwise_lr
+--non_layerwise_lr
 
 bash record.sh CUDA_VISIBLE_DEVICES=5 OMP_NUM_THREADS=1 \
 python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29505  run_pretrain.py \
@@ -68,7 +68,7 @@ python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29505  run_
 --data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
 --output_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_1overk_loss_scaler_all_stages --log_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_1overk_loss_scaler_all_stages \
 --how_scale cubic --t_0 0.8 \
---not_scale_lr --non_layerwise_lr --all_stages
+--non_layerwise_lr --all_stages
 
 
 bash record.sh CUDA_VISIBLE_DEVICES=7 OMP_NUM_THREADS=1 \
@@ -78,7 +78,7 @@ python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29507  run_
 --data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
 --output_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_all_stages --log_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_all_stages \
 --how_scale cubic --t_0 0.8 \
---not_scale_lr --non_layerwise_lr --all_stages
+--non_layerwise_lr --all_stages
 ```
 
 - DONT FREEZE PATCH EMBED NON LAYER WISE AND NOT SCALE LR
@@ -90,7 +90,7 @@ python3 -m torch.distributed.launch --nproc_per_node=2 --master_port=29502  run_
 --data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
 --output_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_dont_freeze_pe --log_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_dont_freeze_pe \
 --how_scale cubic --t_0 0.8 \
---not_scale_lr --non_layerwise_lr --dont_freeze_pe
+--non_layerwise_lr --dont_freeze_pe
 
 bash record.sh CUDA_VISIBLE_DEVICES=5 OMP_NUM_THREADS=1 \
 python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29505  run_pretrain.py \
@@ -99,7 +99,7 @@ python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29505  run_
 --data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
 --output_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_1overk_loss_scaler_all_stages --log_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_1overk_loss_scaler_all_stages \
 --how_scale cubic --t_0 0.8 \
---not_scale_lr --non_layerwise_lr --all_stages
+--non_layerwise_lr --all_stages
 
 
 bash record.sh CUDA_VISIBLE_DEVICES=7 OMP_NUM_THREADS=1 \
@@ -109,7 +109,7 @@ python3 -m torch.distributed.launch --nproc_per_node=1 --master_port=29507  run_
 --data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
 --output_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_all_stages --log_dir pretrain/non_scale_layerwise/freezeout_cubic_t0_8_all_stages \
 --how_scale cubic --t_0 0.8 \
---not_scale_lr --non_layerwise_lr --all_stages
+--non_layerwise_lr --all_stages
 ```
 
 - DEBUG TRAIN
@@ -132,7 +132,7 @@ python3 -m torch.distributed.launch --nproc_per_node=4 --master_port=29503  run_
 --data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
 --output_dir pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1 --log_dir pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1 \
 --how_scale cubic --t_0 1.0 \
---not_scale_lr --non_layerwise_lr
+--non_layerwise_lr
 
 bash record.sh CUDA_VISIBLE_DEVICES=0,7 OMP_NUM_THREADS=1 \
 python3 -m torch.distributed.launch --nproc_per_node=2 --master_port=29506  run_pretrain.py \
@@ -141,7 +141,7 @@ python3 -m torch.distributed.launch --nproc_per_node=2 --master_port=29506  run_
 --data_path /raid/utku/datasets/imagenet/classification/train/image_folders \
 --output_dir pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_without_remove_freezeout_layers_no_find_up --log_dir pretrain/non_scale_layerwise_fixed_cls_token_wd/freezeout_cubic_t0_1_without_remove_freezeout_layers_no_find_up \
 --how_scale cubic --t_0 1.0 \
---not_scale_lr --non_layerwise_lr
+--non_layerwise_lr
 ```
 
 
