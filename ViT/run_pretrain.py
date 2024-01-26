@@ -57,10 +57,10 @@ def get_args():
     # Freezeout model parameters
     parser.add_argument('--dont_freeze_pe', action='store_true', help='dont_freeze patch embedding layer while freezeout')
     parser.set_defaults(dont_freeze_pe=False)
+    parser.add_argument('--default_optimizer_debug', action='store_true', help='use default optimizer without layer wise param groups')
+    parser.set_defaults(default_optimizer_debug=False)
     parser.add_argument('--all_stages', action='store_true', help='all_stages')
     parser.set_defaults(all_stages=False)
-    parser.add_argument('--not_scale_lr',  action='store_true', help='Scale learning rate per layer.')
-    parser.set_defaults(not_scale_lr=False)
     parser.add_argument('--non_layerwise_lr',  action='store_true', help='Update learning rate per layer with different cosine schedule (max_iteration)')
     parser.set_defaults(non_layerwise_lr=False)
     parser.add_argument('--how_scale', default="cubic", type=str, help='Select how to scale the model.')
@@ -165,7 +165,7 @@ def main(args):
     print("effective batch size: %d" % eff_batch_size)
 
     # define the model
-    scale_lr = not args.not_scale_lr
+    scale_lr = not args.non_layerwise_lr
     all_stages = args.all_stages
     dont_freeze_pe = args.dont_freeze_pe
     model = models_mim.__dict__[args.model](hog_nbins=args.hog_nbins, hog_bias=args.hog_bias, how_scale=args.how_scale, t_0=args.t_0, scale_lr=scale_lr, all_stages=all_stages, dont_freeze_pe=dont_freeze_pe)
@@ -217,18 +217,29 @@ def main(args):
     
     # NOTE I want only parameters of the encoder layer to have these freezeout specific param_groups.
     # Default: param_groups = optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay) 
-    # Default optimizer: optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95))
-    optimizer_param_groups = create_param_groups(model_without_ddp,log_writer=log_writer)
-    # NOTE parameters groups set with explicit learning_rate (or other params) will ignore the learning rate of AdamW arguments.
-    optimizer = torch.optim.AdamW(optimizer_param_groups, betas=(0.9, 0.95)) # freezout specific optimizer
-    loss_scaler = NativeScaler() # TODO remove this and calculate the loss normally for the no ddp case.
+    
+    if args.default_optimizer_debug:
+        assert args.non_layerwise_lr, "Layer wise lr cannot be active while the default optimizer is used."
+        param_groups = optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay)
+        # Default optimizer: optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95))
+        optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95))
+    else:
+        #Freezeout optimizer:
+        optimizer_param_groups = create_param_groups(model_without_ddp, default_weight_decay=args.weight_decay, default_lr=args.lr, log_writer=log_writer)
+        # NOTE parameters groups set with explicit learning_rate (or other params) will ignore the learning rate of AdamW arguments? Might override it so, dont set it?
+        optimizer = torch.optim.AdamW(optimizer_param_groups, betas=(0.9, 0.95)) # freezout specific optimizer
 
+    loss_scaler = NativeScaler() # TODO remove this and calculate the loss normally for the no ddp case.
     misc.auto_load_model(args=args, model_without_ddp=model_without_ddp, optimizer=optimizer, loss_scaler=loss_scaler)
 
-    # NOTE initialize the param_groups after auto loading the model and optimizer in case starting from checkpoint
-    param_groups = get_param_groups(optimizer, test=False, log_writer=log_writer) # freezout specific
-    active_freezeout_modules = get_freezeout_modules(model_without_ddp)
-    validate_same_objects(optimizer, param_groups["freezeout"]) # freezout specific assertion
+    if not args.default_optimizer_debug: #No need for active modules while using default optimizer.
+        # NOTE initialize the param_groups after auto loading the model and optimizer in case starting from checkpoint
+        param_groups = get_param_groups(optimizer, test=False, log_writer=log_writer) # freezout specific
+        active_freezeout_modules = get_freezeout_modules(model_without_ddp)
+        validate_same_objects(optimizer, param_groups["freezeout"]) # freezout specific assertion
+    else:
+        active_freezeout_modules = None
+        param_groups = None # Not used further.
 
     print(f"Start training for {args.epochs} epochs")
     start_time = time.time()
