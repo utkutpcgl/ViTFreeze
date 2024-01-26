@@ -62,8 +62,10 @@ def train_one_epoch(model, data_loader, optimizer, device, epoch, loss_scaler, p
         torch.cuda.synchronize()
 
         metric_logger.update(loss=loss_value)
-        # lr = optimizer.param_groups[0]["lr"] # Default was this
-        lr = param_groups["non_freezeout"][0]["lr"] # Freezeout specific
+        if param_groups is None: # default optimizer debug mode
+            lr = optimizer.param_groups[0]["lr"] # Default was this
+        else: #freezeout param_groups are set.
+            lr = param_groups["non_freezeout"][0]["lr"] # Freezeout specific
         metric_logger.update(lr=lr)
 
         loss_value_reduce = misc.all_reduce_mean(loss_value)
